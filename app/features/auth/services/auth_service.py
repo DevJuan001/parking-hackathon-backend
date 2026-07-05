@@ -1,27 +1,26 @@
-from datetime import timedelta
 
-import bcrypt
+
 import jwt
-from jwt import PyJWTError
-from pydantic import EmailStr
+import bcrypt
+from datetime import timedelta
 from fastapi import Request, Response
+from jwt.exceptions import PyJWTError
+from pydantic import EmailStr
 
 from app.core.config import settings
-from app.core.database import get_connection
+from app.utils.logger import get_logger
 from app.core.exception import ServiceError
+from app.core.database import get_connection
+from app.features.users.services.users_service import UsersService
+from app.features.users.repositories.users_repository import UsersRepository
+from app.core.token_blacklist import add_to_blacklist, get_token_remaining_ttl
+from app.features.floors.repositories.floors_repository import FloorsRepository
+from app.features.auth.models.auth_schema import OnboardingSchema, RegisterSchema
+from app.features.parking.repositories.parkings_repository import ParkingsRepository
+from app.tasks.email_tasks import recovery_password_email, send_welcome_registration_email
+from app.features.users.models.users_schemas import CompleteUserOnboardingSchema, CreateUserSchema
 from app.core.security import create_access_token, create_refresh_token, set_auth_cookies, verify_password
 
-from app.core.token_blacklist import add_to_blacklist, get_token_remaining_ttl
-from app.tasks.email_tasks import recovery_password_email, send_welcome_registration_email
-
-from app.utils.logger import get_logger
-from app.features.auth.models.auth_schema import OnboardingSchema, RegisterSchema, VerifyRoleModelSchema
-
-from app.features.users.services.users_service import UsersService
-from app.features.users.models.users_schemas import CompleteUserOnboardingSchema, CreateUserSchema
-from app.features.parking.services.parking_service import ParkingService
-from app.features.floors.services.floors_service import FloorsService
-from app.features.users.repositories.users_repository import UsersRepository
 
 logger = get_logger("auth.service")
 
@@ -30,13 +29,13 @@ class AuthService:
     @staticmethod
     def login(email: str, password: str, response: Response):
         try:
-            error, user = UsersService.get_user_by_email(email)
+            error, user = UsersRepository.find_user_by_email(email)
 
             if error or not user:
                 raise ServiceError(error)
 
             # Validación de los parametros recibidos
-            if not verify_password(user[6], password):
+            if not verify_password(user.password, password):
                 raise ServiceError("Contraseña incorrecta")
 
             # Tiempo en que expira el token
@@ -44,15 +43,19 @@ class AuthService:
 
             # Creación del token
             access_token = create_access_token({
-                "sub": str(user[1]),
-                "role": user[0]
+                "sub": str(user.id),
+                "role": user.role,
+                "parking_id": user.parking_id,
+                "onboarding_completed": True,
             },
                 expires_delta=expires
             )
 
             refresh_token = create_refresh_token({
-                "sub": str(user[1]),
-                "role": user[0]
+                "sub": str(user.id),
+                "role": user.role,
+                "parking_id": user.parking_id,
+                "onboarding_completed": True,
             })
 
             set_auth_cookies(response, access_token, refresh_token)
@@ -120,10 +123,8 @@ class AuthService:
 
             if error or not new_user:
                 raise ServiceError(
-                    error or "No se pudo obtener el usuario creado")
-
-            user_id = new_user[1]
-            role_name = new_user[0]
+                    error or "No se pudo obtener el usuario creado"
+                )
 
             connection.commit()
 
@@ -132,16 +133,18 @@ class AuthService:
             # Creamos los tokens de acceso
             access_token = create_access_token(
                 {
-                    "sub": str(user_id),
-                    "role": role_name,
+                    "sub": str(new_user.id),
+                    "role": new_user.role,
+                    "parking_id": new_user.parking_id,
                     "onboarding_completed": False
                 },
                 expires_delta=expires
             )
 
             refresh_token = create_refresh_token({
-                "sub": str(user_id),
-                "role": role_name,
+                "sub": str(new_user.id),
+                "role": new_user.role,
+                "parking_id": new_user.parking_id,
                 "onboarding_completed": False
             })
 
@@ -176,9 +179,10 @@ class AuthService:
                 raise ServiceError("El usuario ya completó el onboarding")
 
             # Creamos un parking nuevo para ese usuario
-            error, parking_id, parking_message = ParkingService.create_parking(
-                name=data.parking_name,
-                country_id=data.parking_country
+            error, parking_id, parking_message = ParkingsRepository.create_parking(
+                name=data.parking_name.strip(),
+                country_id=data.parking_country,
+                connection=connection,
             )
 
             if error or not parking_id:
@@ -186,9 +190,10 @@ class AuthService:
 
             # Creamos el piso por defecto del parking para que el admin
             # pueda empezar a registrar plazas sin pasos extra
-            error, floor_ok, floor_message = FloorsService.create_floor(
+            error, floor_ok, floor_message = FloorsRepository.create_floor(
                 parking_id=parking_id,
-                name="Piso 1"
+                name="Piso 1",
+                connection=connection,
             )
 
             if error or not floor_ok:
@@ -202,6 +207,7 @@ class AuthService:
                 first_surname=data.first_surname,
                 second_surname=data.second_surname
             )
+
             error, success, message = UsersRepository.complete_user_onboarding(
                 user_id=user_id,
                 parking_id=parking_id,
@@ -222,8 +228,8 @@ class AuthService:
             if error or not user:
                 raise ServiceError(error or "Usuario no encontrado")
 
-            role_name = user[0].role
-            user_email = user[0].email
+            role_name = user.role
+            user_email = user.email
 
             connection.commit()
 
@@ -234,21 +240,21 @@ class AuthService:
                 user_email=user_email
             )
 
-            expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE)
-
             # Creamos los tokens de acceso
             access_token = create_access_token(
                 {
                     "sub": str(user_id),
                     "role": role_name,
+                    "parking_id": parking_id,
                     "onboarding_completed": True
                 },
-                expires_delta=expires
+                expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE)
             )
 
             refresh_token = create_refresh_token({
                 "sub": str(user_id),
                 "role": role_name,
+                "parking_id": parking_id,
                 "onboarding_completed": True
             })
 

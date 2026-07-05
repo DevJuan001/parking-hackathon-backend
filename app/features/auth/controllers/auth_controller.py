@@ -4,7 +4,6 @@ from pydantic import EmailStr
 from app.features.auth.models.auth_schema import (
     OnboardingSchema,
     RegisterSchema,
-    VerifyRoleModelSchema,
 )
 from app.features.auth.services.auth_service import AuthService
 

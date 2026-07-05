@@ -7,7 +7,6 @@ from app.features.auth.models.auth_schema import (
     OnboardingSchema,
     RecoverPasswordSchema,
     RegisterSchema,
-    VerifyRoleModelSchema,
 )
 from app.middlewares.jwt_middleware import verify_jwt
 from app.middlewares.roles_middleware import require_roles
