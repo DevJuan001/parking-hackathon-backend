@@ -8,5 +8,5 @@ class CreateTariffSchema(BaseModel):
 
 
 class UpdateTariffSchema(BaseModel):
-    vehicle_type: Optional[str] = None
+    vehicle_type: Optional[int] = None
     value: Optional[float] = None

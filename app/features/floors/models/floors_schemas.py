@@ -1,13 +1,12 @@
-from pydantic import BaseModel, Field
+from typing import Optional
+from pydantic import BaseModel
 
-
-class FloorsFiltersSchema(BaseModel):
-    pass
+from app.utils.safe_types import safe_optional_str, safe_str
 
 
 class CreateFloorSchema(BaseModel):
-    name: str = Field(min_length=1, max_length=50)
+    name: str = safe_str(min_length=1, max_length=100)
 
 
 class UpdateFloorSchema(BaseModel):
-    name: str | None = Field(default=None, min_length=1, max_length=50)
+    name: Optional[str] = safe_optional_str(min_length=1, max_length=100)

@@ -1,3 +1,4 @@
+from app.features.tariffs.models.tariffs_schemas import UpdateTariffSchema
 from app.utils.logger import get_logger
 from app.utils.date_formatter import date_formatter
 from app.features.tariffs.models.tariffs_responses import TariffResponse
@@ -189,8 +190,19 @@ class TariffsRepository:
             cursor.close()
 
     @staticmethod
-    def update_tariff(parking_id: int, tariff_id: int, value: float, connection):
+    def update_tariff(parking_id: int, tariff_data: UpdateTariffSchema, connection):
         cursor = connection.cursor()
+
+        data = tariff_data.model_dump(exclude_none=True)
+
+        USER_FIELDS = {
+            "role_id": "role_id",
+            "name": "name",
+            "first_surname": "first_surname",
+            "second_surname": "second_surname",
+            "email": "email",
+            "status": "status"
+        }
 
         query = """
         UPDATE RATES
@@ -199,6 +211,23 @@ class TariffsRepository:
         """
 
         try:
+            tariff_fields = {
+                key: data[key]
+                for key in USER_FIELDS.keys()
+                if key in data
+            }
+
+            if tariff_fields:
+                mapped = {
+                    USER_FIELDS[key]: value for key, value in user_fields.items()}
+
+                columns = ", ".join(f"{col} = %s" for col in mapped.keys())
+                values = list(mapped.values()) + [parking_id, user_id]
+
+                cursor.execute(
+                    f"UPDATE USERS SET {columns} WHERE parking_id = %s AND id = %s",
+                    values
+                )
             cursor.execute(query, (value, parking_id, tariff_id))
             return None, True, "Tarifa actualizada correctamente"
 
