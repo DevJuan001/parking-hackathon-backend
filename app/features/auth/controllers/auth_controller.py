@@ -74,9 +74,9 @@ class AuthController:
         }
 
     @staticmethod
-    def logout(response: Response):
-        error, success, message = AuthService.logout(
-            response
+    async def logout(request: Request, response: Response):
+        error, success, message = await AuthService.logout(
+            request, response
         )
 
         if error or not success:

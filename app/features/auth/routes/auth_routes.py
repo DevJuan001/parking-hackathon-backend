@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends, Request, Response
 from fastapi_limiter.depends import RateLimiter
+from fastapi import APIRouter, Depends, Request, Response
 
 from app.features.auth.controllers.auth_controller import AuthController
 from app.features.auth.models.auth_schema import (
@@ -69,8 +69,8 @@ async def refresh_tokens(request: Request, response: Response):
 
 # Endpoint para cerrar sesión
 @router.post("/logout")
-def logout(response: Response):
-    return AuthController.logout(response)
+async def logout(request: Request, response: Response):
+    return await AuthController.logout(request, response)
 
 
 # Endpoint para recuperar contraseña
