@@ -289,7 +289,7 @@ class UsersService:
                     data["email"], connection
                 )
 
-                if existing_user and (existing_user[1] != user_id):
+                if existing_user and (existing_user.id != user_id):
                     raise ServiceError(
                         "El correo ya está registrado, ingresa un correo diferente e intentalo nuevamente"
                     )

@@ -3,7 +3,7 @@ from typing import Optional
 from app.utils.logger import get_logger
 from app.utils.date_formatter import date_formatter
 from app.features.users.models.users_schemas import CompleteUserOnboardingSchema, CreateUserSchema, UpdateUserSchema, UsersFiltersSchema
-from app.features.users.models.users_responses import SurnameResponse, UserByIdResponse, UserResponse, UserStatsResponse
+from app.features.users.models.users_responses import SurnameResponse, UserByEmailResponse, UserByIdResponse, UserResponse, UserStatsResponse
 
 logger = get_logger("users.repository")
 
@@ -198,7 +198,7 @@ class UsersRepository:
                 )
                 for item in result
             ]
-            return None, data
+            return None, data[0]
 
         except Exception as e:
             logger.error("Error en find_user_by_id: %s", e, exc_info=True)
@@ -318,9 +318,24 @@ class UsersRepository:
         try:
             cursor.execute(query, (email,))
 
-            result = cursor.fetchone()
+            result = cursor.fetchall()
 
-            return None, result
+            data = [
+                UserByEmailResponse(
+                    role=item[0],
+                    parking_id=item[1],
+                    id=item[2],
+                    name=item[3],
+                    first_surname=item[4],
+                    second_surname=item[5],
+                    email=item[6],
+                    password=item[7],
+                )
+
+                for item in result
+            ]
+
+            return None, data[0]
 
         except Exception as e:
             logger.error("Error en find_user_by_email: %s", e, exc_info=True)

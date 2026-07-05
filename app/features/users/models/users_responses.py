@@ -26,6 +26,17 @@ class UserByIdResponse(BaseModel):
     status: int
 
 
+class UserByEmailResponse(BaseModel):
+    role: str
+    parking_id: int
+    id: int
+    name: str
+    first_surname: str
+    second_surname: str
+    email: EmailStr
+    password: str
+
+
 class UserStatsResponse(BaseModel):
     total: int
     active: int
