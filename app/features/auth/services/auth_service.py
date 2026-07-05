@@ -29,7 +29,9 @@ class AuthService:
     @staticmethod
     def login(email: str, password: str, response: Response):
         try:
-            error, user = UsersRepository.find_user_by_email(email)
+            connection = get_connection()
+
+            error, user = UsersRepository.find_user_by_email(email, connection)
 
             if error or not user:
                 raise ServiceError(error)

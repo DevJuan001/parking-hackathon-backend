@@ -303,6 +303,7 @@ class UsersRepository:
         query = """
         SELECT
             r.name,
+            u.parking_id,
             u.id,
             u.name,
             u.first_surname,
