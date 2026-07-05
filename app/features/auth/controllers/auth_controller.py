@@ -59,8 +59,8 @@ class AuthController:
         }
 
     @staticmethod
-    def refresh_tokens(request: Request, response: Response):
-        error, success, message = AuthService.refresh_tokens(
+    async def refresh_tokens(request: Request, response: Response):
+        error, success, message = await AuthService.refresh_tokens(
             request, response
         )
 

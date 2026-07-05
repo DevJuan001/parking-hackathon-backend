@@ -11,6 +11,7 @@ from app.core.database import get_connection
 from app.core.exception import ServiceError
 from app.core.security import create_access_token, create_refresh_token, set_auth_cookies, verify_password
 
+from app.core.token_blacklist import add_to_blacklist, get_token_remaining_ttl
 from app.tasks.email_tasks import recovery_password_email, send_welcome_registration_email
 
 from app.utils.logger import get_logger
@@ -52,8 +53,7 @@ class AuthService:
             refresh_token = create_refresh_token({
                 "sub": str(user[1]),
                 "role": user[0]
-            }
-            )
+            })
 
             set_auth_cookies(response, access_token, refresh_token)
 
@@ -139,13 +139,11 @@ class AuthService:
                 expires_delta=expires
             )
 
-            refresh_token = create_refresh_token(
-                {
-                    "sub": str(user_id),
-                    "role": role_name,
-                    "onboarding_completed": False
-                }
-            )
+            refresh_token = create_refresh_token({
+                "sub": str(user_id),
+                "role": role_name,
+                "onboarding_completed": False
+            })
 
             set_auth_cookies(response, access_token, refresh_token)
 
@@ -195,7 +193,8 @@ class AuthService:
 
             if error or not floor_ok:
                 raise ServiceError(
-                    error or floor_message or "No se pudo crear el piso por defecto")
+                    error or floor_message or "No se pudo crear el piso por defecto"
+                )
 
             # Actualizamos los datos del usuario y le asignamos el parking que recien creamos
             user_data = CompleteUserOnboardingSchema(
@@ -247,13 +246,11 @@ class AuthService:
                 expires_delta=expires
             )
 
-            refresh_token = create_refresh_token(
-                {
-                    "sub": str(user_id),
-                    "role": role_name,
-                    "onboarding_completed": True
-                }
-            )
+            refresh_token = create_refresh_token({
+                "sub": str(user_id),
+                "role": role_name,
+                "onboarding_completed": True
+            })
 
             set_auth_cookies(response, access_token, refresh_token)
 
@@ -272,7 +269,7 @@ class AuthService:
             connection.close()
 
     @staticmethod
-    def refresh_tokens(request: Request, response: Response):
+    async def refresh_tokens(request: Request, response: Response):
         refresh_token = request.cookies.get("refresh_token")
 
         if not refresh_token:
@@ -288,6 +285,17 @@ class AuthService:
 
             if not user_id:
                 raise ServiceError("Refresh token inválido")
+
+            # Calculamos el tiempo que le queda para que expire
+            ttl = get_token_remaining_ttl(refresh_token)
+
+            # Agregamos el token con el tiempo que le queda de expiración a la blacklist
+            added = await add_to_blacklist(refresh_token, ttl)
+
+            if not added and ttl > 0:
+                logger.warning(
+                    "No se pudo blacklistear el refresh_token viejo en refresh_tokens"
+                )
 
             new_access_token = create_access_token({
                 "sub": str(user_id),
@@ -320,8 +328,11 @@ class AuthService:
             return "Error al intentar refrezcar los tokens", False, None
 
     @staticmethod
-    def logout(response: Response):
+    async def logout(request: Request, response: Response):
         try:
+            access_token = request.cookies.get("access_token")
+            refresh_token = request.cookies.get("refresh_token")
+
             response.delete_cookie(
                 key="access_token",
                 path="/"
@@ -331,6 +342,30 @@ class AuthService:
                 key="refresh_token",
                 path="/api/auth/refresh"
             )
+
+            if access_token:
+                # Calculamos el tiempo que le queda para que expire
+                ttl = get_token_remaining_ttl(access_token)
+
+                # Agregamos el token con el tiempo que le queda de expiración a la blacklist
+                added = await add_to_blacklist(access_token, ttl)
+
+                if not added and ttl > 0:
+                    logger.warning(
+                        "No se pudo blacklistear el access_token en logout"
+                    )
+
+            if refresh_token:
+                # Calculamos el tiempo que le queda para que expire
+                ttl = get_token_remaining_ttl(refresh_token)
+
+                # Agregamos el token con el tiempo que le queda de expiración a la blacklist
+                added = await add_to_blacklist(refresh_token, ttl)
+
+                if not added and ttl > 0:
+                    logger.warning(
+                        "No se pudo blacklistear el refresh_token en logout"
+                    )
 
             return None, True, "Sesión cerrada exitosamente"
 

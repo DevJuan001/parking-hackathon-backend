@@ -64,8 +64,8 @@ async def complete_onboarding(
         Depends(RateLimiter(times=30, seconds=60)),
     ]
 )
-def refresh_tokens(request: Request, response: Response):
-    return AuthController.refresh_tokens(request, response)
+async def refresh_tokens(request: Request, response: Response):
+    return await AuthController.refresh_tokens(request, response)
 
 
 # Endpoint para cerrar sesión
