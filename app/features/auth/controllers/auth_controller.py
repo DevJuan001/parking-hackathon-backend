@@ -75,19 +75,6 @@ class AuthController:
         }
 
     @staticmethod
-    def verify_roles(body: VerifyRoleModelSchema, payload: dict):
-        error, success = AuthService.verify_roles(
-            body, payload
-        )
-
-        if error or not success:
-            raise HTTPException(status_code=401, detail="No autorizado")
-
-        return {
-            "success": success
-        }
-
-    @staticmethod
     def logout(response: Response):
         error, success, message = AuthService.logout(
             response

@@ -194,7 +194,8 @@ class AuthService:
             )
 
             if error or not floor_ok:
-                raise ServiceError(error or floor_message or "No se pudo crear el piso por defecto")
+                raise ServiceError(
+                    error or floor_message or "No se pudo crear el piso por defecto")
 
             # Actualizamos los datos del usuario y le asignamos el parking que recien creamos
             user_data = CompleteUserOnboardingSchema(
@@ -317,24 +318,6 @@ class AuthService:
         except Exception as e:
             logger.error("Error en refresh_tokens: %s", e, exc_info=True)
             return "Error al intentar refrezcar los tokens", False, None
-
-    @staticmethod
-    def verify_roles(body: VerifyRoleModelSchema, payload: dict):
-        try:
-            user_role = payload.get("role")
-            roles = body.roles
-
-            if user_role not in roles:
-                raise ServiceError("No autorizado")
-
-            return None, True
-
-        except ServiceError as e:
-            return e.message, None
-
-        except Exception as e:
-            logger.error("Error en verify_roles: %s", e, exc_info=True)
-            return "Error al intentar verificar los roles", None
 
     @staticmethod
     def logout(response: Response):
