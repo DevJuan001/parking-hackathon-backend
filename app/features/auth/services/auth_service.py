@@ -289,7 +289,9 @@ class AuthService:
                 settings.REFRESH_TOKEN_SECRET_KEY,
                 algorithms=[settings.ALGORITHM]
             )
+
             user_id = payload.get("sub")
+            parking_id = payload.get("parking_id")
 
             if not user_id:
                 raise ServiceError("Refresh token inválido")
@@ -308,6 +310,7 @@ class AuthService:
             new_access_token = create_access_token({
                 "sub": str(user_id),
                 "role": payload.get("role"),
+                "parking_id": parking_id,
                 "onboarding_completed": payload.get("onboarding_completed", False)
             },
                 expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE)
@@ -316,6 +319,7 @@ class AuthService:
             new_refresh_token = create_refresh_token({
                 "sub": user_id,
                 "role": payload.get("role"),
+                "parking_id": parking_id,
                 "onboarding_completed": payload.get("onboarding_completed", False)
             })
 
