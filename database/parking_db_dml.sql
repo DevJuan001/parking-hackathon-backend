@@ -202,13 +202,13 @@ INSERT INTO COUNTRIES (name, iso_code) VALUES
   ('Zimbabwe', 'ZW');
 
 -- PARKINGS
-INSERT INTO PARKINGS (name, country_id)
+INSERT INTO PARKINGS (name, country_id) VALUES
   ('Parking Central', 1);
 
 -- USERS
 INSERT INTO USERS (role_id, parking_id, name, first_surname, second_surname, email, password, onboarding_completed, status) VALUES
   (1, 1, 'Juan', 'Test', 'Test', 'juanesyt7@gmail.com', '$2b$12$Xlhm1tb3S/hC6ululYDuY.Xm698XL2xAHr2CLdEmsBRprA6Yqm8eG', TRUE, 2),
-  (2, 1, 'Juan', 'Cliente', 'Test', 'juanalvout38@gmail.com', '$2b$12$Xlhm1tb3S/hC6ululYDuY.Xm698XL2xAHr2CLdEmsBRprA6Yqm8eG', FALSE, 2);
+  (2, 1, 'Juan', 'Cliente', 'Test', 'juanalvout38@gmail.com', '$2b$12$Xlhm1tb3S/hC6ululYDuY.Xm698XL2xAHr2CLdEmsBRprA6Yqm8eG', TRUE, 2);
 
 -- VEHICLE_TYPES
 INSERT INTO VEHICLE_TYPES (name) VALUES
