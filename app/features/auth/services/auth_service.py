@@ -81,7 +81,9 @@ class AuthService:
                 raise ServiceError("Las contraseñas no coinciden")
 
             # Buscamos si ya hay un usuario registrado con ese correo
-            error, existing_user = UsersService.get_user_by_email(data.email)
+            error, existing_user = UsersRepository.find_user_by_email(
+                data.email, connection
+            )
 
             if error:
                 raise ServiceError(error)

@@ -15,8 +15,8 @@ class RecoverPasswordSchema(BaseModel):
 
 class RegisterSchema(BaseModel):
     email: EmailStr = safe_str(max_length=254)
-    password: str = Field(..., min_length=8, max_length=128)
-    repeat_password: str = Field(..., min_length=8, max_length=128)
+    password: str = safe_str(min_length=8, max_length=128)
+    repeat_password: str = safe_str(min_length=8, max_length=128)
 
 
 class OnboardingSchema(BaseModel):
