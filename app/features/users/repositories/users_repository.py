@@ -1,5 +1,7 @@
 import bcrypt
 from typing import Optional
+
+from pydantic import EmailStr
 from app.utils.logger import get_logger
 from app.utils.date_formatter import date_formatter
 from app.features.users.models.users_schemas import CompleteUserOnboardingSchema, CreateUserSchema, UpdateUserSchema, UsersFiltersSchema
@@ -296,8 +298,8 @@ class UsersRepository:
 
     # Obtener un usuario mediante el correo
     @staticmethod
-    def find_user_by_email(email: str, connection):
-        cursor = connection.cursor(buffered=True)
+    def find_user_by_email(email: EmailStr, connection):
+        cursor = connection.cursor()
 
         # Petición a la base de datos
         query = """
@@ -319,24 +321,24 @@ class UsersRepository:
         try:
             cursor.execute(query, (email,))
 
-            result = cursor.fetchall()
+            result = cursor.fetchone()
 
-            data = [
-                UserByEmailResponse(
-                    role=item[0],
-                    parking_id=item[1],
-                    id=item[2],
-                    name=item[3],
-                    first_surname=item[4],
-                    second_surname=item[5],
-                    email=item[6],
-                    password=item[7],
+            if not result:
+                return None, None
+
+            if result:
+                data = UserByEmailResponse(
+                    role=result[0],
+                    parking_id=result[1],
+                    id=result[2],
+                    name=result[3],
+                    first_surname=result[4],
+                    second_surname=result[5],
+                    email=result[6],
+                    password=result[7],
                 )
 
-                for item in result
-            ]
-
-            return None, data[0]
+                return None, data
 
         except Exception as e:
             logger.error("Error en find_user_by_email: %s", e, exc_info=True)

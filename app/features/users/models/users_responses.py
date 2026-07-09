@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel, EmailStr
 
 from app.utils.base_schema import BaseSchema
@@ -28,7 +30,7 @@ class UserByIdResponse(BaseModel):
 
 class UserByEmailResponse(BaseModel):
     role: str
-    parking_id: int
+    parking_id: Optional[int] = None
     id: int
     name: str
     first_surname: str
