@@ -37,6 +37,7 @@ class UserByEmailResponse(BaseModel):
     second_surname: str
     email: EmailStr
     password: str
+    onboarding_completed: int
 
 
 class UserStatsResponse(BaseModel):

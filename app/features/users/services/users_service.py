@@ -238,6 +238,7 @@ class UsersService:
                 user_data=user_data,
                 hash_password=hash_password,
                 parking_id=parking_id,
+                onboarding_completed=True,
                 connection=connection
             )
 

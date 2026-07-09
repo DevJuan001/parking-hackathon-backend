@@ -311,7 +311,8 @@ class UsersRepository:
             u.first_surname,
             u.second_surname,
             u.email,
-            u.password
+            u.password,
+            u.onboarding_completed
         FROM USERS AS u
         INNER JOIN ROLES AS r
             ON r.id = u.role_id
@@ -336,6 +337,7 @@ class UsersRepository:
                     second_surname=result[5],
                     email=result[6],
                     password=result[7],
+                    onboarding_completed=result[8],
                 )
 
                 return None, data
@@ -349,7 +351,7 @@ class UsersRepository:
 
     # Crear un usuario
     @staticmethod
-    def create_user(user_data: CreateUserSchema, hash_password: str, parking_id: Optional[int], connection):
+    def create_user(user_data: CreateUserSchema, hash_password: str, parking_id: Optional[int], onboarding_completed: bool, connection):
         data = user_data.model_dump()
 
         cursor = connection.cursor()
@@ -362,8 +364,9 @@ class UsersRepository:
             first_surname,
             second_surname,
             password,
-            email
-        ) VALUES(%s, %s, %s, %s, %s, %s, %s)"""
+            email,
+            onboarding_completed
+        ) VALUES(%s, %s, %s, %s, %s, %s, %s, %s)"""
 
         try:
             cursor.execute(query, (
@@ -373,8 +376,9 @@ class UsersRepository:
                 data["first_surname"],
                 data["second_surname"],
                 hash_password,
-                data["email"])
-            )
+                data["email"],
+                onboarding_completed,
+            ))
 
             return None, True, "Usuario creado correctamente"
 
