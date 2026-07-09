@@ -192,14 +192,16 @@ class AuthService:
                 raise ServiceError("El usuario ya completó el onboarding")
 
             # Creamos un parking nuevo para ese usuario
-            error, parking_id, parking_message = ParkingsRepository.create_parking(
+            error, success, parking_id = ParkingsRepository.create_parking(
                 name=data.parking_name.strip(),
                 country_id=data.parking_country,
                 connection=connection,
             )
 
-            if error or not parking_id:
-                raise ServiceError(error or parking_message)
+            if error or not success:
+                raise ServiceError(
+                    error or "Error al intentar crear el parking"
+                )
 
             # Creamos el piso por defecto del parking para que el admin
             # pueda empezar a registrar plazas sin pasos extra
