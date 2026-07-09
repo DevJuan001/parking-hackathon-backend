@@ -17,7 +17,7 @@ class AuthController:
 
         if error or not success:
             raise HTTPException(
-                status_code=401, detail="Credenciales invalidas"
+                status_code=401, detail=error
             )
 
         return {

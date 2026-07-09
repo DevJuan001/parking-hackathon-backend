@@ -33,12 +33,19 @@ class AuthService:
 
             error, user = UsersRepository.find_user_by_email(email, connection)
 
-            if error or not user:
+            if error:
                 raise ServiceError(error)
+
+            if not user:
+                raise ServiceError(
+                    "¡Parece que aún no tienes cuenta! Regístrate en unos segundos y empieza a usar la app."
+                )
 
             # Validación de los parametros recibidos
             if not verify_password(user.password, password):
-                raise ServiceError("Contraseña incorrecta")
+                raise ServiceError(
+                    "Verifica que tus credenciales esten escritas correctamente e intentalo nuevamente"
+                )
 
             # Tiempo en que expira el token
             expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE)
