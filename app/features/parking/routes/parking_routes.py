@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 from fastapi_limiter.depends import RateLimiter
+from app.features.spots.models.spots_schemas import SpotsFiltersSchema
 from app.middlewares.jwt_middleware import verify_jwt
 from app.middlewares.roles_middleware import require_roles
 from app.features.parking.models.parking_schemas import CreatePlateSchema
@@ -40,8 +41,11 @@ def get_all_vehicle_types():
         Depends(require_roles(["Admin"])),
     ]
 )
-def get_all_spots(payload: dict = Depends(verify_jwt)):
-    return ParkingController.get_all_spots(payload)
+def get_all_spots(
+    filters: SpotsFiltersSchema = Depends(),
+    payload: dict = Depends(verify_jwt)
+):
+    return ParkingController.get_all_spots(payload, filters)
 
 
 @router.get(

@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.utils.safe_types import safe_optional_str, safe_str
 
@@ -7,6 +7,8 @@ from app.utils.safe_types import safe_optional_str, safe_str
 class SpotsFiltersSchema(BaseModel):
     spot_status: Optional[int] = None
     floor_id: Optional[int] = None
+    page: int = Field(1, ge=1)
+    per_page: int = Field(56, ge=1, le=100)
 
 
 class CreateSpotSchema(BaseModel):

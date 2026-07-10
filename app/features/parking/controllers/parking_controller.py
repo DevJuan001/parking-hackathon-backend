@@ -1,13 +1,15 @@
 from fastapi import HTTPException
 from app.features.parking.services.parking_service import ParkingService
 from app.features.parking.models.parking_schemas import CreatePlateSchema
+from app.features.spots.models.spots_schemas import SpotsFiltersSchema
 
 
 class ParkingController:
 
     @staticmethod
     def get_all_plates(payload: dict):
-        error, plates = ParkingService.get_all_plates(int(payload["parking_id"]))
+        error, plates = ParkingService.get_all_plates(
+            int(payload["parking_id"]))
 
         if error:
             raise HTTPException(status_code=404, detail=error)
@@ -28,8 +30,10 @@ class ParkingController:
         }
 
     @staticmethod
-    def get_all_spots(payload: dict):
-        error, spots = ParkingService.get_all_spots(int(payload["parking_id"]))
+    def get_all_spots(payload: dict, filters: SpotsFiltersSchema):
+        error, spots = ParkingService.get_all_spots(
+            int(payload["parking_id"]), filters
+        )
 
         if error:
             raise HTTPException(status_code=404, detail=error)
