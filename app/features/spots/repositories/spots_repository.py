@@ -51,7 +51,14 @@ class SpotsRepository:
             filters.append("s.floor_id = %s")
             values.append(data["floor_id"])
 
-        query += " WHERE " + " AND ".join(filters)
+        if filters:
+            query += " WHERE " + " AND ".join(filters)
+
+        query += " ORDER BY s.spot_id DESC LIMIT %s OFFSET %s"
+
+        per_page = filters_data.per_page
+        offset = (filters_data.page - 1) * per_page
+        values += [per_page, offset]
 
         try:
             cursor.execute(query, values)
