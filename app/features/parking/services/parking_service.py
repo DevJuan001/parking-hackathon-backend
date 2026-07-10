@@ -115,12 +115,12 @@ class ParkingService:
             connection.close()
 
     @staticmethod
-    def get_all_spots(parking_id: int):
+    def get_all_spots(parking_id: int, filters: SpotsFiltersSchema):
         connection = get_connection()
 
         try:
             error, spots = SpotsRepository.find_all_spots(
-                parking_id, SpotsFiltersSchema(), connection
+                parking_id, filters, connection
             )
 
             if error:
