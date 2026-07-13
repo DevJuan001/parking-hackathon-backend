@@ -346,7 +346,9 @@ class UsersService:
             )
 
             if not success:
-                raise ServiceError("Contraseña incorrecta")
+                raise ServiceError(
+                    "Verifique que su contraseña anterior sea la correcta y vuelva a intentarlo"
+                )
 
             error, success, message = UsersRepository.update_user_password(
                 parking_id, user_id, data["new_password"], connection
