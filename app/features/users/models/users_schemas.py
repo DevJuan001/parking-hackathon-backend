@@ -16,7 +16,7 @@ class UsersFiltersSchema(BaseModel):
     start_date: Optional[date] = None
     end_date: Optional[date] = None
     page: int = Field(1, ge=1)
-    per_page: int = Field(3, ge=1, le=100)
+    per_page: int = Field(15, ge=1, le=100)
 
 
 class CreateUserSchema(BaseModel):
