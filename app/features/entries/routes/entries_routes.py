@@ -85,7 +85,8 @@ def get_entry_by_id(
     "/create",
     dependencies=[
         Depends(require_roles(["Admin", "Cliente"])),
-        Depends(RateLimiter(times=30, seconds=60))
+        Depends(RateLimiter(times=30, seconds=60)),
+        Depends(require_onboarded)
     ]
 )
 async def create_entry(
