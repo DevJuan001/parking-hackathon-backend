@@ -54,13 +54,20 @@ class UsersRepository:
         if "end_date" in data:
             filters.append("DATE(u.created_at) <= %s")
             values.append(data["end_date"])
-
-        query += " WHERE " + " AND ".join(filters)
+        
+        if filters:
+            query += " WHERE " + " AND ".join(filters)
 
         if data.get("name_order") == "asc":
             query += " ORDER BY u.name ASC"
         elif data.get("name_order") == "desc":
             query += " ORDER BY u.name DESC"
+
+        query += " ORDER BY u.id DESC LIMIT %s OFFSET %s"
+
+        per_page = filters_data.per_page
+        offset = (filters_data.page - 1) * per_page
+        values += [per_page, offset]
 
         try:
             cursor.execute(query, values)
