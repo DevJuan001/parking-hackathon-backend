@@ -36,7 +36,7 @@ class EntriesRepository:
         if "plate_id" in data:
             filters.append("p.id = %s")
             values.append(data["plate_id"])
-        
+
         if "start_date" in data:
             filters.append("DATE(e.created_at) >= %s")
             values.append(data["start_date"])
@@ -45,7 +45,14 @@ class EntriesRepository:
             filters.append("DATE(e.created_at) <= %s")
             values.append(data["end_date"])
 
-        query += " WHERE " + " AND ".join(filters)
+        if filters:
+            query += " WHERE " + " AND ".join(filters)
+
+        query += " ORDER BY e.id DESC LIMIT %s OFFSET %s"
+
+        per_page = filters_data.per_page
+        offset = (filters_data.page - 1) * per_page
+        values += [per_page, offset]
 
         try:
             cursor.execute(query, values)
