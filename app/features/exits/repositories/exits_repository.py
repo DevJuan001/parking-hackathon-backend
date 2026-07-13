@@ -21,8 +21,10 @@ class ExitsRepository:
             COALESCE(pm.name, 'No registrado') AS payment_method,
             e.created_at
         FROM EXITS AS e
-        INNER JOIN PLATES AS p ON p.id = e.plate_id
-        LEFT JOIN PAYMENTS AS pay ON pay.plate_id = e.plate_id
+        INNER JOIN PLATES AS p 
+            ON p.id = e.plate_id
+        LEFT JOIN PAYMENTS AS pay 
+            ON pay.plate_id = e.plate_id
             AND pay.parking_id = e.parking_id
             AND pay.created_at = (
                 SELECT MAX(p2.created_at)
@@ -30,7 +32,8 @@ class ExitsRepository:
                 WHERE p2.parking_id = pay.parking_id
                   AND p2.plate_id   = pay.plate_id
             )
-        LEFT JOIN PAYMENT_METHODS AS pm ON pm.id = pay.payment_method_id
+        LEFT JOIN PAYMENT_METHODS AS pm
+            ON pm.id = pay.payment_method_id
         """
 
         filters = ["e.parking_id = %s"]
@@ -48,7 +51,14 @@ class ExitsRepository:
             filters.append("DATE(e.created_at) <= %s")
             values.append(data["end_date"])
 
-        query += " WHERE " + " AND ".join(filters)
+        if filters:
+            query += " WHERE " + " AND ".join(filters)
+
+        query += " ORDER BY e.id DESC LIMIT %s OFFSET %s"
+
+        per_page = filters_data.per_page
+        offset = (filters_data.page - 1) * per_page
+        values += [per_page, offset]
 
         try:
             cursor.execute(query, values)
