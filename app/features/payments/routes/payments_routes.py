@@ -51,6 +51,20 @@ def get_all_payment_methods(payload: dict = Depends(verify_jwt)):
 
 
 @router.get(
+    "/growth/{period}",
+    dependencies=[
+        Depends(RateLimiter(times=30, seconds=60)),
+        Depends(require_roles(["Admin"])),
+    ]
+)
+def get_payments_growth(
+    period: str = "30d",
+    payload: dict = Depends(verify_jwt)
+):
+    return PaymentsController.get_payments_growth(period, payload)
+
+
+@router.get(
     "/plate/{plate_id}",
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),

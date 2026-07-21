@@ -1,7 +1,7 @@
-from datetime import datetime
 from app.utils.logger import get_logger
 from app.utils.date_formatter import date_formatter
-from app.features.payments.models.payments_responses import PaymentResponse, PaymentMethodResponse
+from app.utils.periods import daily_periods, period_map
+from app.features.payments.models.payments_responses import PaymentResponse, PaymentMethodResponse, PaymentsGrowthResponse
 
 logger = get_logger("payments.repository")
 
@@ -197,6 +197,55 @@ class PaymentsRepository:
                 "Error en find_all_payment_methods: %s", e, exc_info=True
             )
             return "Error al intentar obtener los metodos de pago", None
+
+        finally:
+            cursor.close()
+
+    @staticmethod
+    def find_payments_growth(parking_id: int, period: str, connection):
+        cursor = connection.cursor()
+
+        if period not in period_map:
+            period = "30d"
+
+        interval = period_map.get(period, "30 DAY")
+        use_daily = period in daily_periods
+
+        if use_daily:
+            group_expr = "DATE(created_at)"
+            select_expr = "DATE(created_at)"
+        else:
+            group_expr = "DATE_FORMAT(created_at, '%Y-%m')"
+            select_expr = "DATE_FORMAT(created_at, '%Y-%m')"
+
+        query = f"""
+        SELECT
+            {select_expr},
+            SUM(value) as value
+        FROM PAYMENTS
+        WHERE parking_id = %s
+            AND created_at >= DATE_SUB(NOW(), INTERVAL {interval})
+        GROUP BY {group_expr}
+        ORDER BY {group_expr} ASC
+        """
+
+        try:
+            cursor.execute(query, (parking_id,))
+            results = cursor.fetchall()
+
+            data = [
+                PaymentsGrowthResponse(
+                    date=item[0],
+                    value=item[1]
+                )
+                for item in results
+            ]
+
+            return None, data
+
+        except Exception as e:
+            logger.error("Error en find_products_growth: %s", e, exc_info=True)
+            return "Error al intentar obtener el crecimento de los productos", None
 
         finally:
             cursor.close()

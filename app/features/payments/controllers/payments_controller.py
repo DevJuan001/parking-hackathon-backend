@@ -34,6 +34,20 @@ class PaymentsController:
         }
 
     @staticmethod
+    def get_payments_growth(period: str, payload: dict):
+        error, payments = PaymentsService.get_payments_growth(
+            int(payload["parking_id"]),
+            period,
+        )
+
+        if error:
+            raise HTTPException(status_code=404, detail=error)
+
+        return {
+            "data": payments
+        }
+
+    @staticmethod
     def get_payments_by_plate(plate_id: int, payload: dict):
         error, payments = PaymentsService.get_payments_by_plate(
             int(payload["parking_id"]),
