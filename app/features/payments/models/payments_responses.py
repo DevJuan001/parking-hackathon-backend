@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from pydantic import BaseModel
 
 
@@ -24,3 +24,8 @@ class CalculatePaymentResponse(BaseModel):
     hours_parked: float
     rate_value: float
     total: float
+
+
+class PaymentsGrowthResponse(BaseModel):
+    date: date | str
+    value: float

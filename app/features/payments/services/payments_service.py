@@ -104,6 +104,34 @@ class PaymentsService:
             connection.close()
 
     @staticmethod
+    def get_payments_growth(parking_id: int, period: str):
+        connection = get_connection()
+
+        try:
+            error, exits = PaymentsRepository.find_payments_growth(
+                parking_id, period, connection
+            )
+
+            if error:
+                raise ServiceError(error)
+
+            return None, exits
+
+        except ServiceError as e:
+            return e.message, None
+
+        except Exception as e:
+            logger.error(
+                "Error en get_payments_growth: %s",
+                e,
+                exc_info=True
+            )
+            return "Error al intentar obtener el crecimiento de los pagos", None
+
+        finally:
+            connection.close()
+
+    @staticmethod
     def get_all_payment_methods():
         connection = get_connection()
 
