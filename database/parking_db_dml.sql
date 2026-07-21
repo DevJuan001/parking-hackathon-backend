@@ -207,8 +207,8 @@ INSERT INTO PARKINGS (name, country_id) VALUES
 
 -- USERS
 INSERT INTO USERS (role_id, parking_id, name, first_surname, second_surname, email, password, onboarding_completed, status) VALUES
-  (1, 1, 'Juan', 'Test', 'Test', 'juanesyt7@gmail.com', '$2b$12$Xlhm1tb3S/hC6ululYDuY.Xm698XL2xAHr2CLdEmsBRprA6Yqm8eG', TRUE, 2),
-  (2, 1, 'Juan', 'Cliente', 'Test', 'juanalvout38@gmail.com', '$2b$12$Xlhm1tb3S/hC6ululYDuY.Xm698XL2xAHr2CLdEmsBRprA6Yqm8eG', TRUE, 2);
+  (1, 1, 'Juan', 'Test', 'Test', 'juanesyt7@gmail.com', '$2b$12$ZWxjTBVABd85Ux4eg3tacO7xRzdbsW8/QclK7b.7hkqZTrqohFi7.', TRUE, 2),
+  (2, 1, 'Juan', 'Cliente', 'Test', 'juanalvout38@gmail.com', '$2b$12$ZWxjTBVABd85Ux4eg3tacO7xRzdbsW8/QclK7b.7hkqZTrqohFi7.', TRUE, 2);
 
 -- VEHICLE_TYPES
 INSERT INTO VEHICLE_TYPES (name) VALUES
@@ -293,13 +293,13 @@ INSERT INTO PAYMENT_METHODS (name, icon) VALUES
 
 -- PAYMENTS
 INSERT INTO PAYMENTS (parking_id, plate_id, spot_id, value, created_at, payment_method_id) VALUES
-  (1, 1,  1,  7000.00,  '2024-06-01 10:05:00', 1),
-  (1, 2,  2,  5000.00,  '2024-06-01 11:05:00', 1),
-  (1, 3,  3,  10500.00, '2024-06-01 12:05:00', 1),
-  (1, 4,  4,  7000.00,  '2024-06-01 12:35:00', 1),
-  (1, 5,  5,  9000.00,  '2024-06-01 13:05:00', 1),
-  (1, 6,  6,  14000.00, '2024-06-01 14:05:00', 1),
-  (1, 7,  7,  10500.00, '2024-06-01 14:35:00', 1),
-  (1, 8,  8,  10500.00, '2024-06-01 15:05:00', 1),
-  (1, 9,  9,  14000.00, '2024-06-01 15:50:00', 1),
-  (1, 10, 10, 7000.00,  '2024-06-01 16:05:00', 1);
+  (1, 1,  1,  7000.00,  '2026-06-01 10:05:00', 1),
+  (1, 2,  2,  5000.00,  '2026-06-01 11:05:00', 1),
+  (1, 3,  3,  10500.00, '2026-06-01 12:05:00', 1),
+  (1, 4,  4,  7000.00,  '2026-06-01 12:35:00', 1),
+  (1, 5,  5,  9000.00,  '2026-06-01 13:05:00', 1),
+  (1, 6,  6,  14000.00, '2026-06-01 14:05:00', 1),
+  (1, 7,  7,  10500.00, '2026-06-01 14:35:00', 1),
+  (1, 8,  8,  10500.00, '2026-06-01 15:05:00', 1),
+  (1, 9,  9,  14000.00, '2026-06-01 15:50:00', 1),
+  (1, 10, 10, 7000.00,  '2026-06-01 16:05:00', 1);
