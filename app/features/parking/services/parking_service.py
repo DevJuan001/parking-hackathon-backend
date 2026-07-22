@@ -233,3 +233,66 @@ class ParkingService:
 
         finally:
             connection.close()
+
+    @staticmethod
+    def update_parking(parking_id: int, name=None, address=None, phone=None):
+        connection = get_connection()
+
+        clean_name = name.strip() if name else None
+        clean_address = address.strip() if address else None
+        clean_phone = phone.strip() if phone else None
+
+        if clean_name is not None and len(clean_name) > 100:
+            return "El nombre del parking es demasiado largo (máx 100 caracteres)", False, None
+
+        if clean_address is not None and len(clean_address) > 200:
+            return "La dirección es demasiado larga (máx 200 caracteres)", False, None
+
+        if clean_phone is not None and len(clean_phone) > 20:
+            return "El teléfono es demasiado largo (máx 20 caracteres)", False, None
+
+        if clean_name is not None and not clean_name:
+            return "El nombre no puede estar vacío", False, None
+
+        if clean_address is not None and not clean_address:
+            return "La dirección no puede estar vacía", False, None
+
+        if clean_phone is not None and not clean_phone:
+            return "El teléfono no puede estar vacío", False, None
+
+        try:
+            error, updated = ParkingsRepository.update_parking(
+                parking_id=parking_id,
+                connection=connection,
+                name=clean_name,
+                address=clean_address,
+                phone=clean_phone,
+            )
+
+            if error:
+                raise ServiceError(error)
+
+            if not updated:
+                raise ServiceError(
+                    "No se encontró el parking o no se realizaron cambios"
+                )
+
+            connection.commit()
+
+            return None, True, "Parking actualizado correctamente"
+
+        except ServiceError as e:
+            connection.rollback()
+            return e.message, False, None
+
+        except Exception as e:
+            connection.rollback()
+            logger.error(
+                "Error en update_parking: %s",
+                e,
+                exc_info=True
+            )
+            return "Error al intentar actualizar el parking", False, None
+
+        finally:
+            connection.close()
