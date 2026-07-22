@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings
 from pydantic import EmailStr
 
+
 class Settings(BaseSettings):
     """
     Esta clase carga y valida las variables de entorno definidas en el archivo ".env"
@@ -27,8 +28,18 @@ class Settings(BaseSettings):
     MAIL_USERNAME: EmailStr
     MAIL_PASSWORD: str
     MAIL_FROM: EmailStr
+    AI_API_KEY: str
+    AI_BASE_URL: str
+    AI_MODEL: str
+    AI_MAX_TOKENS: int = 1024
+    AI_TEMPERATURE: float = 0.3
+    CHATBOT_ENABLED: bool = True
+    QDRANT_HOST: str
+    QDRANT_PORT: int
+    EMBEDDING_MODEL: str
 
     class Config:
         env_file = ".env"
+
 
 settings = Settings()

@@ -9,15 +9,18 @@ from app.features.auth.routes import auth_routes
 from app.features.spots.routes import spots_routes
 from app.features.users.routes import users_routes
 from app.features.exits.routes import exits_routes
+from app.features.floors.routes import floors_routes
+from app.features.chatbot.routes import chatbot_routes
 from app.features.tariffs.routes import tariffs_routes
 from app.features.entries.routes import entries_routes
 from app.features.parking.routes import parking_routes
 from app.features.payments.routes import payments_routes
-from app.features.floors.routes import floors_routes
 from app.features.countries.routes import countries_routes
 
+from app.core.config import settings
 from app.core.database import get_connection
 from app.core.redis import close_redis, init_redis
+from app.core.qdrant import init_qdrant, close_qdrant
 
 
 @asynccontextmanager
@@ -25,9 +28,16 @@ async def lifespan(app: FastAPI):
     # Inicialización de recursos
     redis = await init_redis(app)
     await FastAPILimiter.init(redis)
+
+    if settings.CHATBOT_ENABLED:
+        init_qdrant()
+
     yield
+
     # Cierre de recursos
     await close_redis()
+    if settings.CHATBOT_ENABLED:
+        close_qdrant()
 
 # Instancia principal de la app FastAPI
 app = FastAPI(
@@ -90,3 +100,5 @@ app.include_router(tariffs_routes.router)
 app.include_router(floors_routes.router)
 # Rutas de countries
 app.include_router(countries_routes.router)
+# Rutas de chatbot
+app.include_router(chatbot_routes.router)

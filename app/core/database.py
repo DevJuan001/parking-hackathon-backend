@@ -1,6 +1,9 @@
 import mysql.connector
 from mysql.connector import Error
 from app.core.config import settings
+from app.utils.logger import get_logger
+
+logger = get_logger("database")
 
 
 # Función para conectar a la base de datos
@@ -15,10 +18,16 @@ def get_connection():
             charset="utf8mb4",
             collation="utf8mb4_unicode_ci"
         )
+
         return connection
 
     except Error as e:
-        print(f"Error al conectar a la base de datos: {e}")
+        logger.error(
+            "Error al intentar conectar con la base de datos: %s",
+            e,
+            exc_info=True
+        )
+
         return None
 
 
