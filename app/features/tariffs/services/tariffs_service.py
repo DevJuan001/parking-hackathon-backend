@@ -1,6 +1,7 @@
 from app.utils.logger import get_logger
 from app.core.exception import ServiceError
 from app.core.database import get_connection
+from app.tasks.knowledge_tasks import rebuild_parking_knowledge
 from app.features.tariffs.repositories.tariffs_repository import TariffsRepository
 from app.features.tariffs.models.tariffs_schemas import CreateTariffSchema, UpdateTariffSchema
 
@@ -112,6 +113,10 @@ class TariffsService:
 
             connection.commit()
 
+            rebuild_parking_knowledge.delay(
+                parking_id=parking_id
+            )
+
             return None, True, "Tarifa creada correctamente"
 
         except ServiceError as e:
@@ -154,6 +159,7 @@ class TariffsService:
 
             connection.commit()
 
+            rebuild_parking_knowledge.delay(parking_id)
             return None, True, "Tarifa actualizada correctamente"
 
         except ServiceError as e:
@@ -211,6 +217,7 @@ class TariffsService:
 
             connection.commit()
 
+            rebuild_parking_knowledge.delay(parking_id)
             return None, True, message
 
         except ServiceError as e:
