@@ -11,6 +11,7 @@ from app.core.config import settings
 from app.utils.logger import get_logger
 from app.core.exception import ServiceError
 from app.core.database import get_connection
+from app.tasks.knowledge_tasks import rebuild_parking_knowledge
 from app.features.users.services.users_service import UsersService
 from app.features.users.repositories.users_repository import UsersRepository
 from app.core.token_blacklist import add_to_blacklist, get_token_remaining_ttl
@@ -274,6 +275,8 @@ class AuthService:
             })
 
             set_auth_cookies(response, access_token, refresh_token)
+
+            rebuild_parking_knowledge.delay(parking_id)
 
             return None, True, "Onboarding completado"
 
