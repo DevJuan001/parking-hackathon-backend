@@ -70,6 +70,29 @@ class SpotsService:
             connection.close()
 
     @staticmethod
+    def find_spot_id_by_label(parking_id: int, label: str):
+        connection = get_connection()
+
+        try:
+            error, spot_id = SpotsRepository.find_spot_id_by_label(
+                parking_id, label, connection
+            )
+
+            if error or not spot_id:
+                return error or "Plaza no encontrada", None
+
+            return None, spot_id
+
+        except Exception as e:
+            logger.error(
+                "Error en find_spot_id_by_label: %s", e, exc_info=True
+            )
+            return "Error al buscar la plaza por etiqueta", None
+
+        finally:
+            connection.close()
+
+    @staticmethod
     def create_spot(
         parking_id: int,
         floor_id: int,
