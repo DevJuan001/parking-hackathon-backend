@@ -77,6 +77,33 @@ class FloorsRepository:
             cursor.close()
 
     @staticmethod
+    def find_floor_id_by_name(parking_id: int, name: str, connection):
+        cursor = connection.cursor()
+
+        query = """
+        SELECT id
+        FROM FLOORS
+        WHERE parking_id = %s AND name = %s
+        LIMIT 1
+        """
+
+        try:
+            cursor.execute(query, (parking_id, name))
+            result = cursor.fetchone()
+
+            if not result:
+                return "Piso no encontrado", None
+
+            return None, result[0]
+
+        except Exception as e:
+            logger.error("Error en find_floor_id_by_name: %s", e, exc_info=True)
+            return "Error al buscar el piso por nombre", None
+
+        finally:
+            cursor.close()
+
+    @staticmethod
     def create_floor(parking_id: int, name: str, connection):
         cursor = connection.cursor()
 
