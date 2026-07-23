@@ -10,9 +10,16 @@ class ChatbotRepository:
         cursor = connection.cursor(dictionary=True)
 
         query = """
-        SELECT id, name, address, phone, created_at
-        FROM PARKINGS
-        WHERE id = %s
+        SELECT 
+            p.id, 
+            p.name,
+            p.country_id,
+            c.name,
+            p.created_at
+        FROM PARKINGS AS p
+        INNER JOIN COUNTRIES AS c
+            ON p.country_id = c.id
+        WHERE p.id = %s
         """
 
         try:
@@ -31,9 +38,13 @@ class ChatbotRepository:
         cursor = connection.cursor(dictionary=True)
 
         query = """
-        SELECT t.id, vt.name AS vehicle_type, t.value
-        FROM RATES t
-        JOIN VEHICLE_TYPES vt ON vt.id = t.vehicle_type_id
+        SELECT
+            t.id,
+            vt.name AS vehicle_type,
+            t.value
+        FROM RATES AS t
+        JOIN VEHICLE_TYPES AS vt
+            ON vt.id = t.vehicle_type_id
         WHERE t.parking_id = %s
         """
 
@@ -42,7 +53,11 @@ class ChatbotRepository:
             return None, cursor.fetchall()
 
         except Exception as e:
-            logger.error("Error en get_tariffs_with_vehicle_type: %s", e, exc_info=True)
+            logger.error(
+                "Error en get_tariffs_with_vehicle_type: %s",
+                e,
+                exc_info=True
+            )
             return "Error al intentar obtener las tarifas", None
 
         finally:
@@ -58,12 +73,24 @@ class ChatbotRepository:
             for key, status in (("total", None), ("occupied", 3), ("free", 2)):
                 if status is None:
                     cursor.execute(
-                        "SELECT COUNT(*) AS count FROM SPOTS s JOIN FLOORS f ON f.id = s.floor_id WHERE f.parking_id = %s",
+                        """
+                        SELECT
+                            COUNT(*) AS count
+                        FROM SPOTS AS s 
+                        JOIN FLOORS AS f 
+                            ON f.id = s.floor_id
+                        WHERE f.parking_id = %s""",
                         (parking_id,),
                     )
                 else:
                     cursor.execute(
-                        "SELECT COUNT(*) AS count FROM SPOTS s JOIN FLOORS f ON f.id = s.floor_id WHERE f.parking_id = %s AND s.spot_status = %s",
+                        """
+                        SELECT
+                            COUNT(*) AS count
+                        FROM SPOTS AS s
+                        JOIN FLOORS AS f
+                            ON f.id = s.floor_id
+                        WHERE f.parking_id = %s AND s.spot_status = %s""",
                         (parking_id, status),
                     )
 
@@ -87,14 +114,23 @@ class ChatbotRepository:
 
         try:
             cursor.execute(
-                "SELECT COUNT(*) AS total_entries FROM ENTRIES WHERE parking_id = %s AND DATE(created_at) = %s",
+                """
+                SELECT
+                    COUNT(*) AS total_entries
+                FROM ENTRIES
+                WHERE parking_id = %s AND DATE(created_at) = %s""",
                 (parking_id, today),
             )
 
             entries_count = cursor.fetchone()["total_entries"]
 
             cursor.execute(
-                "SELECT COUNT(*) AS total_exits, COALESCE(SUM(value), 0) AS total_revenue FROM PAYMENTS WHERE parking_id = %s AND DATE(created_at) = %s",
+                """
+                SELECT
+                    COUNT(*) AS total_exits,
+                    COALESCE(SUM(value), 0) AS total_revenue
+                FROM PAYMENTS
+                WHERE parking_id = %s AND DATE(created_at) = %s""",
                 (parking_id, today),
             )
 
@@ -125,7 +161,11 @@ class ChatbotRepository:
             return None, cursor.fetchall()
 
         except Exception as e:
-            logger.error("Error en get_all_payment_methods: %s", e, exc_info=True)
+            logger.error(
+                "Error en get_all_payment_methods: %s",
+                e,
+                exc_info=True
+            )
             return "Error al intentar obtener los métodos de pago", None
 
         finally:
@@ -139,19 +179,39 @@ class ChatbotRepository:
 
         queries = {
             "parking_name": (
-                "SELECT name FROM PARKINGS WHERE id = %s",
+                """
+                SELECT
+                    name
+                FROM PARKINGS
+                WHERE id = %s""",
                 (parking_id,),
             ),
             "total_floors": (
-                "SELECT COUNT(1) FROM FLOORS WHERE parking_id = %s",
+                """
+                SELECT
+                    COUNT(1)
+                FROM FLOORS
+                WHERE parking_id = %s""",
                 (parking_id,),
             ),
             "total_spots": (
-                "SELECT COUNT(1) FROM SPOTS s JOIN FLOORS f ON f.id = s.floor_id WHERE f.parking_id = %s",
+                """
+                SELECT
+                    COUNT(1)
+                FROM SPOTS AS s
+                JOIN FLOORS AS f
+                    ON f.id = s.floor_id
+                WHERE f.parking_id = %s""",
                 (parking_id,),
             ),
             "occupied_spots": (
-                "SELECT COUNT(1) FROM SPOTS s JOIN FLOORS f ON f.id = s.floor_id WHERE f.parking_id = %s AND s.spot_status = 3",
+                """
+                SELECT
+                    COUNT(1)
+                FROM SPOTS AS s
+                JOIN FLOORS AS f
+                    ON f.id = s.floor_id
+                WHERE f.parking_id = %s AND s.spot_status = 3""",
                 (parking_id,),
             ),
             "active_entries": (
@@ -168,7 +228,11 @@ class ChatbotRepository:
                 (parking_id,),
             ),
             "today_payments": (
-                "SELECT COUNT(1), COALESCE(SUM(value), 0) FROM PAYMENTS WHERE parking_id = %s AND DATE(created_at) = CURDATE()",
+                """SELECT
+                    COUNT(1), 
+                    COALESCE(SUM(value), 0) 
+                FROM PAYMENTS
+                WHERE parking_id = %s AND DATE(created_at) = CURDATE()""",
                 (parking_id,),
             ),
         }
@@ -186,6 +250,46 @@ class ChatbotRepository:
             except Exception as e:
                 logger.warning("No se pudo obtener %s: %s", key, e)
                 data[key] = None
+
+        try:
+            cursor.execute(
+                """
+                SELECT
+                    f.name,
+                    JSON_ARRAYAGG(s.spot)
+                FROM FLOORS AS f
+                JOIN SPOTS AS s
+                    ON s.floor_id = f.id
+                WHERE f.parking_id = %s
+                GROUP BY f.id, f.name
+                ORDER BY f.name
+                """,
+                (parking_id,),
+            )
+            data["floors_with_spots"] = cursor.fetchall()
+        
+        except Exception as e:
+            logger.warning("No se pudo obtener floors_with_spots: %s", e)
+            data["floors_with_spots"] = None
+
+        try:
+            cursor.execute(
+                """
+                SELECT
+                    vt.name,
+                    t.value
+                FROM RATES AS t
+                JOIN VEHICLE_TYPES AS vt
+                    ON vt.id = t.vehicle_type_id
+                WHERE t.parking_id = %s
+                """,
+                (parking_id,),
+            )
+            data["tariffs"] = cursor.fetchall()
+        
+        except Exception as e:
+            logger.warning("No se pudo obtener tarifas: %s", e)
+            data["tariffs"] = None
 
         cursor.close()
 

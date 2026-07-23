@@ -114,6 +114,10 @@ class RAGService:
             "content": message
         })
 
+        # Guardamos el índice para saber qué mensajes son nuevos en esta request
+        # y poder guardarlos al historial con tool_calls incluidos
+        save_start = len(messages)
+
         # Verificamos que exista el AI_API_KEY en las variables de entorno
         if not settings.AI_API_KEY:
             return {
@@ -226,7 +230,7 @@ class RAGService:
                 tool_messages.append({
                     "role": "tool",
                     "tool_call_id": tool_call.id,
-                    "content": json.dumps(result, ensure_ascii=False),
+                    "content": json.dumps(result, ensure_ascii=False, default=str),
                 })
 
             # Agregamos todos los mensajes de las herramientas al array de mensajes
@@ -249,15 +253,21 @@ class RAGService:
                     "content": final_content
                 })
 
-        # Agregamos la información al historial
+        # Guardamos la conversación en el historial, incluyendo tool_calls y resultados
+        # para que el modelo recuerde qué herramientas ejecutó en turnos anteriores.
         try:
             await ConversationService.add_message(
                 parking_id, user_id, "user", message
             )
 
-            await ConversationService.add_message(
-                parking_id, user_id, "assistant", final_content,
-            )
+            for msg in messages[save_start:]:
+                await ConversationService.add_message(
+                    parking_id, user_id,
+                    role=msg["role"],
+                    content=msg.get("content", ""),
+                    tool_calls=msg.get("tool_calls"),
+                    tool_call_id=msg.get("tool_call_id"),
+                )
 
         except Exception as e:
             logger.warning(

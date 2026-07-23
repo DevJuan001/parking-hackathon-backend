@@ -66,6 +66,29 @@ class FloorsService:
             connection.close()
 
     @staticmethod
+    def find_floor_id_by_name(parking_id: int, name: str):
+        connection = get_connection()
+
+        try:
+            error, floor_id = FloorsRepository.find_floor_id_by_name(
+                parking_id, name, connection
+            )
+
+            if error or not floor_id:
+                return error or "Piso no encontrado", None
+
+            return None, floor_id
+
+        except Exception as e:
+            logger.error(
+                "Error en find_floor_id_by_name: %s", e, exc_info=True
+            )
+            return "Error al buscar el piso por nombre", None
+
+        finally:
+            connection.close()
+
+    @staticmethod
     def create_floor(parking_id: int, name: str):
         connection = get_connection()
 

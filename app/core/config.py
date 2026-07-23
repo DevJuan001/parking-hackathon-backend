@@ -37,6 +37,7 @@ class Settings(BaseSettings):
     QDRANT_HOST: str
     QDRANT_PORT: int
     EMBEDDING_MODEL: str
+    HF_TOKEN: str
 
     class Config:
         env_file = ".env"

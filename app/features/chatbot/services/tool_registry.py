@@ -148,17 +148,22 @@ register_tool(
 
 register_tool(
     name="update_floor",
-    description="Actualiza el nombre de un piso existente",
+    description="Actualiza el nombre de un piso existente. Usá floor_id o floor_name para identificar el piso.",
     parameters={
         "type": "object",
         "properties": {
             "floor_id": {
                 "type": "integer",
-                "description": "ID del piso a actualizar",
+                "description": "ID del piso a actualizar. Si no tenés el ID, usá floor_name en su lugar (opcional si usás floor_name)",
+            },
+            "floor_name": {
+                "type": "string",
+                "description": "Nombre del piso a actualizar (ej: 'Piso 1', 'PB'). Si no tenés el ID del piso, usá este campo en lugar de floor_id (opcional si usás floor_id)",
             },
             "name": {"type": "string", "description": "Nuevo nombre del piso"},
+            "confirm": {"type": "boolean", "description": "Confirmación explícita para modificar. Pasá true solo si el usuario ya dijo que sí."},
         },
-        "required": ["floor_id", "name"],
+        "required": ["name"],
     },
     required_roles=["Admin"],
     func=tool_update_floor,
@@ -166,16 +171,21 @@ register_tool(
 
 register_tool(
     name="delete_floor",
-    description="Elimina un piso y todas sus plazas (solo si no hay plazas ocupadas)",
+    description="Elimina un piso y todas sus plazas (solo si no hay plazas ocupadas). Usá floor_id o floor_name.",
     parameters={
         "type": "object",
         "properties": {
             "floor_id": {
                 "type": "integer",
-                "description": "ID del piso a eliminar",
-            }
+                "description": "ID del piso a eliminar. Si no tenés el ID, usá floor_name en su lugar (opcional si usás floor_name)",
+            },
+            "floor_name": {
+                "type": "string",
+                "description": "Nombre del piso a eliminar (ej: 'Piso 1', 'PB'). Si no tenés el ID del piso, usá este campo en lugar de floor_id (opcional si usás floor_id)",
+            },
+            "confirm": {"type": "boolean", "description": "Confirmación explícita para eliminar. Pasá true solo si el usuario ya dijo que sí."},
         },
-        "required": ["floor_id"],
+        "required": [],
     },
     required_roles=["Admin"],
     func=tool_delete_floor,
@@ -226,11 +236,18 @@ register_tool(
 
 register_tool(
     name="update_spot",
-    description="Actualiza los datos de una plaza existente (piso, número, tipo de vehículo)",
+    description="Actualiza los datos de una plaza existente (piso, número, tipo de vehículo). Usá spot_id o spot_label.",
     parameters={
         "type": "object",
         "properties": {
-            "spot_id": {"type": "integer", "description": "ID de la plaza a actualizar"},
+            "spot_id": {
+                "type": "integer",
+                "description": "ID de la plaza a actualizar. Si no tenés el ID, usá spot_label en su lugar (opcional si usás spot_label)",
+            },
+            "spot_label": {
+                "type": "string",
+                "description": "Etiqueta de la plaza (ej: 'A-01', 'C-03'). Si no tenés el ID de la plaza, usá este campo en lugar de spot_id (opcional si usás spot_id)",
+            },
             "floor_id": {
                 "type": "integer",
                 "description": "Nuevo ID del piso (opcional)",
@@ -243,8 +260,9 @@ register_tool(
                 "type": "integer",
                 "description": "Nuevo ID del tipo de vehículo (opcional)",
             },
+            "confirm": {"type": "boolean", "description": "Confirmación explícita para modificar. Pasá true solo si el usuario ya dijo que sí."},
         },
-        "required": ["spot_id"],
+        "required": [],
     },
     required_roles=["Admin"],
     func=tool_update_spot,
@@ -252,13 +270,21 @@ register_tool(
 
 register_tool(
     name="delete_spot",
-    description="Elimina una plaza (solo si no está ocupada)",
+    description="Elimina una plaza (solo si no está ocupada). Usá spot_id o spot_label.",
     parameters={
         "type": "object",
         "properties": {
-            "spot_id": {"type": "integer", "description": "ID de la plaza a eliminar"}
+            "spot_id": {
+                "type": "integer",
+                "description": "ID de la plaza a eliminar. Si no tenés el ID, usá spot_label en su lugar (opcional si usás spot_label)",
+            },
+            "spot_label": {
+                "type": "string",
+                "description": "Etiqueta de la plaza (ej: 'A-01', 'C-03'). Si no tenés el ID de la plaza, usá este campo en lugar de spot_id (opcional si usás spot_id)",
+            },
+            "confirm": {"type": "boolean", "description": "Confirmación explícita para eliminar. Pasá true solo si el usuario ya dijo que sí."},
         },
-        "required": ["spot_id"],
+        "required": [],
     },
     required_roles=["Admin"],
     func=tool_delete_spot,
@@ -300,20 +326,25 @@ register_tool(
 
 register_tool(
     name="update_tariff",
-    description="Actualiza el valor de una tarifa existente",
+    description="Actualiza el valor de una tarifa existente. Usá tariff_id o vehicle_type_id.",
     parameters={
         "type": "object",
         "properties": {
             "tariff_id": {
                 "type": "integer",
-                "description": "ID de la tarifa a actualizar",
+                "description": "ID de la tarifa a actualizar. Si no tenés el ID, usá vehicle_type_id en su lugar (opcional si usás vehicle_type_id)",
+            },
+            "vehicle_type_id": {
+                "type": "integer",
+                "description": "ID del tipo de vehículo (1=auto, 2=moto). Si no tenés el ID de la tarifa, usá este campo en lugar de tariff_id (opcional si usás tariff_id)",
             },
             "rate_per_hour": {
                 "type": "number",
                 "description": "Nuevo valor por hora en pesos",
             },
+            "confirm": {"type": "boolean", "description": "Confirmación explícita para modificar. Pasá true solo si el usuario ya dijo que sí."},
         },
-        "required": ["tariff_id", "rate_per_hour"],
+        "required": ["rate_per_hour"],
     },
     required_roles=["Admin"],
     func=tool_update_tariff,
@@ -321,16 +352,21 @@ register_tool(
 
 register_tool(
     name="delete_tariff",
-    description="Elimina una tarifa (solo si no hay vehículos activos de ese tipo)",
+    description="Elimina una tarifa (solo si no hay vehículos activos de ese tipo). Usá tariff_id o vehicle_type_id.",
     parameters={
         "type": "object",
         "properties": {
             "tariff_id": {
                 "type": "integer",
-                "description": "ID de la tarifa a eliminar",
-            }
+                "description": "ID de la tarifa a eliminar. Si no tenés el ID, usá vehicle_type_id en su lugar (opcional si usás vehicle_type_id)",
+            },
+            "vehicle_type_id": {
+                "type": "integer",
+                "description": "ID del tipo de vehículo (1=auto, 2=moto). Si no tenés el ID de la tarifa, usá este campo en lugar de tariff_id (opcional si usás tariff_id)",
+            },
+            "confirm": {"type": "boolean", "description": "Confirmación explícita para eliminar. Pasá true solo si el usuario ya dijo que sí."},
         },
-        "required": ["tariff_id"],
+        "required": [],
     },
     required_roles=["Admin"],
     func=tool_delete_tariff,

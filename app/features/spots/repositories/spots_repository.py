@@ -141,6 +141,34 @@ class SpotsRepository:
             cursor.close()
 
     @staticmethod
+    def find_spot_id_by_label(parking_id: int, label: str, connection):
+        cursor = connection.cursor()
+
+        query = """
+        SELECT s.spot_id
+        FROM SPOTS s
+        JOIN FLOORS f ON f.id = s.floor_id
+        WHERE f.parking_id = %s AND s.spot = %s
+        LIMIT 1
+        """
+
+        try:
+            cursor.execute(query, (parking_id, label))
+            result = cursor.fetchone()
+
+            if not result:
+                return "Plaza no encontrada", None
+
+            return None, result[0]
+
+        except Exception as e:
+            logger.error("Error en find_spot_id_by_label: %s", e, exc_info=True)
+            return "Error al buscar la plaza por etiqueta", None
+
+        finally:
+            cursor.close()
+
+    @staticmethod
     def find_available_spot(parking_id: int, vehicle_type_id: int, connection):
         cursor = connection.cursor()
 

@@ -129,6 +129,35 @@ class TariffsRepository:
             cursor.close()
 
     @staticmethod
+    def find_tariff_id_by_vehicle_type(parking_id: int, vehicle_type_id: int, connection):
+        cursor = connection.cursor()
+
+        query = """
+        SELECT id
+        FROM RATES
+        WHERE parking_id = %s AND vehicle_type_id = %s
+        LIMIT 1
+        """
+
+        try:
+            cursor.execute(query, (parking_id, vehicle_type_id))
+            result = cursor.fetchone()
+
+            if not result:
+                return "Tarifa no encontrada para ese tipo de vehículo", None
+
+            return None, result[0]
+
+        except Exception as e:
+            logger.error(
+                "Error en find_tariff_id_by_vehicle_type: %s", e, exc_info=True
+            )
+            return "Error al buscar la tarifa por tipo de vehículo", None
+
+        finally:
+            cursor.close()
+
+    @staticmethod
     def find_vehicle_types_without_tariff(parking_id: int, connection):
         cursor = connection.cursor()
 
