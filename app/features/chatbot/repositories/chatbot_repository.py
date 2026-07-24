@@ -14,7 +14,7 @@ class ChatbotRepository:
             p.id, 
             p.name,
             p.country_id,
-            c.name,
+            c.name AS country_name,
             p.created_at
         FROM PARKINGS AS p
         INNER JOIN COUNTRIES AS c
