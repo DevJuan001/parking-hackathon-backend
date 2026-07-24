@@ -114,7 +114,9 @@ async def execute_tool(name: str, params: dict, user_payload: dict) -> dict:
     except Exception as e:
         logger = get_logger("chatbot.tool_registry")
         logger.error("Error ejecutando tool '%s': %s", name, e, exc_info=True)
-        return {"error": "Ocurrió un error inesperado al ejecutar la acción"}
+        return {
+            "error": "Ocurrió un error inesperado al ejecutar la acción"
+        }
 
 
 # ─────────────────────────── PISOS ───────────────────────────
@@ -126,7 +128,7 @@ register_tool(
         "properties": {},
         "required": [],
     },
-    required_roles=["Admin", "Cliente"],
+    required_roles=["Admin"],
     func=tool_list_floors,
 )
 
@@ -206,7 +208,7 @@ register_tool(
         },
         "required": [],
     },
-    required_roles=["Admin", "Cliente"],
+    required_roles=["Admin"],
     func=tool_list_spots,
 )
 
@@ -300,7 +302,7 @@ register_tool(
         "properties": {},
         "required": [],
     },
-    required_roles=["Admin", "Cliente"],
+    required_roles=["Admin"],
     func=tool_list_tariffs,
 )
 
@@ -399,7 +401,7 @@ register_tool(
         },
         "required": ["plate"],
     },
-    required_roles=["Admin", "Cliente"],
+    required_roles=["Admin"],
     func=tool_register_entry,
 )
 
@@ -412,7 +414,7 @@ register_tool(
         "properties": {},
         "required": [],
     },
-    required_roles=["Admin", "Cliente"],
+    required_roles=["Admin"],
     func=tool_list_exits,
 )
 
@@ -429,7 +431,7 @@ register_tool(
         },
         "required": ["plate"],
     },
-    required_roles=["Admin", "Cliente"],
+    required_roles=["Admin"],
     func=tool_register_exit,
 )
 
@@ -459,7 +461,7 @@ register_tool(
         },
         "required": ["plate"],
     },
-    required_roles=["Admin", "Cliente"],
+    required_roles=["Admin"],
     func=tool_calculate_payment,
 )
 
@@ -484,7 +486,7 @@ register_tool(
         },
         "required": ["plate", "exit_time", "payment_method"],
     },
-    required_roles=["Admin", "Cliente"],
+    required_roles=["Admin"],
     func=tool_create_payment,
 )
 
@@ -497,27 +499,19 @@ register_tool(
         "properties": {},
         "required": [],
     },
-    required_roles=["Admin", "Cliente"],
+    required_roles=["Admin"],
     func=tool_get_parking_info,
 )
 
 register_tool(
     name="update_parking",
-    description="Actualiza los datos del parking (nombre, dirección, teléfono)",
+    description="Actualiza el nombre del parking",
     parameters={
         "type": "object",
         "properties": {
             "name": {
                 "type": "string",
                 "description": "Nuevo nombre del parking (opcional)",
-            },
-            "address": {
-                "type": "string",
-                "description": "Nueva dirección del parking (opcional)",
-            },
-            "phone": {
-                "type": "string",
-                "description": "Nuevo teléfono del parking (opcional)",
             },
         },
         "required": [],
@@ -563,7 +557,7 @@ register_tool(
         "properties": {},
         "required": [],
     },
-    required_roles=["Admin", "Cliente"],
+    required_roles=["Admin"],
     func=tool_get_occupancy_stats,
 )
 
@@ -588,6 +582,6 @@ register_tool(
         "properties": {},
         "required": [],
     },
-    required_roles=["Admin", "Cliente"],
+    required_roles=["Admin"],
     func=tool_get_parking_state,
 )
