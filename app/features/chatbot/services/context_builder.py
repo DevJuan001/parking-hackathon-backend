@@ -59,7 +59,7 @@ class ContextBuilder:
 
                 if total_spots > 100:
                     parts.append(
-                        "Plazas por piso: [más de 100, consultá list_spots para verlas]"
+                        "Plazas por piso: [más de 100, consulta list_spots para verlas]"
                     )
 
                 else:
