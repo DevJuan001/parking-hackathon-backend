@@ -84,6 +84,22 @@ class IntentClassifier:
             r"you\s+are\s+(now\s+)?a\s+(model|assistant)\s+(without|with\s+no)\s+(restrictions|limits|rules)",
             re.IGNORECASE
         ),
+        re.compile(
+            r"ignor[aeá]?\s+(las\s+)?(reglas|instrucciones|directivas|restricciones)",
+            re.IGNORECASE
+        ),
+        re.compile(
+            r"olvid[aeá]?\s+(las\s+)?(reglas|instrucciones|directivas|restricciones)",
+            re.IGNORECASE
+        ),
+        re.compile(
+            r"ahora\s+(hac[ée]|haga)\s+lo\s+que\s+yo",
+            re.IGNORECASE
+        ),
+        re.compile(
+            r"salt[aeá]\s+(las|el)\s+filtro",
+            re.IGNORECASE
+        ),
     ]
 
     @staticmethod

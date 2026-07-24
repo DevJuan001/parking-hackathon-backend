@@ -1,4 +1,5 @@
 from app.utils.logger import get_logger
+from app.features.parking.models.parking_schemas import UpdateParkingSchema
 
 logger = get_logger("parkings.repository")
 
@@ -26,39 +27,42 @@ class ParkingsRepository:
             cursor.close()
 
     @staticmethod
-    def update_parking(parking_id: int, connection, name=None, address=None, phone=None):
+    def update_parking(
+        parking_id: int,
+        parking_data: UpdateParkingSchema,
+        connection,
+    ):
+        data = parking_data.model_dump(exclude_none=True)
+
+        PARKING_FIELDS = {"name": "name"}
+
         cursor = connection.cursor()
 
-        fields = {}
-
-        if name is not None:
-            fields["name"] = name.strip()
-
-        if address is not None:
-            fields["address"] = address.strip()
-
-        if phone is not None:
-            fields["phone"] = phone.strip()
-
-        if not fields:
-            return None, True
-
-        set_clause = ", ".join(f"{k} = %s" for k in fields)
-
-        values = list(fields.values())
-
-        values.append(parking_id)
-
-        query = f"UPDATE PARKINGS SET {set_clause} WHERE id = %s"
-
         try:
-            cursor.execute(query, tuple(values))
+            parking_fields = {
+                key: data[key]
+                for key in PARKING_FIELDS.keys()
+                if key in data
+            }
 
-            return None, cursor.rowcount > 0
+            if parking_fields:
+                mapped = {
+                    PARKING_FIELDS[k]: v for k, v in parking_fields.items()
+                }
+
+                columns = ", ".join(f"{col} = %s" for col in mapped.keys())
+                values = list(mapped.values()) + [parking_id]
+
+                cursor.execute(
+                    f"UPDATE PARKINGS SET {columns} WHERE id = %s",
+                    values,
+                )
+
+            return None, True, "Parking actualizado correctamente"
 
         except Exception as e:
             logger.error("Error en update_parking: %s", e, exc_info=True)
-            return "Error al intentar actualizar el parking", False
+            return "Error al intentar actualizar el parking", False, None
 
         finally:
             cursor.close()

@@ -4,8 +4,8 @@ import openai
 from openai import AsyncOpenAI
 
 from app.core.config import settings
+from app.features.chatbot.models.chatbot_responses import ChatbotResponse
 from app.utils.logger import get_logger
-from app.features.chatbot.services.context_builder import ContextBuilder
 from app.features.chatbot.repositories.vector_repository import VectorRepository
 from app.features.chatbot.services.conversation_service import ConversationService
 from app.features.chatbot.services.intent_classifier import IntentClassifier, Intent
@@ -35,7 +35,7 @@ def get_openai_client() -> AsyncOpenAI:
 class RAGService:
 
     @staticmethod
-    def load_system_prompt(snapshot: str, rag_chunks: list[dict]) -> str:
+    def load_system_prompt(rag_chunks: list[dict]) -> str:
         # Abrimos el system prompt file en "utf-8"
         with open(SYSTEM_PROMPT_PATH, encoding="utf-8") as file:
             base = file.read()
@@ -49,9 +49,9 @@ class RAGService:
         else:
             context_text = "No hay información adicional disponible."
 
-        # Devolvemos el system prompt para indicarle al modelo las reglas a seguir, junto a la captura de los datos actuales del parking
-        # Junto al contexto almacenado en la base de datos vectorial
-        return f"{base}\n\n## ESTADO ACTUAL DEL PARKING:\n{snapshot}\n\n## INFORMACIÓN DE REFERENCIA:\n{context_text}"
+        # Devolvemos el system prompt para indicarle al modelo las reglas a seguir,
+        # junto al contexto almacenado en la base de datos vectorial
+        return f"{base}\n\n## INFORMACIÓN DE REFERENCIA:\n{context_text}"
 
     @staticmethod
     async def ask(message: str, user_payload: dict) -> dict:
@@ -67,14 +67,6 @@ class RAGService:
 
         parking_id = user_payload.get("parking_id")
         user_id = user_payload.get("user_id")
-        role = user_payload.get("role", "Cliente")
-
-        # Obtenemos una captura (snapshot) del estado actual del parking:
-        # pisos, plazas, ocupación y recaudación del día (esta última solo para Admin).
-        # Va a un thread porque mysql-connector es síncrono
-        snapshot = await asyncio.to_thread(
-            ContextBuilder.build_snapshot, parking_id, role
-        )
 
         # Buscamos la información almacenada en la base de datos vectorial
         # (también a un thread: qdrant-client y el encode de embeddings son síncronos)
@@ -97,7 +89,7 @@ class RAGService:
             history = []
 
         # Buscamos el system prompt que contiene las reglas que debe seguir el modelo
-        system_prompt = RAGService.load_system_prompt(snapshot, rag_chunks)
+        system_prompt = RAGService.load_system_prompt(rag_chunks)
 
         # Creamos un array de mensajes con el rol del modelo y el system prompt
         messages: list[dict] = [{
@@ -274,8 +266,8 @@ class RAGService:
                 "No se pudo guardar el historial de conversación: %s", e
             )
 
-        return {
-            "response": final_content,
-            "actions": all_actions or None,
-            "sources": list(all_sources) if all_sources else None,
-        }
+        return ChatbotResponse(
+            response=final_content,
+            actions=all_actions or None,
+            sources=list(all_sources) if all_sources else None,
+        )

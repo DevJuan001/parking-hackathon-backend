@@ -2,7 +2,7 @@ from app.utils.logger import get_logger
 from app.core.exception import ServiceError
 from app.core.database import get_connection
 from app.utils.plate_formatter import plate_formatter
-from app.features.parking.models.parking_schemas import CreatePlateSchema
+from app.features.parking.models.parking_schemas import CreatePlateSchema, UpdateParkingSchema
 from app.features.parking.repositories.parkings_repository import ParkingsRepository
 from app.features.parking.repositories.plates_repository import PlatesRepository
 from app.features.parking.repositories.vehicle_types_repository import VehicleTypesRepository
@@ -235,51 +235,22 @@ class ParkingService:
             connection.close()
 
     @staticmethod
-    def update_parking(parking_id: int, name=None, address=None, phone=None):
+    def update_parking(parking_id: int, parking_data: UpdateParkingSchema):
         connection = get_connection()
 
-        clean_name = name.strip() if name else None
-        clean_address = address.strip() if address else None
-        clean_phone = phone.strip() if phone else None
-
-        if clean_name is not None and len(clean_name) > 100:
-            return "El nombre del parking es demasiado largo (máx 100 caracteres)", False, None
-
-        if clean_address is not None and len(clean_address) > 200:
-            return "La dirección es demasiado larga (máx 200 caracteres)", False, None
-
-        if clean_phone is not None and len(clean_phone) > 20:
-            return "El teléfono es demasiado largo (máx 20 caracteres)", False, None
-
-        if clean_name is not None and not clean_name:
-            return "El nombre no puede estar vacío", False, None
-
-        if clean_address is not None and not clean_address:
-            return "La dirección no puede estar vacía", False, None
-
-        if clean_phone is not None and not clean_phone:
-            return "El teléfono no puede estar vacío", False, None
-
         try:
-            error, updated = ParkingsRepository.update_parking(
+            error, success, message = ParkingsRepository.update_parking(
                 parking_id=parking_id,
+                parking_data=parking_data,
                 connection=connection,
-                name=clean_name,
-                address=clean_address,
-                phone=clean_phone,
             )
 
-            if error:
+            if error or not success:
                 raise ServiceError(error)
-
-            if not updated:
-                raise ServiceError(
-                    "No se encontró el parking o no se realizaron cambios"
-                )
 
             connection.commit()
 
-            return None, True, "Parking actualizado correctamente"
+            return None, True, message
 
         except ServiceError as e:
             connection.rollback()
@@ -290,7 +261,7 @@ class ParkingService:
             logger.error(
                 "Error en update_parking: %s",
                 e,
-                exc_info=True
+                exc_info=True,
             )
             return "Error al intentar actualizar el parking", False, None
 

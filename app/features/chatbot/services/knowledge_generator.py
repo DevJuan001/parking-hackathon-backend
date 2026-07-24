@@ -43,8 +43,7 @@ class KnowledgeGenerator:
                 "id": f"parking_{parking_id}_parking_info_0",
                 "text": (
                     f"El parking se llama {parking['name']}. "
-                    f"Está ubicado en {parking['address']}. "
-                    f"Teléfono de contacto: {parking['phone']}."
+                    f"País: {parking.get('country_name', 'no especificado')}."
                 ),
                 "source": "parking_info",
                 "category": "informacion_general",

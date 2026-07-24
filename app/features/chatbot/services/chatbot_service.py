@@ -1,7 +1,6 @@
 from app.core.database import get_connection
 from app.utils.logger import get_logger
 from app.features.chatbot.repositories.chatbot_repository import ChatbotRepository
-from app.features.chatbot.repositories.vector_repository import VectorRepository
 
 logger = get_logger("chatbot.service")
 
@@ -73,15 +72,3 @@ class ChatbotService:
 
         finally:
             connection.close()
-
-    @staticmethod
-    def get_knowledge_sources(parking_id: int):
-        return VectorRepository.get_all_sources(parking_id)
-
-    @staticmethod
-    def delete_knowledge_source(parking_id: int, source: str):
-        return VectorRepository.delete_chunks_by_source(parking_id, source)
-
-    @staticmethod
-    def get_knowledge_chunks(parking_id: int):
-        return VectorRepository.get_all_chunks(parking_id)
