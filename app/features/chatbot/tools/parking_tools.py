@@ -3,6 +3,7 @@ from app.utils.logger import get_logger
 from app.features.parking.services.parking_service import ParkingService
 from app.features.parking.models.parking_schemas import CreatePlateSchema
 from app.features.chatbot.services.chatbot_service import ChatbotService
+from app.features.chatbot.services.context_builder import ContextBuilder
 
 logger = get_logger("chatbot.tools.parking")
 
@@ -11,9 +12,14 @@ def tool_get_parking_info(parking_id: int) -> dict:
     error, data = ChatbotService.get_parking_info(parking_id)
 
     if error:
-        return {"error": error}
+        return {
+            "error": error
+        }
 
-    return {"success": True, "data": data}
+    return {
+        "success": True,
+        "data": data
+    }
 
 
 def tool_update_parking(
@@ -35,7 +41,12 @@ def tool_update_parking(
     if success:
         rebuild_parking_knowledge.delay(parking_id)
 
-    return {"success": True, "data": {"message": message}}
+    return {
+        "success": True,
+        "data": {
+            "message": message
+        }
+    }
 
 
 def tool_list_plates(parking_id: int) -> dict:
@@ -72,5 +83,21 @@ async def tool_register_plate(parking_id: int, plate: str, vehicle_type_id: int 
         "success": True,
         "data": {
             "message": message
+        }
+    }
+
+
+def tool_get_parking_state(parking_id: int) -> dict:
+    snapshot = ContextBuilder.build_snapshot(parking_id, role="Admin")
+
+    if snapshot.startswith("No se pudo"):
+        return {
+            "error": snapshot
+        }
+
+    return {
+        "success": True,
+        "data": {
+            "snapshot": snapshot
         }
     }

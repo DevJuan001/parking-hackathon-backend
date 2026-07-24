@@ -34,6 +34,7 @@ from app.features.chatbot.tools.parking_tools import (
     tool_update_parking,
     tool_list_plates,
     tool_register_plate,
+    tool_get_parking_state,
 )
 from app.features.chatbot.tools.queries_tools import (
     tool_get_occupancy_stats,
@@ -576,4 +577,17 @@ register_tool(
     },
     required_roles=["Admin"],
     func=tool_get_daily_summary,
+)
+
+# ─────────────────────────── ESTADO DEL PARKING ───────────────────────────
+register_tool(
+    name="get_parking_state",
+    description="Devuelve el estado actual del parking: nombre, pisos, plazas (libres/ocupadas), tarifas y pagos de hoy. Usá esta herramienta cuando el usuario pregunte por el estado del parking o cuando lo necesites para responder. No la llames después de crear, modificar o eliminar recursos a menos que el usuario lo pida.",
+    parameters={
+        "type": "object",
+        "properties": {},
+        "required": [],
+    },
+    required_roles=["Admin", "Cliente"],
+    func=tool_get_parking_state,
 )
