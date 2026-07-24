@@ -4,6 +4,7 @@ import openai
 from openai import AsyncOpenAI
 
 from app.core.config import settings
+from app.features.chatbot.models.chatbot_responses import ChatbotResponse
 from app.utils.logger import get_logger
 from app.features.chatbot.repositories.vector_repository import VectorRepository
 from app.features.chatbot.services.conversation_service import ConversationService
@@ -265,8 +266,8 @@ class RAGService:
                 "No se pudo guardar el historial de conversación: %s", e
             )
 
-        return {
-            "response": final_content,
-            "actions": all_actions or None,
-            "sources": list(all_sources) if all_sources else None,
-        }
+        return ChatbotResponse(
+            response=final_content,
+            actions=all_actions or None,
+            sources=list(all_sources) if all_sources else None,
+        )
