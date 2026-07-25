@@ -151,7 +151,7 @@ register_tool(
 
 register_tool(
     name="update_floor",
-    description="Actualiza el nombre de un piso existente. Usá floor_id o floor_name para identificar el piso.",
+    description="Actualiza el nombre de un piso existente. Usa floor_id o floor_name para identificar el piso.",
     parameters={
         "type": "object",
         "properties": {
@@ -174,7 +174,7 @@ register_tool(
 
 register_tool(
     name="delete_floor",
-    description="Elimina un piso y todas sus plazas (solo si no hay plazas ocupadas). Usá floor_id o floor_name.",
+    description="Elimina un piso y todas sus plazas (solo si no hay plazas ocupadas). Usa floor_id o floor_name.",
     parameters={
         "type": "object",
         "properties": {
@@ -239,7 +239,7 @@ register_tool(
 
 register_tool(
     name="update_spot",
-    description="Actualiza los datos de una plaza existente (piso, número, tipo de vehículo). Usá spot_id o spot_label.",
+    description="Actualiza los datos de una plaza existente (piso, número, tipo de vehículo). Usa spot_id o spot_label.",
     parameters={
         "type": "object",
         "properties": {
@@ -273,7 +273,7 @@ register_tool(
 
 register_tool(
     name="delete_spot",
-    description="Elimina una plaza (solo si no está ocupada). Usá spot_id o spot_label.",
+    description="Elimina una plaza (solo si no está ocupada). Usa spot_id o spot_label.",
     parameters={
         "type": "object",
         "properties": {
@@ -329,7 +329,7 @@ register_tool(
 
 register_tool(
     name="update_tariff",
-    description="Actualiza el valor de una tarifa existente. Usá tariff_id o vehicle_type_id.",
+    description="Actualiza el valor de una tarifa existente. Usa tariff_id o vehicle_type_id.",
     parameters={
         "type": "object",
         "properties": {
@@ -355,7 +355,7 @@ register_tool(
 
 register_tool(
     name="delete_tariff",
-    description="Elimina una tarifa (solo si no hay vehículos activos de ese tipo). Usá tariff_id o vehicle_type_id.",
+    description="Elimina una tarifa (solo si no hay vehículos activos de ese tipo). Usa tariff_id o vehicle_type_id.",
     parameters={
         "type": "object",
         "properties": {
@@ -576,7 +576,7 @@ register_tool(
 # ─────────────────────────── ESTADO DEL PARKING ───────────────────────────
 register_tool(
     name="get_parking_state",
-    description="Devuelve el estado actual del parking: nombre, pisos, plazas (libres/ocupadas), tarifas y pagos de hoy. Usá esta herramienta cuando el usuario pregunte por el estado del parking o cuando lo necesites para responder. No la llames después de crear, modificar o eliminar recursos a menos que el usuario lo pida.",
+    description="Devuelve el estado actual del parking: nombre, pisos, plazas (libres/ocupadas), tarifas y pagos de hoy. Usa esta herramienta cuando el usuario pregunte por el estado del parking o cuando la necesites para responder. No la llames después de crear, modificar o eliminar recursos a menos que el usuario lo pida.",
     parameters={
         "type": "object",
         "properties": {},

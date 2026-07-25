@@ -4,8 +4,8 @@ import openai
 from openai import AsyncOpenAI
 
 from app.core.config import settings
-from app.features.chatbot.models.chatbot_responses import ChatbotResponse
 from app.utils.logger import get_logger
+from app.features.chatbot.models.chatbot_responses import ChatbotResponse
 from app.features.chatbot.repositories.vector_repository import VectorRepository
 from app.features.chatbot.services.conversation_service import ConversationService
 from app.features.chatbot.services.intent_classifier import IntentClassifier, Intent
