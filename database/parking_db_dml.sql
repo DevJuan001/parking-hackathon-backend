@@ -307,4 +307,5 @@ INSERT INTO PAYMENTS (parking_id, plate_id, spot_id, value, created_at, payment_
 -- RESERVATIONS
 INSERT INTO RESERVATIONS (parking_id, name, level, start_date, end_date, status) VALUES
   (1, "Test1", 1, '2026-07-01T18:37:31', '2026-07-01T19:37:31', 2),
-  (1, "Test2", 2, '2026-07-01T18:37:31', '2026-07-01T19:37:31', 2); 
+  (1, "Test2", 2, '2026-07-01T18:37:31', '2026-07-01T19:37:31', 2),
+  (1, "Test3", 2, '2026-07-01T18:37:31', '2026-07-01T19:37:31', 2); 
