@@ -16,6 +16,7 @@ from app.features.entries.routes import entries_routes
 from app.features.parking.routes import parking_routes
 from app.features.payments.routes import payments_routes
 from app.features.countries.routes import countries_routes
+from app.features.reservations.routes import reservations_routes
 
 from app.core.config import settings
 from app.core.database import get_connection
@@ -102,3 +103,5 @@ app.include_router(floors_routes.router)
 app.include_router(countries_routes.router)
 # Rutas de chatbot
 app.include_router(chatbot_routes.router)
+# Rutas para las reservas
+app.include_router(reservations_routes.router)
