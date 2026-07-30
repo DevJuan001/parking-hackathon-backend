@@ -15,6 +15,7 @@ class ReservationsRepository():
         query = """
         SELECT
             id,
+            user_id,
             name,
             level,
             start_date,
@@ -46,12 +47,13 @@ class ReservationsRepository():
             data = [
                 ReservationsResponse(
                     id=item[0],
-                    name=item[1],
-                    level=item[2],
-                    start_date=item[3],
-                    end_date=item[4],
-                    created_at=item[5],
-                    status=item[6],
+                    user_id=item[1],
+                    name=item[2],
+                    level=item[3],
+                    start_date=item[4],
+                    end_date=item[5],
+                    created_at=item[6],
+                    status=item[7],
                 )
 
                 for item in results
@@ -66,6 +68,49 @@ class ReservationsRepository():
                 exc_info=True
             )
             return "Error al intentar obtener las reservas", None
+
+        finally:
+            cursor.close()
+
+    @staticmethod
+    def create_reservation(
+        parking_id: int,
+        user_id: int,
+        name: str,
+        level: int,
+        start_date,
+        end_date,
+        connection,
+    ):
+        cursor = connection.cursor()
+
+        query = """
+        INSERT INTO RESERVATIONS (
+            parking_id,
+            user_id,
+            name,
+            level,
+            start_date,
+            end_date
+        )
+        VALUES (%s, %s, %s, %s, %s, %s)
+        """
+
+        try:
+            cursor.execute(
+                query,
+                (parking_id, user_id, name, level, start_date, end_date),
+            )
+
+            return None, True, "Reserva creada correctamente"
+
+        except Exception as e:
+            logger.error(
+                "Error en create_reservation: %s",
+                e,
+                exc_info=True
+            )
+            return "Error al intentar crear la reserva", False, None
 
         finally:
             cursor.close()

@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 class ReservationsResponse(BaseModel):
     id: int
+    user_id: int
     name: str
     level: int
     start_date: datetime
