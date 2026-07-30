@@ -306,7 +306,7 @@ class UsersRepository:
     # Obtener un usuario mediante el correo
     @staticmethod
     def find_user_by_email(email: EmailStr, connection):
-        cursor = connection.cursor()
+        cursor = connection.cursor(buffered=True)
 
         # Petición a la base de datos
         query = """
