@@ -7,7 +7,7 @@
 
 ## 1. What is this project?
 
-A **FastAPI** backend (Python 3.13) for a multi-tenant parking management system. An `Admin` user registers a parking, completes the onboarding, and from there manages floors, spots, plates, tariffs, entries, exits and payments. The `Cliente` role consumes a subset of endpoints (payment calculation and registration, payment methods listing).
+A **FastAPI** backend (Python 3.13) for a multi-tenant parking management system. An `Admin` user registers a parking, completes the onboarding, and from there manages floors, spots, plates, tariffs, entries, exits and payments. The `Cliente` role consumes a subset of endpoints (payment calculation and registration, payment methods listing). The `Maquina` role is the third role, used for machine-driven operations (entry creation, payment calculation/registration, payment methods, self-reservations).
 
 **Visible product:** "Tracklinker / Parking Hackathon" (see `app/templates/welcome_mail.html`, `app/main.py:33`).
 
@@ -88,7 +88,7 @@ Base URL: `http://localhost:8000`. Swagger: `/docs`. Healthchecks: `GET /` and `
 - **Errors**: services raise `ServiceError` or return tuples `(error, data[, success, message])`. Controllers translate to `HTTPException`.
 - **Transactions**: the `service` opens the connection with `get_connection()`, calls `commit()` at the end and `rollback()` in any `except`. The cursor is closed in `finally`.
 - **Multi-tenant**: `parking_id` ALWAYS comes from the JWT (`payload["parking_id"]`); never from the body or the URL.
-- **Roles**: `Admin` and `Cliente`. Apply with `Depends(require_roles([...]))` and `Depends(require_onboarded)` when applicable.
+- **Roles**: `Admin`, `Maquina`, and `Cliente`. Apply with `Depends(require_roles([...]))` and `Depends(require_onboarded)` when applicable.
 - **Plates**: always pass through `plate_formatter` (`app/utils/plate_formatter.py`).
 - **User strings**: use `safe_str` / `safe_optional_str` / `safe_list_str` for validation + sanitization (`app/utils/safe_types.py`).
 - **Money**: round up to the next multiple of 50 with `round_up_to_next_50` (`app/utils/round_to_50.py`).
@@ -104,10 +104,11 @@ Base URL: `http://localhost:8000`. Swagger: `/docs`. Healthchecks: `GET /` and `
 | Parking (parking, plates, vehicle-types) | `app/features/parking` | `GET/POST /api/parking/*` | Admin |
 | Floors | `app/features/floors` | `GET/POST/PUT/DELETE /api/floors/*` | any authenticated user |
 | Spots | `app/features/spots` | `GET/POST/PUT/DELETE /api/spots/*` | any authenticated user |
-| Entries | `app/features/entries` | `GET/POST /api/entries/*` | Admin (read) / Admin+Cliente (POST) |
+| Entries | `app/features/entries` | `GET/POST /api/entries/*` | Admin (read) / Admin+Maquina (POST) |
 | Exits | `app/features/exits` | `GET/POST /api/exits/*` | Admin (read) / authenticated (POST) |
 | Tariffs | `app/features/tariffs` | `GET/POST/PUT/DELETE /api/tariffs/*` | Admin |
-| Payments | `app/features/payments` | `GET/POST /api/payments/*` | Admin (read) / Cliente (`/calculate`, `/create`) |
+| Payments | `app/features/payments` | `GET/POST /api/payments/*` | Admin (read) / Maquina (`/calculate`, `/create`, `/payment-methods`) |
+| Reservations | `app/features/reservations` | `GET/POST /api/reservations/*` | Admin (read/create-for-user) / Cliente (`/create-self`) |
 | Countries | `app/features/countries` | `GET /api/countries` | Admin |
 
 ---
