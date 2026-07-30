@@ -1,5 +1,4 @@
 import bcrypt
-from fastapi import HTTPException
 from pydantic import EmailStr
 from app.utils.logger import get_logger
 from app.core.exception import ServiceError
@@ -99,6 +98,9 @@ class UsersService:
             )
             return "Error al intentar obtener el usuario mediante el id", None
 
+        finally:
+            connection.close()
+
     @staticmethod
     def get_user_by_id_global(user_id: int):
         connection = get_connection()
@@ -124,6 +126,9 @@ class UsersService:
                 exc_info=True
             )
             return "Error al intentar obtener el usuario mediante el id", None
+
+        finally:
+            connection.close()
 
     @staticmethod
     def get_user_by_email(email: EmailStr):
@@ -151,6 +156,9 @@ class UsersService:
             )
             return "Error al intentar obtener el usuario mediante el correo", None
 
+        finally:
+            connection.close()
+
     @staticmethod
     def get_all_roles():
         connection = get_connection()
@@ -175,6 +183,9 @@ class UsersService:
                 exc_info=True
             )
             return "Error al intentar obtener los roles", None
+
+        finally:
+            connection.close()
 
     @staticmethod
     def get_all_surnames(parking_id: int):
@@ -245,15 +256,14 @@ class UsersService:
             if error or not success:
                 raise ServiceError(error)
 
-            if success:
-                send_welcome_email.delay(
-                    user_name=data["name"],
-                    user_first_surname=data["first_surname"],
-                    user_email=data["email"],
-                    password=temporal_password
-                )
-
             connection.commit()
+
+            send_welcome_email.delay(
+                user_name=data["name"],
+                user_first_surname=data["first_surname"],
+                user_email=data["email"],
+                password=temporal_password
+            )
 
             return None, True, "Usuario Creado Correctamente"
 
@@ -269,6 +279,9 @@ class UsersService:
                 exc_info=True
             )
             return "Error al intentar crear el usuario", False, None
+
+        finally:
+            connection.close()
 
     @staticmethod
     def update_user(parking_id: int, user_id: int, user_data: UpdateUserSchema):
@@ -414,6 +427,9 @@ class UsersService:
             )
             return "Error al intentar deshabilitar el usuario", False, None
 
+        finally:
+            connection.close()
+
     @staticmethod
     def enable_user(parking_id: int, user_id: int):
         connection = get_connection()
@@ -450,3 +466,6 @@ class UsersService:
                 exc_info=True
             )
             return "Error al intentar habilitar el usuario", False, None
+
+        finally:
+            connection.close()
