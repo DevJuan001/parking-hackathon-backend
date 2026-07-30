@@ -29,7 +29,7 @@ def get_all_payments(
     "/calculate/",
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
-        Depends(require_roles(["Cliente"])),
+        Depends(require_roles(["Maquina"])),
     ]
 )
 def calculate_payment(
@@ -43,7 +43,7 @@ def calculate_payment(
     "/payment-methods",
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
-        Depends(require_roles(["Admin", "Cliente"])),
+        Depends(require_roles(["Admin", "Maquina"])),
     ]
 )
 def get_all_payment_methods(payload: dict = Depends(verify_jwt)):
@@ -96,7 +96,7 @@ def get_payment_by_id(
     "/create",
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
-        Depends(require_roles(["Cliente"])),
+        Depends(require_roles(["Maquina"])),
     ]
 )
 async def create_payment(
