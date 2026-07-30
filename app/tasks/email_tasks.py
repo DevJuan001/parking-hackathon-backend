@@ -77,3 +77,37 @@ def send_welcome_registration_email(
 
     except Exception as e:
         raise self.retry(exc=e, countdown=60)
+
+
+@celery.task(bind=True, max_retries=3)
+def send_reservation_created_email(
+    self,
+    user_email: EmailStr,
+    user_name: str,
+    reservation_name: str,
+    level: int,
+    start_date: str,
+    end_date: str,
+):
+    try:
+        message = MessageSchema(
+            subject="Tu reserva está confirmada",
+            recipients=[user_email],
+            template_body={
+                "user_name": user_name,
+                "reservation_name": reservation_name,
+                "level": level,
+                "start_date": start_date,
+                "end_date": end_date,
+            },
+            subtype="html",
+        )
+
+        asyncio.run(
+            fm.send_message(
+                message, template_name="reservation_created.html"
+            )
+        )
+
+    except Exception as e:
+        raise self.retry(exc=e, countdown=60)
