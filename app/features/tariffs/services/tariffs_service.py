@@ -170,11 +170,11 @@ class TariffsService:
             if not existing:
                 raise ServiceError("Tarifa no encontrada")
 
-            if not tariff_data:
+            if tariff_data.value is None:
                 raise ServiceError("Debes enviar el valor a actualizar")
 
             error, success, message = TariffsRepository.update_tariff(
-                parking_id, tariff_data, connection
+                parking_id, tariff_id, tariff_data.value, connection
             )
 
             if error or not success:
