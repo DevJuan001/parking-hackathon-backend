@@ -1,4 +1,5 @@
 import asyncio
+from typing import Optional
 
 from pydantic import EmailStr
 from app.core.mail import fm
@@ -86,8 +87,8 @@ def send_reservation_created_email(
     user_name: str,
     reservation_name: str,
     level: int,
-    start_date: str,
-    end_date: str,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
 ):
     try:
         message = MessageSchema(

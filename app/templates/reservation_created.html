@@ -94,7 +94,7 @@
               >HASTA</span
             >
             <strong style="font-family: monospace; font-size: 15px"
-              >{{end_date}}</strong
+              >{% if end_date %}{{end_date}}{% else %}Sin fecha de fin{% endif %}</strong
             >
           </p>
         </div>
