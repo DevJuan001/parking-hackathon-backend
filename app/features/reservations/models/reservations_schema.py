@@ -15,11 +15,11 @@ class CreateReservationSchema(BaseModel):
     name: str = safe_str(min_length=1, max_length=100)
     level: int = Field(..., ge=1)
     start_date: date
-    end_date: date
+    end_date: Optional[date] = None
 
 
 class CreateSelfReservationSchema(BaseModel):
     name: str = safe_str(min_length=1, max_length=100)
     level: int = Field(..., ge=1)
     start_date: date
-    end_date: date
+    end_date: Optional[date] = None

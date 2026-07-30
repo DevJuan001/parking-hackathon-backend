@@ -81,8 +81,8 @@ class ReservationsService():
                 user_name=user.name,
                 reservation_name=name,
                 level=level,
-                start_date=str(start_date),
-                end_date=str(end_date),
+                start_date=start_date.isoformat() if start_date else None,
+                end_date=end_date.isoformat() if end_date else None,
             )
 
             return None, True, "Reserva creada correctamente"
