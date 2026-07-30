@@ -48,7 +48,7 @@ app/
 
 These are FastAPI **Depends**, not ASGI middlewares.
 
-- `verify_jwt` (`jwt_middleware.py`) — reads `access_token` from the cookie, validates, **queries the DB** for `parking_id` and `onboarding_completed`, returns `{"user_id","role","parking_id","onboarding_completed"}`.
+- `verify_jwt` (`jwt_middleware.py`) — reads `access_token` from the cookie, validates, reads `parking_id`, `onboarding_completed` and `role` from the JWT payload (the payload is cryptographically signed with `settings.ACCESS_TOKEN_SECRET_KEY`; the DB is not consulted per request), returns `{"user_id","role","parking_id","onboarding_completed"}`.
 - `require_roles(["Admin", "Cliente"])` — factory that returns a Depends validating the role.
 - `require_onboarded` — Depends that requires `payload["onboarding_completed"] == True`.
 
