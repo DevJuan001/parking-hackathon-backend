@@ -31,7 +31,7 @@ def get_all_users(
     "/me",
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
-        Depends(require_roles(["Admin", "Cliente"])),
+        Depends(require_roles(["Admin", "Maquina", "Cliente"])),
     ]
 )
 def get_me(payload: dict = Depends(verify_jwt)):
@@ -108,7 +108,7 @@ async def create_user(
     "/update/me",
     dependencies=[
         Depends(RateLimiter(times=10, seconds=60)),
-        Depends(require_roles(["Admin", "Cliente"]))
+        Depends(require_roles(["Admin", "Maquina", "Cliente"]))
     ]
 )
 def update_me(user_data: UpdateCurrentUserSchema, payload: dict = Depends(verify_jwt)):
@@ -120,7 +120,7 @@ def update_me(user_data: UpdateCurrentUserSchema, payload: dict = Depends(verify
     "/update-password",
     dependencies=[
         Depends(RateLimiter(times=10, seconds=60)),
-        Depends(require_roles(["Admin", "Cliente"]))
+        Depends(require_roles(["Admin", "Maquina", "Cliente"]))
     ]
 )
 def update_user_password(password_data: UpdatePasswordSchema, payload: dict = Depends(verify_jwt)):
