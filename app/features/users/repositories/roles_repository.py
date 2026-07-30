@@ -26,7 +26,7 @@ class RolesRepository:
 
         except Exception as e:
             logger.error("Error en find_all_roles: %s", e, exc_info=True)
-            return "Error al intentar obtener los roles"
+            return "Error al intentar obtener los roles", None
 
         finally:
             cursor.close()
