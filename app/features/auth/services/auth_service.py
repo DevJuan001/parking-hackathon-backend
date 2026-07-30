@@ -29,9 +29,9 @@ logger = get_logger("auth.service")
 class AuthService:
     @staticmethod
     def login(email: str, password: str, response: Response):
-        try:
-            connection = get_connection()
+        connection = get_connection()
 
+        try:
             error, user = UsersRepository.find_user_by_email(email, connection)
 
             if error:
@@ -78,6 +78,9 @@ class AuthService:
         except Exception as e:
             logger.error("Error en login: %s", e, exc_info=True)
             return "No autorizado", False, None
+
+        finally:
+            connection.close()
 
     @staticmethod
     async def register(data: RegisterSchema, response: Response):
@@ -409,7 +412,7 @@ class AuthService:
             if user:
                 recovery_password_email.delay(
                     user_email=email,
-                    user_name=user[2]
+                    user_name=user.name
                 )
 
         except Exception:

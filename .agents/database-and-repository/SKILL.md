@@ -20,7 +20,7 @@ description: How database access works in parking-hackathon-backend: connection 
 | `controller` | does not touch | does not touch | does not touch | does not touch |
 | `route` | does not touch | does not touch | does not touch | does not touch |
 
-**`verify_jwt` is the only exception**: it opens and closes its own connection because it runs before the service.
+**No layer opens its own connection outside this contract.** `verify_jwt` does **not** query the DB — it reads `parking_id`, `onboarding_completed` and `role` from the JWT payload, which is signed with `settings.ACCESS_TOKEN_SECRET_KEY`.
 
 ## Repository template
 

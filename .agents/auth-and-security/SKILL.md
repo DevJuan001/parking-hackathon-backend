@@ -60,7 +60,7 @@ recover-password (public)
 
 ## `verify_jwt` — `app/middlewares/jwt_middleware.py`
 
-Reads the `access_token` cookie, decodes, **queries the DB** for `parking_id` and `onboarding_completed`, and returns:
+Reads the `access_token` cookie, decodes, and returns:
 
 ```python
 {
@@ -71,15 +71,22 @@ Reads the `access_token` cookie, decodes, **queries the DB** for `parking_id` an
 }
 ```
 
+`verify_jwt` reads `parking_id`, `onboarding_completed` and `role` from the JWT payload (the payload is cryptographically signed with `settings.ACCESS_TOKEN_SECRET_KEY`; the DB is not consulted per request).
+
 Important:
 
 - If the token has no `sub` or `role` → 401.
 - Any `PyJWTError` → 401 "Token inválido o expirado".
-- `parking_id` always comes from the DB, not the JWT. The DB is the truth.
 
 ## Roles and onboarding
 
-- `require_roles(["Admin"])` or `["Admin", "Cliente"]` — rejects with 403 if the role is not in the list.
+There are three roles in the system: `Admin`, `Maquina`, and `Cliente`.
+
+- `Admin` — the parking owner / staff. Manages floors, spots, plates, tariffs, entries, exits, payments, and users. Creates reservations on behalf of users.
+- `Maquina` — machine-driven role (e.g. kiosks, plate-recognition cameras, self-service machines). Performs entry creation, payment calculation and registration, payment methods listing, and self-reservations via the API. The role is referenced in the JWT as `Maquina` (a string) and is stored in `ROLES` as a separate role_id.
+- `Cliente` — end-user / driver. Consumes a subset of endpoints (self-reservations) plus any future driver-facing flows.
+
+- `require_roles(["Admin"])`, `["Admin", "Maquina"]`, `["Admin", "Cliente"]`, or `["Admin", "Maquina", "Cliente"]` — rejects with 403 if the role is not in the list.
 - `require_onboarded` — rejects with 403 "Debes completar el onboarding…" if `payload["onboarding_completed"]` is false.
 - For public routes (login, register, refresh, recover-password) **do not** apply `verify_jwt`.
 
@@ -113,7 +120,7 @@ curl -b cookies.txt http://localhost:8000/api/users/me
 - If you change the JWT payload format, remember there are tokens in flight. Decide whether you break compatibility or migrate.
 - If you change the cookie names, update `set_auth_cookies` and `delete_cookie` (logout) in the same PR.
 - If you add a new payload field, pass it through `refresh_tokens` too so it is preserved.
-- If you touch `verify_jwt`, the DB query runs **per request** — watch out for N+1.
+- If you touch `verify_jwt`, remember the payload is signed with `settings.ACCESS_TOKEN_SECRET_KEY` — any change to the JWT shape will break tokens already in flight.
 
 ## User-facing error messages (auth)
 
