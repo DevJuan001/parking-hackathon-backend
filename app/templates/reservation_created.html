@@ -76,10 +76,10 @@
                 display: block;
                 margin-bottom: 2px;
               "
-              >DESDE</span
+              >FECHA DE INICIO</span
             >
             <strong style="font-family: monospace; font-size: 15px"
-              >{{start_date}}</strong
+              >{{start_date}} &middot; {{start_time}}</strong
             >
           </p>
 
@@ -91,10 +91,10 @@
                 display: block;
                 margin-bottom: 2px;
               "
-              >HASTA</span
+              >FECHA DE FIN</span
             >
             <strong style="font-family: monospace; font-size: 15px"
-              >{% if end_date %}{{end_date}}{% else %}Sin fecha de fin{% endif %}</strong
+              >{% if end_date %}{{end_date}} &middot; {{end_time}}{% else %}Sin fecha de fin{% endif %}</strong
             >
           </p>
         </div>

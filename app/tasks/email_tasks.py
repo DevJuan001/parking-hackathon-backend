@@ -88,7 +88,9 @@ def send_reservation_created_email(
     reservation_name: str,
     level: int,
     start_date: Optional[str] = None,
+    start_time: Optional[str] = None,
     end_date: Optional[str] = None,
+    end_time: Optional[str] = None,
 ):
     try:
         message = MessageSchema(
@@ -99,7 +101,9 @@ def send_reservation_created_email(
                 "reservation_name": reservation_name,
                 "level": level,
                 "start_date": start_date,
+                "start_time": start_time,
                 "end_date": end_date,
+                "end_time": end_time,
             },
             subtype="html",
         )
