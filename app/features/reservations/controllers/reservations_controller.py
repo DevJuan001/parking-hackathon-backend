@@ -26,11 +26,13 @@ class ReservationsController:
     def create_reservation_for_user(data: CreateReservationSchema, payload: dict):
         error, success, message = ReservationsService.create_reservation(
             int(payload["parking_id"]),
-            data.user_id,
+            data.client_id,
             data.name,
             data.level,
             data.start_date,
+            data.start_time,
             data.end_date,
+            data.end_time,
         )
 
         if error:
@@ -46,7 +48,9 @@ class ReservationsController:
             data.name,
             data.level,
             data.start_date,
+            data.start_time,
             data.end_date,
+            data.end_time,
         )
 
         if error:
