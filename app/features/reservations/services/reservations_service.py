@@ -1,3 +1,5 @@
+from datetime import datetime, time
+
 from app.utils.logger import get_logger
 from app.core.exception import ServiceError
 from app.core.database import get_connection
@@ -42,17 +44,19 @@ class ReservationsService():
     @staticmethod
     def create_reservation(
         parking_id: int,
-        user_id: int,
+        client_id: int,
         name: str,
         level: int,
         start_date,
-        end_date,
+        start_time,
+        end_date=None,
+        end_time=None,
     ):
         connection = get_connection()
 
         try:
             error, user = UsersRepository.find_user_by_id(
-                parking_id, user_id, connection
+                parking_id, client_id, connection
             )
 
             if error or not user:
@@ -61,13 +65,21 @@ class ReservationsService():
             if user.role != "Cliente":
                 raise ServiceError("El usuario target debe tener rol Cliente")
 
+            start_datetime = datetime.combine(start_date, start_time)
+
+            if end_date is not None:
+                effective_end_time = end_time if end_time is not None else time(23, 59, 59)
+                end_datetime = datetime.combine(end_date, effective_end_time)
+            else:
+                end_datetime = None
+
             error, success, message = ReservationsRepository.create_reservation(
                 parking_id=parking_id,
-                user_id=user_id,
+                user_id=client_id,
                 name=name,
                 level=level,
-                start_date=start_date,
-                end_date=end_date,
+                start_datetime=start_datetime,
+                end_datetime=end_datetime,
                 connection=connection,
             )
 
@@ -81,8 +93,10 @@ class ReservationsService():
                 user_name=user.name,
                 reservation_name=name,
                 level=level,
-                start_date=start_date.isoformat() if start_date else None,
+                start_date=start_date.isoformat(),
+                start_time=start_time.strftime("%H:%M:%S"),
                 end_date=end_date.isoformat() if end_date else None,
+                end_time=end_datetime.strftime("%H:%M:%S") if end_datetime else None,
             )
 
             return None, True, "Reserva creada correctamente"
