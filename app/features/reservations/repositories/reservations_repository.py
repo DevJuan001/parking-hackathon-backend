@@ -50,8 +50,10 @@ class ReservationsRepository():
                     user_id=item[1],
                     name=item[2],
                     level=item[3],
-                    start_date=item[4],
-                    end_date=item[5],
+                    start_date=item[4].date(),
+                    start_time=item[4].time(),
+                    end_date=item[5].date() if item[5] else None,
+                    end_time=item[5].time() if item[5] else None,
                     created_at=item[6],
                     status=item[7],
                 )
@@ -78,8 +80,8 @@ class ReservationsRepository():
         user_id: int,
         name: str,
         level: int,
-        start_date,
-        end_date,
+        start_datetime,
+        end_datetime,
         connection,
     ):
         cursor = connection.cursor()
@@ -99,7 +101,7 @@ class ReservationsRepository():
         try:
             cursor.execute(
                 query,
-                (parking_id, user_id, name, level, start_date, end_date),
+                (parking_id, user_id, name, level, start_datetime, end_datetime),
             )
 
             return None, True, "Reserva creada correctamente"
