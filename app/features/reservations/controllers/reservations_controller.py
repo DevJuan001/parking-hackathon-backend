@@ -4,6 +4,7 @@ from app.features.reservations.models.reservations_schema import (
     CreateReservationSchema,
     CreateSelfReservationSchema,
     FilterReservationsSchema,
+    UpdateReservationSchema,
 )
 from app.features.reservations.services.reservations_service import ReservationsService
 
@@ -38,7 +39,10 @@ class ReservationsController:
         if error:
             raise HTTPException(status_code=400, detail=error)
 
-        return {"success": success, "message": message}
+        return {
+            "success": success,
+            "message": message
+        }
 
     @staticmethod
     def create_reservation_for_self(data: CreateSelfReservationSchema, payload: dict):
@@ -56,4 +60,21 @@ class ReservationsController:
         if error:
             raise HTTPException(status_code=400, detail=error)
 
-        return {"success": success, "message": message}
+        return {
+            "success": success,
+            "message": message
+        }
+
+    @staticmethod
+    def update_reservation(reservation_id: int, data: UpdateReservationSchema, payload: dict):
+        error, success, message = ReservationsService.update_reservation(
+            reservation_id, data, int(payload["parking_id"])
+        )
+
+        if error:
+            raise HTTPException(status_code=400, detail=error)
+
+        return {
+            "success": success,
+            "message": message
+        }
