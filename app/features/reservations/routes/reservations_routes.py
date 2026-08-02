@@ -77,3 +77,18 @@ def update_reservation(
     payload: dict = Depends(verify_jwt)
 ):
     return ReservationsController.update_reservation(reservation_id, data, payload)
+
+
+@router.delete(
+    "/delete/{reservation_id}",
+    dependencies=[
+        Depends(RateLimiter(times=30, seconds=60)),
+        Depends(require_roles(["Admin"])),
+        Depends(require_onboarded),
+    ]
+)
+def delete_reservation(
+    reservation_id: int,
+    payload: dict = Depends(verify_jwt)
+):
+    return ReservationsController.delete_reservation(reservation_id, payload)

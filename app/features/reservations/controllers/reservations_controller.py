@@ -78,3 +78,17 @@ class ReservationsController:
             "success": success,
             "message": message
         }
+
+    @staticmethod
+    def delete_reservation(reservation_id: int, payload: dict):
+        error, success, message = ReservationsService.delete_reservation(
+            reservation_id, int(payload["parking_id"])
+        )
+
+        if error:
+            raise HTTPException(status_code=400, detail=error)
+
+        return {
+            "success": success,
+            "message": message
+        }
