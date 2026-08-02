@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+  <body
+    style="
+      font-family: Inter, sans-serif;
+      padding: 20px;
+      background-color: #f5f5f5;
+    "
+  >
+    <div style="max-width: 600px; margin: 0 auto">
+      <div
+        style="
+          background-color: #ffffff;
+          border-radius: 12px;
+          overflow: hidden;
+          padding: 30px;
+        "
+      >
+        <img
+          src="https://i.ibb.co/8nYJMRgt/Large-Icon.png"
+          alt="tracklinker logo"
+          style="max-width: 200px"
+        />
+        <p style="font-size: 16px; color: #333">
+          Hola, <strong>{{user_name}}</strong>
+        </p>
+
+        <p style="font-size: 16px; color: #333">
+          Tu reserva fue cancelada. Estos eran los detalles:
+        </p>
+
+        <div
+          style="
+            background-color: #cccad636;
+            border-left: 4px solid #000;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+          "
+        >
+          <p style="margin: 0 0 8px; color: #444">
+            <span
+              style="
+                color: #888;
+                font-size: 12px;
+                display: block;
+                margin-bottom: 2px;
+              "
+              >NOMBRE</span
+            >
+            <strong style="font-family: monospace; font-size: 15px"
+              >{{reservation_name}}</strong
+            >
+          </p>
+
+          <p style="margin: 0 0 8px; color: #444">
+            <span
+              style="
+                color: #888;
+                font-size: 12px;
+                display: block;
+                margin-bottom: 2px;
+              "
+              >PISO</span
+            >
+            <strong style="font-family: monospace; font-size: 15px"
+              >{{level}}</strong
+            >
+          </p>
+
+          <p style="margin: 0 0 8px; color: #444">
+            <span
+              style="
+                color: #888;
+                font-size: 12px;
+                display: block;
+                margin-bottom: 2px;
+              "
+              >FECHA DE INICIO</span
+            >
+            <strong style="font-family: monospace; font-size: 15px"
+              >{{start_date}} &middot; {{start_time}}</strong
+            >
+          </p>
+
+          <p style="margin: 0; color: #444">
+            <span
+              style="
+                color: #888;
+                font-size: 12px;
+                display: block;
+                margin-bottom: 2px;
+              "
+              >FECHA DE FIN</span
+            >
+            <strong style="font-family: monospace; font-size: 15px"
+              >{% if end_date %}{{end_date}} &middot; {{end_time}}{% else %}Sin fecha de fin{% endif %}</strong
+            >
+          </p>
+        </div>
+
+        <p style="font-size: 16px; color: #333">
+          Si tenés alguna duda, contactanos.
+        </p>
+      </div>
+
+      <p
+        style="text-align: center; color: #aaa; font-size: 12px; margin-top: 40px"
+      >
+        Este es un correo automático,<br />
+        Por favor, no respondas a este mensaje. <br />
+        © 2026 Parking Hackathon. Todos los derechos reservados.
+      </p>
+    </div>
+  </body>
+</html>
