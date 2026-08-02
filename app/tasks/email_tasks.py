@@ -116,3 +116,41 @@ def send_reservation_created_email(
 
     except Exception as e:
         raise self.retry(exc=e, countdown=60)
+
+
+@celery.task(bind=True, max_retries=3)
+def send_reservation_cancelled_email(
+    self,
+    user_email: EmailStr,
+    user_name: str,
+    reservation_name: str,
+    level: int,
+    start_date: Optional[str] = None,
+    start_time: Optional[str] = None,
+    end_date: Optional[str] = None,
+    end_time: Optional[str] = None,
+):
+    try:
+        message = MessageSchema(
+            subject="Tu reserva fue cancelada",
+            recipients=[user_email],
+            template_body={
+                "user_name": user_name,
+                "reservation_name": reservation_name,
+                "level": level,
+                "start_date": start_date,
+                "start_time": start_time,
+                "end_date": end_date,
+                "end_time": end_time,
+            },
+            subtype="html",
+        )
+
+        asyncio.run(
+            fm.send_message(
+                message, template_name="reservation_cancelled.html"
+            )
+        )
+
+    except Exception as e:
+        raise self.retry(exc=e, countdown=60)

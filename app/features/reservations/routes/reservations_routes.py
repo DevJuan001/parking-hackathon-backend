@@ -8,6 +8,7 @@ from app.features.reservations.models.reservations_schema import (
     CreateReservationSchema,
     CreateSelfReservationSchema,
     FilterReservationsSchema,
+    UpdateReservationSchema,
 )
 from app.features.reservations.controllers.reservations_controller import ReservationsController
 
@@ -60,3 +61,34 @@ def create_self_reservation(
     payload: dict = Depends(verify_jwt)
 ):
     return ReservationsController.create_reservation_for_self(data, payload)
+
+
+@router.put(
+    "/update/{reservation_id}",
+    dependencies=[
+        Depends(RateLimiter(times=30, seconds=60)),
+        Depends(require_roles(["Admin"])),
+        Depends(require_onboarded),
+    ]
+)
+def update_reservation(
+    reservation_id: int,
+    data: UpdateReservationSchema,
+    payload: dict = Depends(verify_jwt)
+):
+    return ReservationsController.update_reservation(reservation_id, data, payload)
+
+
+@router.delete(
+    "/delete/{reservation_id}",
+    dependencies=[
+        Depends(RateLimiter(times=30, seconds=60)),
+        Depends(require_roles(["Admin"])),
+        Depends(require_onboarded),
+    ]
+)
+def delete_reservation(
+    reservation_id: int,
+    payload: dict = Depends(verify_jwt)
+):
+    return ReservationsController.delete_reservation(reservation_id, payload)
