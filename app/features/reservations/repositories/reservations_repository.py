@@ -29,17 +29,17 @@ class ReservationsRepository():
         values = [parking_id]
 
         if "start_date" in data:
-            filters.append("DATE(created_at) >= %s")
+            filters.append("DATE(start_date) >= %s")
             values.append(data["start_date"])
 
         if "end_date" in data:
-            filters.append("DATE(created_at) <= %s")
+            filters.append("DATE(end_date) <= %s")
             values.append(data["end_date"])
 
         if filters:
             query += " WHERE " + " AND ".join(filters)
 
-        query += " ORDER BY id DESC LIMIT %s OFFSET %s"
+        query += " ORDER BY id LIMIT %s OFFSET %s"
 
         per_page = filters_data.per_page
         offset = (filters_data.page - 1) * per_page
@@ -240,7 +240,7 @@ class ReservationsRepository():
                 e,
                 exc_info=True
             )
-            return "Error al intentar actualizar el estado de la reserva", False, None
+            return "Error al intentar actualizar la reserva", False, None
 
         finally:
             cursor.close()

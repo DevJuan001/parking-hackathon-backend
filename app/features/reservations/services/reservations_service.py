@@ -146,21 +146,26 @@ class ReservationsService():
                 raise ServiceError(error or "Reserva no encontrada")
 
             today = date.today()
-
-            if reservation_data.start_date < today:
-                raise ServiceError(
-                    "No se puede editar la reserva de una fecha anterior a la actual"
-                )
-
-            reservation_data.start_date = datetime.combine(
+            start_date = datetime.combine(
                 reservation_data.start_date or existing_reservation.start_date,
                 reservation_data.start_time or existing_reservation.start_time
             )
 
-            reservation_data.end_date = datetime.combine(
-                reservation_data.end_date or existing_reservation.end_date,
-                reservation_data.end_time or existing_reservation.end_time
-            )
+            if reservation_data.end_date is not None or existing_reservation.end_date is not None:
+                end_date = datetime.combine(
+                    reservation_data.end_date or existing_reservation.end_date,
+                    reservation_data.end_time or existing_reservation.end_time
+                )
+            else:
+                end_date = None
+
+            if start_date.date() < today:
+                raise ServiceError(
+                    "No se puede editar la reserva de una fecha anterior a la actual"
+                )
+
+            reservation_data.start_date = start_date
+            reservation_data.end_date = end_date
 
             error, success, message = ReservationsRepository.update_reservation(
                 reservation_id, parking_id, reservation_data, connection
@@ -168,7 +173,7 @@ class ReservationsService():
 
             if error or not success:
                 raise ServiceError(
-                    error or "Error al intentar actualizar el estado de la reserva"
+                    error or "Error al intentar actualizar la reserva"
                 )
 
             connection.commit()
