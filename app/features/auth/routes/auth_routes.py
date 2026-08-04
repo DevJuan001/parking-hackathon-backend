@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, Request, Response
 
 from app.features.auth.controllers.auth_controller import AuthController
 from app.features.auth.models.auth_schema import (
+    GoogleLoginModelSchema,
     LoginModelSchema,
     OnboardingSchema,
     RecoverPasswordSchema,
@@ -27,6 +28,17 @@ router = APIRouter(
 )
 def login(credentials: LoginModelSchema, response: Response):
     return AuthController.login(credentials.email, credentials.password, response)
+
+
+# Endpoint para loguearse
+@router.post(
+    "/google-login",
+    dependencies=[
+        Depends(RateLimiter(times=10, seconds=60))
+    ]
+)
+def login(credentials: GoogleLoginModelSchema, response: Response):
+    return AuthController.google_login(credentials, response)
 
 
 # Endpoint para registrar un nuevo administrador
