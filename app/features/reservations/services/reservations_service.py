@@ -105,8 +105,8 @@ class ReservationsService():
             send_reservation_created_email.delay(
                 user_email=user.email,
                 user_name=user.name,
+                user_first_surname=user.first_surname,
                 reservation_name=name,
-                level=level,
                 start_date=start_date.isoformat(),
                 start_time=start_time.strftime("%H:%M:%S"),
                 end_date=end_date.isoformat() if end_date else None,
@@ -234,8 +234,8 @@ class ReservationsService():
             send_reservation_cancelled_email.delay(
                 user_email=user.email,
                 user_name=user.name,
+                user_first_surname=user.first_surname,
                 reservation_name=existing.name,
-                level=existing.level,
                 start_date=existing.start_date.isoformat(),
                 start_time=existing.start_time.strftime("%H:%M:%S"),
                 end_date=existing.end_date.isoformat() if existing.end_date else None,
