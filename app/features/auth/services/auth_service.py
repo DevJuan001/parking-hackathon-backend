@@ -8,6 +8,7 @@ from jwt.exceptions import PyJWTError
 from pydantic import EmailStr
 
 from app.core.config import settings
+from app.core.oauth import oauth
 from app.utils.logger import get_logger
 from app.core.exception import ServiceError
 from app.core.database import get_connection
@@ -78,6 +79,91 @@ class AuthService:
         except Exception as e:
             logger.error("Error en login: %s", e, exc_info=True)
             return "No autorizado", False, None
+
+        finally:
+            connection.close()
+
+    @staticmethod
+    async def google_login(code: str, response: Response):
+        connection = get_connection()
+
+        try:
+            token = await oauth.google.authorize_access_token(code)
+            user_info = token.get("userInfo")
+
+            if not user_info:
+                raise ServiceError(
+                    "No se pudo obtener la información del usuario de Google"
+                )
+
+            email = user_info.get("email")
+            name = user_info.get("name", "")
+            first_surname = user_info.get("family_name", "")
+            second_surname = user_info.get("given_name", "")
+
+            if not email:
+                raise ServiceError("Google no proporcionó un email")
+
+            error, user = UsersRepository.find_user_by_email(email, connection)
+
+            if error:
+                raise ServiceError(error)
+
+            if not user:
+                shell_user = CreateUserSchema(
+                    role_id=1,
+                    name=name or "",
+                    first_surname=first_surname or "",
+                    second_surname=second_surname or "",
+                    email=email,
+                    onboarding_completed=False
+                )
+
+                error, success, message = UsersRepository.create_user(
+                    user_data=shell_user,
+                    hash_password=None,
+                    parking_id=None,
+                    onboarding_completed=False,
+                    connection=connection
+                )
+
+                if error or not success:
+                    raise ServiceError(error or message)
+
+                error, user = UsersRepository.find_user_by_email(
+                    email, connection)
+
+                if error or not user:
+                    raise ServiceError("No se pudo obtener el usuario creado")
+
+                connection.commit()
+
+            expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE)
+
+            access_token = create_access_token({
+                "sub": str(user.id),
+                "role": user.role,
+                "parking_id": user.parking_id,
+                "onboarding_completed": user.onboarding_completed,
+            }, expires_delta=expires)
+
+            refresh_token = create_refresh_token({
+                "sub": str(user.id),
+                "role": user.role,
+                "parking_id": user.parking_id,
+                "onboarding_completed": user.onboarding_completed,
+            })
+
+            set_auth_cookies(response, access_token, refresh_token)
+
+            return None, True, user.onboarding_completed, "Inicio de sesión exitoso"
+
+        except ServiceError as e:
+            return e.message, False, False, "No autorizado"
+
+        except Exception as e:
+            logger.error("Error en google_login: %s", e, exc_info=True)
+            return "No autorizado", False, False, None
 
         finally:
             connection.close()
