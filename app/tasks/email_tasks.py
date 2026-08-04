@@ -6,6 +6,8 @@ from app.core.mail import fm
 from app.core.celery_app import celery
 from fastapi_mail import MessageSchema
 
+from app.utils.date_formatter import date_formatter, time_to_12h
+
 
 @celery.task(bind=True, max_retries=3)
 def send_welcome_email(self, user_name: str, user_first_surname: str, user_email: EmailStr, password: str):
@@ -85,10 +87,10 @@ def send_reservation_created_email(
     self,
     user_email: EmailStr,
     user_name: str,
+    user_first_surname: str,
     reservation_name: str,
-    level: int,
-    start_date: Optional[str] = None,
-    start_time: Optional[str] = None,
+    start_date: str,
+    start_time: str,
     end_date: Optional[str] = None,
     end_time: Optional[str] = None,
 ):
@@ -98,12 +100,10 @@ def send_reservation_created_email(
             recipients=[user_email],
             template_body={
                 "user_name": user_name,
+                "user_first_surname": user_first_surname,
                 "reservation_name": reservation_name,
-                "level": level,
-                "start_date": start_date,
-                "start_time": start_time,
-                "end_date": end_date,
-                "end_time": end_time,
+                "start_date": f"{date_formatter(start_date)} {time_to_12h(start_time)}",
+                "end_date": f"{date_formatter(end_date)} {time_to_12h(end_time)}",
             },
             subtype="html",
         )
@@ -123,8 +123,8 @@ def send_reservation_cancelled_email(
     self,
     user_email: EmailStr,
     user_name: str,
+    user_first_surname: str,
     reservation_name: str,
-    level: int,
     start_date: Optional[str] = None,
     start_time: Optional[str] = None,
     end_date: Optional[str] = None,
@@ -136,12 +136,10 @@ def send_reservation_cancelled_email(
             recipients=[user_email],
             template_body={
                 "user_name": user_name,
+                "user_first_surname": user_first_surname,
                 "reservation_name": reservation_name,
-                "level": level,
-                "start_date": start_date,
-                "start_time": start_time,
-                "end_date": end_date,
-                "end_time": end_time,
+                "start_date": f"{date_formatter(start_date)} {time_to_12h(start_time)}",
+                "end_date": f"{date_formatter(end_date)} {time_to_12h(end_time)}",
             },
             subtype="html",
         )

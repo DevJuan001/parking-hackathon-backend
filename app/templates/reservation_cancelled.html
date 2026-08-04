@@ -18,11 +18,11 @@
       >
         <img
           src="https://i.ibb.co/8nYJMRgt/Large-Icon.png"
-          alt="tracklinker logo"
+          alt="Parking logo"
           style="max-width: 200px"
         />
         <p style="font-size: 16px; color: #333">
-          Hola, <strong>{{user_name}}</strong>
+          Hola, <strong>{{user_name}} {{user_first_surname}}</strong>
         </p>
 
         <p style="font-size: 16px; color: #333">
@@ -46,11 +46,13 @@
                 display: block;
                 margin-bottom: 2px;
               "
-              >NOMBRE</span
             >
-            <strong style="font-family: monospace; font-size: 15px"
-              >{{reservation_name}}</strong
-            >
+              NOMBRE
+            </span>
+
+            <strong style="font-family: monospace; font-size: 15px">
+              {{reservation_name}}
+            </strong>
           </p>
 
           <p style="margin: 0 0 8px; color: #444">
@@ -61,26 +63,12 @@
                 display: block;
                 margin-bottom: 2px;
               "
-              >PISO</span
-            >
-            <strong style="font-family: monospace; font-size: 15px"
-              >{{level}}</strong
-            >
-          </p>
+              >FECHA DE INICIO
+            </span>
 
-          <p style="margin: 0 0 8px; color: #444">
-            <span
-              style="
-                color: #888;
-                font-size: 12px;
-                display: block;
-                margin-bottom: 2px;
-              "
-              >FECHA DE INICIO</span
-            >
-            <strong style="font-family: monospace; font-size: 15px"
-              >{{start_date}} &middot; {{start_time}}</strong
-            >
+            <strong style="font-family: monospace; font-size: 15px">
+              {{start_date}}
+            </strong>
           </p>
 
           <p style="margin: 0; color: #444">
@@ -91,11 +79,12 @@
                 display: block;
                 margin-bottom: 2px;
               "
-              >FECHA DE FIN</span
-            >
-            <strong style="font-family: monospace; font-size: 15px"
-              >{% if end_date %}{{end_date}} &middot; {{end_time}}{% else %}Sin fecha de fin{% endif %}</strong
-            >
+              >FECHA DE FIN
+            </span>
+
+            <strong style="font-family: monospace; font-size: 15px">
+              {% if end_date %}{{end_date}}{% endif %}
+            </strong>
           </p>
         </div>
 
@@ -105,7 +94,12 @@
       </div>
 
       <p
-        style="text-align: center; color: #aaa; font-size: 12px; margin-top: 40px"
+        style="
+          text-align: center;
+          color: #aaa;
+          font-size: 12px;
+          margin-top: 40px;
+        "
       >
         Este es un correo automático,<br />
         Por favor, no respondas a este mensaje. <br />
