@@ -38,6 +38,9 @@ class Settings(BaseSettings):
     QDRANT_PORT: int
     EMBEDDING_MODEL: str
     HF_TOKEN: str
+    GOOGLE_CLIENT_ID: str
+    GOOGLE_CLIENT_SECRET: str
+    GOOGLE_REDIRECT_URL: str
 
     class Config:
         env_file = ".env"

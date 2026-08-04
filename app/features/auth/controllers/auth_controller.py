@@ -2,6 +2,7 @@ from fastapi import HTTPException, Request, Response
 from pydantic import EmailStr
 
 from app.features.auth.models.auth_schema import (
+    GoogleLoginModelSchema,
     OnboardingSchema,
     RegisterSchema,
 )
@@ -23,6 +24,19 @@ class AuthController:
         return {
             "success": success,
             "message": message
+        }
+
+    @staticmethod
+    async def google_login(credentials: GoogleLoginModelSchema, response: Response):
+        error, success, onboarding_completed, message = await AuthService.google_login(credentials.code, response)
+
+        if error or not success:
+            raise HTTPException(status_code=400, detail=error)
+
+        return {
+            "success": success,
+            "message": message,
+            "onboarding_completed": onboarding_completed
         }
 
     @staticmethod

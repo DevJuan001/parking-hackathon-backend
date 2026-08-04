@@ -358,7 +358,7 @@ class UsersRepository:
 
     # Crear un usuario
     @staticmethod
-    def create_user(user_data: CreateUserSchema, hash_password: str, parking_id: Optional[int], onboarding_completed: bool, connection):
+    def create_user(user_data: CreateUserSchema, hash_password: Optional[str], parking_id: Optional[int], onboarding_completed: bool, connection):
         data = user_data.model_dump()
 
         cursor = connection.cursor()

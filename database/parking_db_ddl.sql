@@ -38,7 +38,7 @@ CREATE TABLE USERS (
   first_surname TEXT NULL,
   second_surname TEXT NULL,
   email TEXT NOT NULL,
-  password TEXT NOT NULL,
+  password TEXT NULL,
   onboarding_completed BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   status INT NOT NULL DEFAULT 2,
