@@ -6,7 +6,7 @@ from app.core.database import get_connection
 from app.features.users.repositories.users_repository import UsersRepository
 from app.features.reservations.repositories.reservations_repository import ReservationsRepository
 from app.tasks.email_tasks import send_reservation_created_email, send_reservation_cancelled_email
-from app.features.reservations.models.reservations_schema import FilterReservationsSchema, UpdateReservationSchema
+from app.features.reservations.models.reservations_schemas import FilterReservationsSchema, UpdateReservationSchema
 
 
 logger = get_logger("reservations.service")

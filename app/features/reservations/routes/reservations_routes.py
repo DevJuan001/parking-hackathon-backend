@@ -4,7 +4,7 @@ from fastapi_limiter.depends import RateLimiter
 from app.middlewares.jwt_middleware import verify_jwt
 from app.middlewares.roles_middleware import require_roles
 from app.middlewares.onboarding_middleware import require_onboarded
-from app.features.reservations.models.reservations_schema import (
+from app.features.reservations.models.reservations_schemas import (
     CreateReservationSchema,
     CreateSelfReservationSchema,
     FilterReservationsSchema,

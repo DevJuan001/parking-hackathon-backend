@@ -41,7 +41,7 @@ Grep `per_page` in the repo (currently five features paginate):
 | `exits` | 15 | `app/features/exits/models/exits_schemas.py:13` |
 | `users` | 15 | `app/features/users/models/users_schemas.py:19` |
 | `spots` | 56 | `app/features/spots/models/spots_schemas.py:11` |
-| `reservations` | 50 | `app/features/reservations/models/reservations_schema.py:14` (note: singular filename) |
+| `reservations` | 50 | `app/features/reservations/models/reservations_schemas.py:14` |
 | `payments` | — (no pagination; `PaymentsFiltersSchema` has no `page` / `per_page`) | `app/features/payments/models/payments_schemas.py:9-13` |
 
 **`payments` does not paginate** — the filter schema (`app/features/payments/models/payments_schemas.py:9-13`) has no `page` or `per_page`; the listing endpoint returns the full filtered result set. If the payments table grows, add the same pattern as `entries` — do not assume pagination already exists.
