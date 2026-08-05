@@ -4,6 +4,7 @@ from typing import Optional
 from pydantic import EmailStr
 from app.utils.logger import get_logger
 from app.utils.date_formatter import date_formatter
+from app.features.users.types.users_types import VALID_PROVIDERS, ProviderType
 from app.features.users.models.users_schemas import CompleteUserOnboardingSchema, CreateUserSchema, UpdateUserSchema, UsersFiltersSchema
 from app.features.users.models.users_responses import SurnameResponse, UserByEmailResponse, UserByIdResponse, UserResponse, UserStatsResponse
 
@@ -319,7 +320,9 @@ class UsersRepository:
             u.second_surname,
             u.email,
             u.password,
-            u.onboarding_completed
+            u.onboarding_completed,
+            u.provider,
+            u.google_id
         FROM USERS AS u
         INNER JOIN ROLES AS r
             ON r.id = u.role_id
@@ -343,8 +346,10 @@ class UsersRepository:
                     first_surname=result[4],
                     second_surname=result[5],
                     email=result[6],
-                    password=result[7] if result [7] else None,
+                    password=result[7] if result[7] else None,
                     onboarding_completed=result[8],
+                    provider=result[9],
+                    google_id=result[10] if result[10] else None,
                 )
 
                 return None, data
@@ -358,13 +363,36 @@ class UsersRepository:
 
     # Crear un usuario
     @staticmethod
-    def create_user(user_data: CreateUserSchema, hash_password: Optional[str], parking_id: Optional[int], onboarding_completed: bool, connection):
+    def create_user(
+        user_data: CreateUserSchema,
+        hash_password: Optional[str],
+        parking_id: Optional[int],
+        onboarding_completed: bool,
+        connection,
+        provider: ProviderType,
+        google_id: Optional[str] = None,
+    ):
+        if provider not in VALID_PROVIDERS:
+            logger.error(
+                "Provider inválido '%s'. Valores válidos: %s. "
+                "Esto es un bug en el código que llama a create_user.",
+                provider,
+                sorted(VALID_PROVIDERS),
+            )
+
+            return (
+                "Lo sentimos. No se pudo crear el usuario. Intentalo nuevamente más tarde.",
+                False,
+                None,
+            )
+
         data = user_data.model_dump()
 
         cursor = connection.cursor()
 
         # Petición a la base de datos
-        query = """INSERT INTO USERS (
+        query = """
+        INSERT INTO USERS (
             role_id,
             parking_id,
             name,
@@ -372,8 +400,10 @@ class UsersRepository:
             second_surname,
             password,
             email,
+            provider,
+            google_id,
             onboarding_completed
-        ) VALUES(%s, %s, %s, %s, %s, %s, %s, %s)"""
+        ) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
 
         try:
             cursor.execute(query, (
@@ -384,6 +414,8 @@ class UsersRepository:
                 data["second_surname"],
                 hash_password,
                 data["email"],
+                provider,
+                google_id,
                 onboarding_completed,
             ))
 
