@@ -152,11 +152,15 @@ Every variable lives in `.env.example`. The table below groups them by concern a
 
 | Variable | Purpose | Dev value |
 |---|---|---|
+| `MAIL_SERVER` | SMTP hostname | `smtp.gmail.com` (or your MailHog/Mailpit host for dev) |
+| `MAIL_PORT` | SMTP port | `587` (STARTTLS) or `465` (SSL/TLS) |
+| `MAIL_STARTTLS` | Upgrade plain SMTP to TLS via the `STARTTLS` command (recommended with port 587) | `True` |
+| `MAIL_SSL_TLS` | Wrap the whole SMTP session in TLS from byte 0 (use only with port 465) | `False` |
 | `MAIL_USERNAME` | SMTP login | dev mailbox |
 | `MAIL_PASSWORD` | SMTP password (use an app password) | dev secret |
 | `MAIL_FROM` | `From:` header | dev mailbox |
 
-For dev, a local SMTP catcher (MailHog, Mailpit) on port 1025 is fine.
+For dev, a local SMTP catcher (MailHog, Mailpit) on port 1025 is fine — set `MAIL_SERVER`, `MAIL_PORT=1025`, `MAIL_STARTTLS=False`, `MAIL_SSL_TLS=False`.
 
 ### AI / LLM (chatbot)
 
