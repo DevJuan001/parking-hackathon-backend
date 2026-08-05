@@ -2,7 +2,8 @@ from typing import Optional
 
 from pydantic import BaseModel, EmailStr
 
-from app.utils.base_schema import BaseSchema
+from app.features.users.types.users_types import ProviderType
+
 
 
 class UserResponse(BaseModel):
@@ -38,6 +39,8 @@ class UserByEmailResponse(BaseModel):
     email: EmailStr
     password: Optional[str] = None
     onboarding_completed: int
+    provider: ProviderType
+    google_id: Optional[str] = None
 
 
 class UserStatsResponse(BaseModel):
