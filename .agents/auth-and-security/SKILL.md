@@ -43,7 +43,7 @@ recover-password (public)
 
 A second login path exists for users who authenticate through Google instead of email/password.
 
-- `POST /api/auth/google-login` (`app/features/auth/routes/auth_routes.py:34-41`) is rate-limited to **10/min** (`auth_routes.py:37`) and takes `GoogleLoginModelSchema` with a single `code: str` field (`app/features/auth/models/auth_schema.py:12-13`, singular filename).
+- `POST /api/auth/google-login` (`app/features/auth/routes/auth_routes.py:34-41`) is rate-limited to **10/min** (`auth_routes.py:37`) and takes `GoogleLoginModelSchema` with a single `code: str` field (`app/features/auth/models/auth_schemas.py:12-13`).
 - The OAuth client lives in `app/core/oauth.py` — `authlib.starlette_client.OAuth` registered with `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` from `Settings`, discovery URL `https://accounts.google.com/.well-known/openid-configuration`, scope `openid email profile` (`app/core/oauth.py:7-12`).
 - `USERS.password` is `TEXT NULL` (`database/parking_db_ddl.sql:41`) — Google users have no password; `AuthService.google_login` creates a shell user with `hash_password=None` (`app/features/auth/services/auth_service.py:122-137`).
 - **Anti-pattern — do not fix in passing:** `AuthService.recover_password` wraps the body in `try/except: pass` (`app/features/auth/services/auth_service.py:505-515`). DB outages, Celery outages, malformed emails — every failure is silently swallowed and the client still sees `"Correo enviado correctamente"`. Surface it in the PR so the team can decide between logging, structured retry, or a real 5xx.
