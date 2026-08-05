@@ -128,6 +128,14 @@ Read the matching skill **before** touching that area:
 | `database-and-repository` | If you write SQL, open connections or touch transactions. |
 | `api-layer` | If you add/modify routes, middlewares, rate limiting or the response shape. |
 | `email-and-tasks` | If you touch Celery, emails or HTML templates. |
+| `caching` | Before adding Redis cache to an endpoint, or to confirm whether the `app/core/cache.py` helpers are still orphaned before wiring them up. |
+| `chatbot` | Before touching the Qdrant RAG, the LLM tool registry, the intent classifier, the system prompt, or the knowledge rebuild flow. |
+| `config-and-settings` | Before adding a new env var to `app/core/config.py` or updating `.env.example`. |
+| `database-migrations` | Before changing the DDL/DML in `database/`, adding a column/table, or applying manual ALTERs to the dev DB. |
+| `docker-and-deployment` | Before changing the `DockerFile`, `docker-compose.dev.yml`, or deploying the local stack with containers. |
+| `logging-conventions` | Before adding or auditing log statements; defines levels per layer and what is never logged. |
+| `pagination` | Before adding or modifying a paginated listing endpoint (`page` + `per_page` + `LIMIT/OFFSET`). |
+| `tool-registry` | Before adding a new tool to the chatbot, modifying the role gate, or changing the dispatch flow. |
 
 Each skill is invokable with `skill <name>` and is loaded as instructions in the current conversation.
 
