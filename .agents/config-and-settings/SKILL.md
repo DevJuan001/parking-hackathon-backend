@@ -77,12 +77,12 @@ These map to `get_connection()` in `app/core/database.py` with `charset="utf8mb4
 | `MAIL_USERNAME` | EmailStr | yes | Sender. |
 | `MAIL_PASSWORD` | str | yes | Gmail **app password** (not the account password). |
 | `MAIL_FROM` | EmailStr | yes | Usually equal to `MAIL_USERNAME`. |
-| `MAIL_PORT` | int | no (default `587`) | Set in `app/core/mail.py`. |
-| `MAIL_SERVER` | str | no (default `smtp.gmail.com`) | Set in `app/core/mail.py`. |
-| `MAIL_STARTTLS` | bool | no (default `True`) | Set in `app/core/mail.py`. |
-| `MAIL_SSL_TLS` | bool | no (default `False`) | Set in `app/core/mail.py`. |
+| `MAIL_PORT` | int | no (default `587`) | SMTP submission port. Use `587` with `MAIL_STARTTLS=True` (recommended) or `465` with `MAIL_SSL_TLS=True`. |
+| `MAIL_SERVER` | str | no (default `smtp.gmail.com`) | SMTP hostname. Override for SendGrid, AWS SES, Mailgun, etc. |
+| `MAIL_STARTTLS` | bool | no (default `True`) | Upgrade the plain SMTP connection to TLS via the `STARTTLS` command. Recommended with port `587`. |
+| `MAIL_SSL_TLS` | bool | no (default `False`) | Wrap the whole SMTP session in TLS from byte 0 (like HTTPS). Use only with port `465`. Mutually exclusive with `MAIL_STARTTLS`. |
 
-The `MAIL_*` connection settings are **not** in `Settings` — they live in `ConnectionConfig` inside `app/core/mail.py`. If you move them to env vars, change the `ConnectionConfig` too.
+All `MAIL_*` vars are loaded by `pydantic-settings` into `Settings` (`app/core/config.py:28-34`) and consumed by `ConnectionConfig` in `app/core/mail.py:5-11`.
 
 ### Chatbot (LLM)
 
@@ -107,9 +107,19 @@ The `MAIL_*` connection settings are **not** in `Settings` — they live in `Con
 | Var | Type | Required | Default |
 |---|---|---|---|
 | `EMBEDDING_MODEL` | str | yes (if chatbot on) | — (typical: `all-MiniLM-L6-v2`) |
-| `HF_TOKEN` | str | required only for gated HF models | — |
+| `HF_TOKEN` | str | yes (pydantic requires it; the app fails to start without it) | — |
 
 The collection `parking_knowledge` is hard-coded to **size 384, distance COSINE** in `app/core/qdrant.py`. If you change `EMBEDDING_MODEL` to one with a different output size, the Qdrant upsert will fail.
+
+### Google OAuth
+
+| Var | Type | Required | Notes |
+|---|---|---|---|
+| `GOOGLE_CLIENT_ID` | str | yes | OAuth client id from Google Cloud Console. Read by `app/core/oauth.py:9`. |
+| `GOOGLE_CLIENT_SECRET` | str | yes | OAuth client secret. Read by `app/core/oauth.py:10`. |
+| `GOOGLE_REDIRECT_URL` | str | yes | E.g. `http://localhost:8000/api/auth/google-callback`. Used as `redirect_uri` in `authlib` and by the `POST /api/auth/google-login` flow (`app/features/auth/services/auth_service.py:95`). |
+
+All three are declared as required `str` in `app/core/config.py:45-47` (no default), so the process fails to start if any is missing — even for users who never hit the Google login route. The `OAUTH_DISCOVERY_URL` (`https://accounts.google.com/.well-known/openid-configuration`) is hard-coded in `app/core/oauth.py:11`, not env-driven.
 
 ### Celery
 
@@ -129,9 +139,9 @@ Celery currently uses `REDIS_URL` for both broker and result backend. If you add
 
 ## Required vs optional summary
 
-Required (the app **fails to start** without them): `DB_*`, `REDIS_URL`, `ENVIRONMENT`, `ACCESS_TOKEN_SECRET_KEY`, `REFRESH_TOKEN_SECRET_KEY`, `ALGORITHM`, `ACCESS_TOKEN_EXPIRE`, `REFRESH_TOKEN_EXPIRE`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM`, `AI_API_KEY`, `AI_BASE_URL`, `AI_MODEL`.
+Required (the app **fails to start** without them): `DB_*`, `REDIS_URL`, `ENVIRONMENT`, `ACCESS_TOKEN_SECRET_KEY`, `REFRESH_TOKEN_SECRET_KEY`, `ALGORITHM`, `ACCESS_TOKEN_EXPIRE`, `REFRESH_TOKEN_EXPIRE`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM`, `AI_API_KEY`, `AI_BASE_URL`, `AI_MODEL`, `HF_TOKEN`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URL`.
 
-Optional with defaults: `AI_MAX_TOKENS`, `AI_TEMPERATURE`, `CHATBOT_ENABLED`, `QDRANT_HOST`, `QDRANT_PORT`, `EMBEDDING_MODEL`, `HF_TOKEN`.
+Optional with defaults: `AI_MAX_TOKENS`, `AI_TEMPERATURE`, `CHATBOT_ENABLED`, `QDRANT_HOST`, `QDRANT_PORT`, `EMBEDDING_MODEL`.
 
 If the chatbot is off (`CHATBOT_ENABLED=False`), Qdrant and embedding vars can be empty (the client is not initialized).
 

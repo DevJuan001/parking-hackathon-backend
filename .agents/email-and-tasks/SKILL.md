@@ -26,8 +26,8 @@ service  →  <task>.delay(...)   (enqueues in Redis broker)
 
 ## Where everything lives
 
-- `app/core/celery_app.py` — `celery = Celery("worker", broker=…, backend=…, include=["app.tasks.email_tasks"])`.
-- `app/core/mail.py` — `ConnectionConfig` with `MAIL_PORT=587`, `MAIL_SERVER="smtp.gmail.com"`, `MAIL_STARTTLS=True`, `MAIL_SSL_TLS=False`, `TEMPLATE_FOLDER="app/templates"`. `fm = FastMail(config)`.
+- `app/core/celery_app.py` — `celery = Celery("worker", broker=…, backend=…, include=["app.tasks.email_tasks", "app.tasks.knowledge_tasks"])`.
+- `app/core/mail.py` — `ConnectionConfig` reads every `MAIL_*` field from `settings` (pydantic-settings); `TEMPLATE_FOLDER="app/templates"` is local. `fm = FastMail(config)`.
 - `app/tasks/email_tasks.py` — concrete tasks.
 - `app/templates/*.html` — Jinja2 templates.
 
@@ -95,6 +95,13 @@ my_email.delay(user_email=user.email, user_name=user.name)
 | `POST /api/users/create` (Admin creates a user of the parking) | `send_welcome_email` (with a temporary `password`) | `welcome_mail.html` |
 | `PUT /api/auth/complete-on-boarding` (Admin onboarding) | `send_welcome_registration_email` | `welcome_registration_mail.html` |
 | `POST /api/auth/recover-password` | `recovery_password_email` | `recover_password.html` |
+
+### Reservation emails (also enqueued by `app/features/reservations/services/reservations_service.py`)
+
+| Task | Template | Args |
+|---|---|---|
+| `send_reservation_created_email` | `reservation_created.html` | `user_email, user_name, user_first_surname, reservation_name, start_date, start_time, end_date, end_time` |
+| `send_reservation_cancelled_email` | `reservation_cancelled.html` | same as above (the cancelled variant treats `end_date`/`time` as optional) |
 
 ## Required environment variables
 

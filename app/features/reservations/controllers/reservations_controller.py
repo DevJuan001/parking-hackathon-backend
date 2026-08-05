@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 
-from app.features.reservations.models.reservations_schema import (
+from app.features.reservations.models.reservations_schemas import (
     CreateReservationSchema,
     CreateSelfReservationSchema,
     FilterReservationsSchema,

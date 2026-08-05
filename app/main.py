@@ -43,7 +43,7 @@ async def lifespan(app: FastAPI):
 # Instancia principal de la app FastAPI
 app = FastAPI(
     title="API con FastAPI y MySQL",
-    description="Api para tracklinker",
+    description="Api para parking hackathon",
     version="1.0.0",
     lifespan=lifespan
 )

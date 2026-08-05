@@ -20,8 +20,8 @@ The `DockerFile` is **dev-oriented as-is**: no multi-stage build, no non-root us
 | `db` | `mysql:8.0` | `3306:3306` | `mysql_data_dev:/var/lib/mysql` | `mysqladmin ping` every 10s | `MYSQL_ROOT_PASSWORD`, `MYSQL_DATABASE` from `.env` |
 | `redis` | `redis:7-alpine` | `6379:6379` | `redis_data_dev:/data` | none | — |
 | `qdrant` | `qdrant/qdrant:latest` | `6333:6333`, `6334:6334` | `qdrant_data_dev:/qdrant/storage` | none | `QDRANT__SERVICE__GRPC_PORT=6334` |
-| `api` | local build (`DockerFile`) | `8000:8000` | — | none (depends on `db` healthy) | `.env` + `.env.docker` |
-| `celery_worker` | local build (`DockerFile`) | — | — | none (depends on `db` healthy) | `.env` + `.env.docker` |
+| `api` | local build (`DockerFile`) | `8000:8000` | — | none (depends on `db` healthy, `redis` started, `qdrant` started) | `.env` + `.env.docker` |
+| `celery_worker` | local build (`DockerFile`) | — | — | none (depends on `db` healthy, `redis` started; `qdrant` is not required because the worker does not touch RAG) | `.env` + `.env.docker` |
 
 All services share the `parking-net` bridge network. Service names (`db`, `redis`, `qdrant`, `api`, `celery_worker`) are the DNS hostnames the containers see each other as.
 

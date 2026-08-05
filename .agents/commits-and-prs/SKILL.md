@@ -98,7 +98,7 @@ gh pr create --base main --title "feat: add exit cancel" --body "..."
 
 ## Versioning and tags
 
-The project does not use automated `bumpversion` or `semver` (version lives in `pyproject.toml:3` and `app/main.py:36`). If a change is release-worthy, update those two by hand and tag it:
+The project does not use automated `bumpversion` or `semver` (version lives in `pyproject.toml:3` and `app/main.py:47`). If a change is release-worthy, update those two by hand and tag it:
 
 ```bash
 git tag -a v0.2.0 -m "feat: ..."

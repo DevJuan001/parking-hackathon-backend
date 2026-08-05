@@ -2,7 +2,7 @@ from fastapi_limiter.depends import RateLimiter
 from fastapi import APIRouter, Depends, Request, Response
 
 from app.features.auth.controllers.auth_controller import AuthController
-from app.features.auth.models.auth_schema import (
+from app.features.auth.models.auth_schemas import (
     GoogleLoginModelSchema,
     LoginModelSchema,
     OnboardingSchema,

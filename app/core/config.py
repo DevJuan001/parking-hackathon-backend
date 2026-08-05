@@ -25,6 +25,10 @@ class Settings(BaseSettings):
     ALGORITHM: str
     REFRESH_TOKEN_EXPIRE: int
     ACCESS_TOKEN_EXPIRE: int
+    MAIL_PORT: int
+    MAIL_SERVER: str
+    MAIL_STARTTLS: bool
+    MAIL_SSL_TLS: bool
     MAIL_USERNAME: EmailStr
     MAIL_PASSWORD: str
     MAIL_FROM: EmailStr

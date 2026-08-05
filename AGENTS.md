@@ -9,7 +9,7 @@
 
 A **FastAPI** backend (Python 3.13) for a multi-tenant parking management system. An `Admin` user registers a parking, completes the onboarding, and from there manages floors, spots, plates, tariffs, entries, exits and payments. The `Cliente` role consumes a subset of endpoints (payment calculation and registration, payment methods listing). The `Maquina` role is the third role, used for machine-driven operations (entry creation, payment calculation/registration, payment methods, self-reservations).
 
-**Visible product:** "Tracklinker / Parking Hackathon" (see `app/templates/welcome_mail.html`, `app/main.py:33`).
+**Visible product:** "Tracklinker / Parking Hackathon" (see `app/templates/welcome_mail.html` and the `description` field in `app/main.py:46`).
 
 ---
 
@@ -17,11 +17,11 @@ A **FastAPI** backend (Python 3.13) for a multi-tenant parking management system
 
 | Layer | Technology | Notes |
 |---|---|---|
-| HTTP | `fastapi` 0.136+ | Uvicorn as the ASGI server (`app/main.py:38`). |
-| Validation | `pydantic` v2 + `pydantic-settings` | Settings in `app/core/config.py:1`. |
+| HTTP | `fastapi` 0.136+ | Uvicorn as the ASGI server. Entrypoint: `app.main:app` (see `DockerFile`). |
+| Validation | `pydantic` v2 + `pydantic-settings` | `Settings` class at `app/core/config.py:5`. |
 | DB | `mysql-connector-python` (sync driver) | Raw connection, no ORM. |
 | Auth | `pyjwt` + `bcrypt` | JWT in HTTP-only cookies. |
-| Cache / blacklist | `redis` (async) + `fastapi-limiter` | Initialized in `lifespan` (`app/main.py:24`). |
+| Cache / blacklist | `redis` (async) + `fastapi-limiter` | `init_redis(app)` at `app/main.py:30`; `init_qdrant()` at `app/main.py:34` when `CHATBOT_ENABLED=True`. |
 | Queue | `celery` with Redis broker | Async email. |
 | Email | `fastapi-mail` | Templates in `app/templates/`. |
 | Packaging | `uv` (see `uv.lock`, `DockerFile`) | Do not use `pip` directly. |
@@ -128,6 +128,14 @@ Read the matching skill **before** touching that area:
 | `database-and-repository` | If you write SQL, open connections or touch transactions. |
 | `api-layer` | If you add/modify routes, middlewares, rate limiting or the response shape. |
 | `email-and-tasks` | If you touch Celery, emails or HTML templates. |
+| `caching` | Before adding Redis cache to an endpoint, or to confirm whether the `app/core/cache.py` helpers are still orphaned before wiring them up. |
+| `chatbot` | Before touching the Qdrant RAG, the LLM tool registry, the intent classifier, the system prompt, or the knowledge rebuild flow. |
+| `config-and-settings` | Before adding a new env var to `app/core/config.py` or updating `.env.example`. |
+| `database-migrations` | Before changing the DDL/DML in `database/`, adding a column/table, or applying manual ALTERs to the dev DB. |
+| `docker-and-deployment` | Before changing the `DockerFile`, `docker-compose.dev.yml`, or deploying the local stack with containers. |
+| `logging-conventions` | Before adding or auditing log statements; defines levels per layer and what is never logged. |
+| `pagination` | Before adding or modifying a paginated listing endpoint (`page` + `per_page` + `LIMIT/OFFSET`). |
+| `tool-registry` | Before adding a new tool to the chatbot, modifying the role gate, or changing the dispatch flow. |
 
 Each skill is invokable with `skill <name>` and is loaded as instructions in the current conversation.
 

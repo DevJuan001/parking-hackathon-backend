@@ -1,7 +1,7 @@
 from fastapi import HTTPException, Request, Response
 from pydantic import EmailStr
 
-from app.features.auth.models.auth_schema import (
+from app.features.auth.models.auth_schemas import (
     GoogleLoginModelSchema,
     OnboardingSchema,
     RegisterSchema,

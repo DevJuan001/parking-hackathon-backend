@@ -1,6 +1,6 @@
 from app.utils.logger import get_logger
 from app.features.reservations.models.reservations_responses import ReservationsResponse
-from app.features.reservations.models.reservations_schema import FilterReservationsSchema, UpdateReservationSchema
+from app.features.reservations.models.reservations_schemas import FilterReservationsSchema, UpdateReservationSchema
 
 logger = get_logger("reservations.repository")
 

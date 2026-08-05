@@ -27,12 +27,13 @@ Defaults and ranges:
 - `per_page`: depends on the feature.
   - `entries`, `exits`, `users`: default `15`, max `100`.
   - `spots`: default `56` (the dashboard renders a grid), max `100`.
+  - `reservations`: default `50`, max `100`.
 
 Pydantic enforces the bounds. A request with `?per_page=999` returns `400` from FastAPI before the route runs.
 
 ## Where it's used
 
-Grep `per_page` in the repo (currently five features):
+Grep `per_page` in the repo (currently five features paginate):
 
 | Feature | `per_page` default | File |
 |---|---|---|
@@ -40,9 +41,10 @@ Grep `per_page` in the repo (currently five features):
 | `exits` | 15 | `app/features/exits/models/exits_schemas.py:13` |
 | `users` | 15 | `app/features/users/models/users_schemas.py:19` |
 | `spots` | 56 | `app/features/spots/models/spots_schemas.py:11` |
-| `payments` | 15 | (follow the same pattern) |
+| `reservations` | 50 | `app/features/reservations/models/reservations_schemas.py:14` |
+| `payments` | — (no pagination; `PaymentsFiltersSchema` has no `page` / `per_page`) | `app/features/payments/models/payments_schemas.py:9-13` |
 
-**`reservations` does NOT use pagination yet** — it's a potential TODO. When you add it, follow the same schema and SQL pattern.
+**`payments` does not paginate** — the filter schema (`app/features/payments/models/payments_schemas.py:9-13`) has no `page` or `per_page`; the listing endpoint returns the full filtered result set. If the payments table grows, add the same pattern as `entries` — do not assume pagination already exists.
 
 ## Repo example (`entries_repository.find_all_entries`)
 

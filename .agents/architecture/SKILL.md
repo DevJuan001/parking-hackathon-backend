@@ -17,7 +17,7 @@ route  →  controller  →  service  →  repository  →  MySQL
                        tasks (Celery + email)
 ```
 
-The frontend lives at `http://localhost:5173` (CORS allow-listed in `app/main.py:43`).
+The frontend lives at `http://localhost:5173` (CORS allow-listed in `app/main.py:52-58`).
 
 ## Folder layout
 
@@ -36,13 +36,15 @@ app/
 
 - `config.py` — `Settings(BaseSettings)` loads `.env`. Access: `from app.core.config import settings`.
 - `database.py` — `get_connection()` returns a raw `mysql.connector` connection (no ORM). It is called once at import to validate at startup.
-- `redis.py` — `init_redis(app)`, `close_redis()`, `get_redis()`. Initialized in `lifespan` (`main.py:24`).
+- `redis.py` — `init_redis(app)`, `close_redis()`, `get_redis()`. Initialized in `lifespan` (`app/main.py:30`); `init_qdrant()` runs at `app/main.py:34` when `CHATBOT_ENABLED=True`.
 - `cache.py` — `set_cache / get_cache / invalidate_cache` (serializes pydantic models to JSON).
 - `celery_app.py` — `celery = Celery("worker", broker=REDIS_URL, …)`.
-- `mail.py` — `ConnectionConfig` SMTP (Gmail STARTTLS, port 587) and `fm = FastMail(config)`.
+- `mail.py` — `ConnectionConfig` reads `MAIL_*` from Settings (pydantic-settings); `fm = FastMail(config)`.
 - `security.py` — `create_access_token`, `create_refresh_token`, `set_auth_cookies`, `verify_password`, `generate_temporal_password`.
 - `token_blacklist.py` — Redis blacklist for access/refresh tokens (TTL = what's left on the token).
 - `exception.py` — `class ServiceError(Exception)` with `self.message`.
+- `oauth.py` — `authlib.starlette_client.OAuth` registered for Google (see `auth-and-security`).
+- `qdrant.py` — `init_qdrant()` / `close_qdrant()` / `get_qdrant()`; `parking_knowledge` collection, 384-dim, COSINE (see `chatbot`).
 
 ### `app/middlewares/`
 

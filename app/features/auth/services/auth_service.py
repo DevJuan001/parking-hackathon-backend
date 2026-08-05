@@ -17,7 +17,7 @@ from app.features.users.services.users_service import UsersService
 from app.features.users.repositories.users_repository import UsersRepository
 from app.core.token_blacklist import add_to_blacklist, get_token_remaining_ttl
 from app.features.floors.repositories.floors_repository import FloorsRepository
-from app.features.auth.models.auth_schema import OnboardingSchema, RegisterSchema
+from app.features.auth.models.auth_schemas import OnboardingSchema, RegisterSchema
 from app.features.parking.repositories.parkings_repository import ParkingsRepository
 from app.tasks.email_tasks import recovery_password_email, send_welcome_registration_email
 from app.features.users.models.users_schemas import CompleteUserOnboardingSchema, CreateUserSchema

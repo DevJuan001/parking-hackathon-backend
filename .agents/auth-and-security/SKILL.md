@@ -39,6 +39,15 @@ recover-password (public)
   → if the email exists, enqueues recovery_password_email (always generic response to avoid leaking existence)
 ```
 
+## Google OAuth login
+
+A second login path exists for users who authenticate through Google instead of email/password.
+
+- `POST /api/auth/google-login` (`app/features/auth/routes/auth_routes.py:34-41`) is rate-limited to **10/min** (`auth_routes.py:37`) and takes `GoogleLoginModelSchema` with a single `code: str` field (`app/features/auth/models/auth_schemas.py:12-13`).
+- The OAuth client lives in `app/core/oauth.py` — `authlib.starlette_client.OAuth` registered with `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` from `Settings`, discovery URL `https://accounts.google.com/.well-known/openid-configuration`, scope `openid email profile` (`app/core/oauth.py:7-12`).
+- `USERS.password` is `TEXT NULL` (`database/parking_db_ddl.sql:41`) — Google users have no password; `AuthService.google_login` creates a shell user with `hash_password=None` (`app/features/auth/services/auth_service.py:122-137`).
+- **Anti-pattern — do not fix in passing:** `AuthService.recover_password` wraps the body in `try/except: pass` (`app/features/auth/services/auth_service.py:505-515`). DB outages, Celery outages, malformed emails — every failure is silently swallowed and the client still sees `"Correo enviado correctamente"`. Surface it in the PR so the team can decide between logging, structured retry, or a real 5xx.
+
 ## Cookies (`app/core/security.py:set_auth_cookies`)
 
 - `httponly=True` always.
@@ -92,7 +101,7 @@ There are three roles in the system: `Admin`, `Maquina`, and `Cliente`.
 
 ## Blacklist (`app/core/token_blacklist.py`)
 
-- Storage: Redis with prefix `blacklist:access_token:` and `blacklist:refresh_token:`.
+- Storage: Redis with a single prefix `blacklist:access_token:` (`app/core/token_blacklist.py:9` — `BLACKLIST_PREFIX`). Both access and refresh tokens share the same prefix; the module does **not** distinguish them.
 - Value: `"1"`.
 - TTL: what is left on the token at the moment of blacklisting. Calculated with `get_token_remaining_ttl(token)` which decodes **without verifying the signature** and reads `payload["exp"]`.
 - `is_blacklisted(token)` will be used by future middlewares (today only writes happen, no blocking in the current flow — it is still the source of truth for invalidation).
@@ -124,10 +133,17 @@ curl -b cookies.txt http://localhost:8000/api/users/me
 
 ## User-facing error messages (auth)
 
-- "Credenciales invalidas" — failed login.
-- "Contraseña incorrecta" — `verify_password` failed.
-- "Refresh token expirado o inválido" — failed refresh.
-- "El usuario ya completó el onboarding" — POST to `complete-on-boarding` twice.
-- "Token inválido o expirado" — `verify_jwt`.
-- "No puedes realizar esta acción" — `require_roles`.
-- "Debes completar el onboarding para acceder a este recurso" — `require_onboarded`.
+- "¡Parece que aún no tienes cuenta! Regístrate en unos segundos y empieza a usar la app." — login, user not found (`app/features/auth/services/auth_service.py:43`).
+- "Verifica que tus credenciales esten escritas correctamente e intentalo nuevamente" — login, `verify_password` failed (`app/features/auth/services/auth_service.py:49`).
+- "Las contraseñas no coinciden" — register, `password != repeat_password` (`app/features/auth/services/auth_service.py:188`).
+- "Lo sentimos por el momento no podemos crear tu cuenta, por favor intentalo nuevamente más tarde" — register, email already exists (`app/features/auth/services/auth_service.py:200`).
+- "Refresh token no encontrado" — refresh, no `refresh_token` cookie (`app/features/auth/services/auth_service.py:399`).
+- "Refresh token inválido" — refresh, no `sub` in the decoded payload (`app/features/auth/services/auth_service.py:412`).
+- "Refresh token expirado o inválido" — refresh, `PyJWTError` (`app/features/auth/services/auth_service.py:447`).
+- "Correo enviado correctamente" — `recover-password` always returns this regardless of whether the email exists; anti-enumeration pattern (`app/features/auth/services/auth_service.py:517`). See the `try/except: pass` warning above.
+- "El usuario ya completó el onboarding" — `complete-on-boarding` called twice (`app/features/auth/services/auth_service.py:292`).
+- "No se pudo obtener la información del usuario de Google" — google-login, empty `user_info` from Google (`app/features/auth/services/auth_service.py:105`).
+- "Google no proporcionó un email" — google-login, no `email` claim in `user_info` (`app/features/auth/services/auth_service.py:114`).
+- "Token inválido o expirado" — `verify_jwt` (`app/middlewares/jwt_middleware.py:11`).
+- "No puedes realizar esta acción" — `require_roles` (`app/middlewares/roles_middleware.py:35`).
+- "Debes completar el onboarding para acceder a este recurso" — `require_onboarded` (`app/middlewares/onboarding_middleware.py:10`).
