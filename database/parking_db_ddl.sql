@@ -41,10 +41,13 @@ CREATE TABLE USERS (
   password TEXT NULL,
   onboarding_completed BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  provider VARCHAR(50) NOT NULL DEFAULT "Local",
+  google_id TEXT NULL,
   status INT NOT NULL DEFAULT 2,
   PRIMARY KEY(id),
   FOREIGN KEY (role_id) REFERENCES ROLES(id),
-  FOREIGN KEY (parking_id) REFERENCES PARKINGS(id)
+  FOREIGN KEY (parking_id) REFERENCES PARKINGS(id),
+  UNIQUE INDEX uq_users_google_id (google_id)
 );
 
 CREATE TABLE FLOORS (
