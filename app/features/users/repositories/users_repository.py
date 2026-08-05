@@ -54,7 +54,7 @@ class UsersRepository:
         if "end_date" in data:
             filters.append("DATE(u.created_at) <= %s")
             values.append(data["end_date"])
-        
+
         if filters:
             query += " WHERE " + " AND ".join(filters)
 
@@ -343,7 +343,7 @@ class UsersRepository:
                     first_surname=result[4],
                     second_surname=result[5],
                     email=result[6],
-                    password=result[7],
+                    password=result[7] if result [7] else None,
                     onboarding_completed=result[8],
                 )
 
