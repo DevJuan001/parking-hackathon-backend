@@ -100,6 +100,36 @@ If you need new seed data for tests, add it to `parking_db_dml.sql` behind a cle
 - **Timestamps**: `created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP`. `updated_at` is not used in the current schema.
 - **Money / decimals**: prefer `INT` (cents) or `DECIMAL(10,2)` over `FLOAT`. The current schema uses `DECIMAL` in `RATES.value` and `PAYMENTS.value`.
 - **Charset**: `utf8mb4` / `utf8mb4_unicode_ci` everywhere. The DDL sets it on the database, the docker-compose sets it on the server. Do not change it.
+- **VARCHAR over TEXT for short fixed-set fields**: `TEXT`, `MEDIUMTEXT`, `LONGTEXT`, `BLOB` and `JSON` columns **cannot** have a `DEFAULT` value in MySQL (unless using MySQL 8.0.13+ expression default syntax `DEFAULT ('value')` with parens, which is not portable). For short fixed-set string fields like `USERS.provider` (which only ever holds `'Local'`, `'Google'`, or `'GitHub'`) use `VARCHAR(N) NOT NULL DEFAULT "value"` so the column can self-populate on ALTER. The set itself is enforced in the Python `Literal` + `frozenset(get_args(...))` pattern (see `code-conventions`).
+
+## Worked example — `USERS.provider` and `USERS.google_id`
+
+These two columns support the local-vs-Google distinction. They were added in the same PR as the Google login refactor:
+
+```sql
+-- database/parking_db_ddl.sql
+CREATE TABLE USERS (
+  ...
+  provider VARCHAR(50) NOT NULL DEFAULT "Local",  -- not TEXT — needs DEFAULT
+  google_id TEXT NULL,                            -- TEXT is fine, NULL is acceptable
+  status INT NOT NULL DEFAULT 2,
+  ...
+  UNIQUE INDEX uq_users_google_id (google_id)
+);
+```
+
+**Backfill recipe** (run on prod **before** the NOT NULL constraint takes effect, or before any INSERT that does not pass `provider`):
+
+```sql
+-- Idempotent. Safe to run multiple times.
+UPDATE USERS
+SET provider = 'Local'
+WHERE provider IS NULL OR provider = '' OR provider = 'local' OR provider = 'google';
+```
+
+The `LOWER` clauses cover the case where someone hand-seeded with lowercase. After this, all existing rows have a valid `provider` and the constraint is safe to enforce.
+
+**Why the unique index on `google_id`**: the same Google account could otherwise create two users in our DB if the user logs in twice with different emails but the same Google `sub` (which is the stable identity). The unique index prevents that. `google_id` is NULL-able because Local users don't have one.
 
 ## Anti-patterns
 

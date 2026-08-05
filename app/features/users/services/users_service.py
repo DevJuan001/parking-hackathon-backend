@@ -250,6 +250,7 @@ class UsersService:
                 hash_password=hash_password,
                 parking_id=parking_id,
                 onboarding_completed=True,
+                provider="Local",
                 connection=connection
             )
 

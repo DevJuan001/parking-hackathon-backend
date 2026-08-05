@@ -66,6 +66,58 @@ class UpdateUserSchema(BaseModel):
 - `BaseSchema` (in `app/utils/base_schema.py`) converts `date` to `str` in the `mode="before"` validator — use it when you need to accept `date` in a response.
 - `Optional[...]` for fields that may be missing (`plate` optional in `SpotResponse`).
 
+## Pydantic — fixed-set strings (Literal + types/ module)
+
+For fields whose value comes from a small, finite set of strings (e.g. `provider = "Local" | "Google" | "GitHub"`), use a `Literal` type alias in a dedicated **`types/`** module per feature. **Never** put the set as an inline `Literal[...]` annotation in the schema or the service — the same set will be needed in three places (input schema, response model, repository) and duplicating it causes silent drift.
+
+**The pattern**, in 3 files:
+
+```python
+# app/features/<feature>/types/<feature>_types.py
+from typing import Literal, get_args
+
+MyFieldType = Literal["A", "B", "C"]
+VALID_MY_FIELDS: frozenset[str] = frozenset(get_args(MyFieldType))
+```
+
+```python
+# app/features/<feature>/models/<feature>_responses.py
+from app.features.<feature>.types.<feature>_types import MyFieldType
+
+class MyResponse(BaseModel):
+    my_field: MyFieldType
+```
+
+```python
+# app/features/<feature>/repositories/<feature>_repository.py
+from app.features.<feature>.types.<feature>_types import MyFieldType, VALID_MY_FIELDS
+
+def create_thing(..., my_field: MyFieldType, ...):
+    # Defensa en profundidad: validar ANTES de tocar la DB.
+    # Un typo como "gogle" o "Github" (sin H) se rechaza acá.
+    if my_field not in VALID_MY_FIELDS:
+        logger.error(
+            "MyField inválido '%s'. Valores válidos: %s. "
+            "Esto es un bug en el código que llama a create_thing.",
+            my_field, sorted(VALID_MY_FIELDS),
+        )
+        return (
+            "No se pudo crear el elemento. Intentalo nuevamente más tarde.",
+            False, None,
+        )
+    # ... INSERT INTO ...
+```
+
+**Rules**:
+
+- The `Literal` is the **single source of truth** for the set. Adding a new value (e.g. `"D"`) is a one-line change in `types/<feature>_types.py`. Pydantic, the response model, and the runtime check all pick it up automatically.
+- `Literal` is a **type hint only** in Python — it is not enforced at runtime. `frozenset(get_args(Literal[...]))` extracts the set so the repository can validate before the SQL hits the DB.
+- The user-facing message on a validation failure is **generic** ("No se pudo crear el elemento..."). The technical detail (which value, which set) goes to `logger.error`, never to the API response. This prevents leaking the set of valid values to a potential attacker.
+- The validation lives in the **repository**, not the service or the schema. This makes it impossible to bypass: every caller of `create_*` is protected, including future ones (admin endpoints, Celery tasks, scripts, tests).
+- **Do not** add `provider`-style fields to `CreateXSchema` (the input schema). The set is a service-layer concern, not an API consumer concern. See the worked example in `auth-and-security/SKILL.md` for why.
+
+**Worked example in the repo**: `app/features/users/types/users_types.py` defines `ProviderType = Literal["Local", "Google", "GitHub"]` and `VALID_PROVIDERS`. Both `users_responses.py` and `users_repository.py` import from it. The runtime check is in `users_repository.py:create_user`.
+
 ## Plates
 
 ```python
