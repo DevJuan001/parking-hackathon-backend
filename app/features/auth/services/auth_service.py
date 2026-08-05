@@ -88,8 +88,17 @@ class AuthService:
         connection = get_connection()
 
         try:
-            token = await oauth.google.authorize_access_token(code)
-            user_info = token.get("userInfo")
+            # Comprobamos si el token es correcto
+            token = await oauth.google.fetch_access_token(
+                code=code,
+                grant_type="authorization_code",
+                redirect_uri=settings.GOOGLE_REDIRECT_URL,
+            )
+
+            # Obtenemos la información del usuario con el access_token
+            user_info = await oauth.google.userinfo(
+                token={"access_token": token["access_token"]}
+            )
 
             if not user_info:
                 raise ServiceError(
@@ -131,7 +140,8 @@ class AuthService:
                     raise ServiceError(error or message)
 
                 error, user = UsersRepository.find_user_by_email(
-                    email, connection)
+                    email, connection
+                )
 
                 if error or not user:
                     raise ServiceError("No se pudo obtener el usuario creado")
