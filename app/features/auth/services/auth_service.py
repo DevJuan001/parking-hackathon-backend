@@ -2,13 +2,13 @@
 
 import jwt
 import bcrypt
-from datetime import timedelta
-from fastapi import Request, Response
-from jwt.exceptions import PyJWTError
 from pydantic import EmailStr
+from datetime import timedelta
+from jwt.exceptions import PyJWTError
+from fastapi import Request, Response
 
-from app.core.config import settings
 from app.core.oauth import oauth
+from app.core.config import settings
 from app.utils.logger import get_logger
 from app.core.exception import ServiceError
 from app.core.database import get_connection
@@ -43,10 +43,15 @@ class AuthService:
                     "¡Parece que aún no tienes cuenta! Regístrate en unos segundos y empieza a usar la app."
                 )
 
+            if user.provider == "Google":
+                raise ServiceError(
+                    "Esta cuenta fue creada con Google. Para acceder, Inicia sesión con Google."
+                )
+
             # Validación de los parametros recibidos
             if not verify_password(user.password, password):
                 raise ServiceError(
-                    "Verifica que tus credenciales esten escritas correctamente e intentalo nuevamente"
+                    "Verifica que tus credenciales esten escritas correctamente e intentalo nuevamente."
                 )
 
             # Tiempo en que expira el token
@@ -118,6 +123,17 @@ class AuthService:
             if error:
                 raise ServiceError(error)
 
+            if user and user.provider == "Local":
+                raise ServiceError(
+                    "Este correo ya está registrado con contraseña, Ingresa con tu contraseña"
+                )
+
+            sub = user_info.get("sub")
+            
+            if not sub:
+                raise ServiceError("Google no proporcionó un identificador de usuario (sub)")
+
+
             if not user:
                 shell_user = CreateUserSchema(
                     role_id=1,
@@ -133,6 +149,8 @@ class AuthService:
                     hash_password=None,
                     parking_id=None,
                     onboarding_completed=False,
+                    provider="Google",
+                    google_id=sub,
                     connection=connection
                 )
 
@@ -222,6 +240,7 @@ class AuthService:
                 hash_password=hash_password,
                 parking_id=None,
                 onboarding_completed=False,
+                provider="Local",
                 connection=connection
             )
 
