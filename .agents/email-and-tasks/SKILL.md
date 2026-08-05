@@ -27,7 +27,7 @@ service  →  <task>.delay(...)   (enqueues in Redis broker)
 ## Where everything lives
 
 - `app/core/celery_app.py` — `celery = Celery("worker", broker=…, backend=…, include=["app.tasks.email_tasks"])`.
-- `app/core/mail.py` — `ConnectionConfig` with `MAIL_PORT=587`, `MAIL_SERVER="smtp.gmail.com"`, `MAIL_STARTTLS=True`, `MAIL_SSL_TLS=False`, `TEMPLATE_FOLDER="app/templates"`. `fm = FastMail(config)`.
+- `app/core/mail.py` — `ConnectionConfig` reads every `MAIL_*` field from `settings` (pydantic-settings); `TEMPLATE_FOLDER="app/templates"` is local. `fm = FastMail(config)`.
 - `app/tasks/email_tasks.py` — concrete tasks.
 - `app/templates/*.html` — Jinja2 templates.
 

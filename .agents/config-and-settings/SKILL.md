@@ -77,12 +77,12 @@ These map to `get_connection()` in `app/core/database.py` with `charset="utf8mb4
 | `MAIL_USERNAME` | EmailStr | yes | Sender. |
 | `MAIL_PASSWORD` | str | yes | Gmail **app password** (not the account password). |
 | `MAIL_FROM` | EmailStr | yes | Usually equal to `MAIL_USERNAME`. |
-| `MAIL_PORT` | int | no (default `587`) | **Hardcoded** in `app/core/mail.py:8` (not env-driven). |
-| `MAIL_SERVER` | str | no (default `smtp.gmail.com`) | **Hardcoded** in `app/core/mail.py:9` (not env-driven). |
-| `MAIL_STARTTLS` | bool | no (default `True`) | **Hardcoded** in `app/core/mail.py:10` (not env-driven). |
-| `MAIL_SSL_TLS` | bool | no (default `False`) | **Hardcoded** in `app/core/mail.py:11` (not env-driven). |
+| `MAIL_PORT` | int | no (default `587`) | SMTP submission port. Use `587` with `MAIL_STARTTLS=True` (recommended) or `465` with `MAIL_SSL_TLS=True`. |
+| `MAIL_SERVER` | str | no (default `smtp.gmail.com`) | SMTP hostname. Override for SendGrid, AWS SES, Mailgun, etc. |
+| `MAIL_STARTTLS` | bool | no (default `True`) | Upgrade the plain SMTP connection to TLS via the `STARTTLS` command. Recommended with port `587`. |
+| `MAIL_SSL_TLS` | bool | no (default `False`) | Wrap the whole SMTP session in TLS from byte 0 (like HTTPS). Use only with port `465`. Mutually exclusive with `MAIL_STARTTLS`. |
 
-The `MAIL_*` connection settings are **not** in `Settings` — they live in `ConnectionConfig` inside `app/core/mail.py`. If you move them to env vars, change the `ConnectionConfig` too.
+All `MAIL_*` vars are loaded by `pydantic-settings` into `Settings` (`app/core/config.py:28-34`) and consumed by `ConnectionConfig` in `app/core/mail.py:5-11`.
 
 ### Chatbot (LLM)
 
