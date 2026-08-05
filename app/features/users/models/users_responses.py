@@ -36,7 +36,7 @@ class UserByEmailResponse(BaseModel):
     first_surname: str
     second_surname: str
     email: EmailStr
-    password: str
+    password: Optional[str] = None
     onboarding_completed: int
 
 
