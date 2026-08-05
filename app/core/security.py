@@ -80,6 +80,9 @@ def set_auth_cookies(response: Response, access_token: str, refresh_token: str):
 
 # Función para verificar la contraseña del usuario
 def verify_password(user_password: str, password: str):
+    if not user_password:
+        return False
+
     password_bytes = password.encode("utf-8")
     hashed_bytes = user_password.encode("utf-8")
 
