@@ -524,13 +524,13 @@ class AuthService:
         try:
             error, user = UsersService.get_user_by_email(email)
 
-            if user:
+            if user and user.provider == "Local":
                 recovery_password_email.delay(
                     user_email=email,
                     user_name=user.name
                 )
 
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error("Error en recover_password: %s", e, exc_info=True)
 
-        return True, "Correo enviado correctamente"
+        return True, "Te hemos enviado un correo para restablecer la contraseña"
