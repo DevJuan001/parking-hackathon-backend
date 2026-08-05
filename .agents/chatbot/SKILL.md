@@ -28,7 +28,7 @@ RAGService.ask(message, user_payload)
         │
         ├─► VectorRepository.search_chunks(parking_id, message, limit=5)  ── Qdrant
         │
-        ├─► ConversationService.get_history(parking_id, user_id, limit=15)  ── Redis
+        ├─► ConversationService.get_history(parking_id, user_id, limit=10)  ── Redis
         │
         ├─► load_system_prompt(rag_chunks)  ── file: prompts/system.txt + RAG context
         │
@@ -69,8 +69,8 @@ app/
         ├── prompts/
         │   └── system.txt                       # 15-rule system prompt (Spanish, GFM, tool policy)
         ├── repositories/
-        │   ├── chatbot_repository.py            # MySQL: get_parking_info, get_tariffs, get_occupancy_stats,
-        │   │                                     #   get_daily_summary, get_snapshot_data, payment_methods
+        │   ├── chatbot_repository.py            # MySQL: get_parking_info, get_tariffs_with_vehicle_type, get_occupancy_stats,
+        │   │                                     #   get_daily_summary, get_snapshot_data, get_all_payment_methods
         │   └── vector_repository.py             # Qdrant: upsert_chunks, search_chunks, delete_*_by_parking
         ├── routes/
         │   └── chatbot_routes.py                # POST /api/chatbot/ask, RateLimiter 20/min
@@ -121,7 +121,7 @@ See the `tool-registry` skill for the full contract and how to add a new tool.
 
 ### RAG Service (`app/features/chatbot/services/rag_service.py`)
 
-The orchestrator. It calls `IntentClassifier.classify` first, then `VectorRepository.search_chunks` (5 chunks, COSINE), then `ConversationService.get_history` (last 15 messages), then builds the system prompt by reading `prompts/system.txt` and appending `## INFORMACIÓN DE REFERENCIA:` with the RAG chunks. The LLM call is via `AsyncOpenAI` (singleton, lazy init). **Max 5 tool-call iterations** — if the model still wants more tools, a final completion is forced without tools so the user always gets an answer. All `messages[save_start:]` are persisted at the end (including `tool_calls` and `tool` results) so the next turn has full context.
+The orchestrator. It calls `IntentClassifier.classify` first, then `VectorRepository.search_chunks` (5 chunks, COSINE), then `ConversationService.get_history` (last 10 messages, overriding the function default of 15), then builds the system prompt by reading `prompts/system.txt` and appending `## INFORMACIÓN DE REFERENCIA:` with the RAG chunks. The LLM call is via `AsyncOpenAI` (singleton, lazy init). **Max 5 tool-call iterations** — if the model still wants more tools, a final completion is forced without tools so the user always gets an answer. All `messages[save_start:]` are persisted at the end (including `tool_calls` and `tool` results) so the next turn has full context.
 
 ### Intent Classifier (`app/features/chatbot/services/intent_classifier.py`)
 
@@ -216,7 +216,7 @@ The task is **enqueued after the service commits** — see the pattern in `email
 - **Hardcoding tool names in code or tests.** Always reference `tool_registry.TOOLS` or the tool name from the LLM contract.
 - **Skipping the intent classifier.** The classifier is a first layer of defense against prompt injection; bypassing it leaves only the LLM guard.
 - **Allowing Cliente / Maquina access.** The chatbot is Admin-only. `require_roles(["Admin"])` in the route is non-negotiable.
-- **Building RAG chunks from PII.** The current generator only includes parking name, country, tariffs, and payment-method names. Do not add user emails, plate numbers, or payment values.
+- **Building RAG chunks from PII.** The current generator already includes per-vehicle-type tariff rates. Do not add user emails, plate numbers, per-payment values, or aggregate totals.
 - **Bypassing the tool registry.** Tools must be registered, role-checked, and run in `asyncio.to_thread` if sync. Don't call service methods directly from `rag_service.py`.
 - **Editing `CHATBOT-ARCHITECTURE.md`.** It is outdated. Update this skill instead.
 - **Setting `AI_TEMPERATURE` > 0.5.** Increases hallucination on tool calls; the system prompt assumes factual answers.

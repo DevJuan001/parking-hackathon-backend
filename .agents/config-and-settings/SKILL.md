@@ -119,7 +119,7 @@ The collection `parking_knowledge` is hard-coded to **size 384, distance COSINE*
 | `GOOGLE_CLIENT_SECRET` | str | yes | OAuth client secret. Read by `app/core/oauth.py:10`. |
 | `GOOGLE_REDIRECT_URL` | str | yes | E.g. `http://localhost:8000/api/auth/google-callback`. Used as `redirect_uri` in `authlib` and by the `POST /api/auth/google-login` flow (`app/features/auth/services/auth_service.py:95`). |
 
-All three are declared as required `str` in `app/core/config.py:41-43` (no default), so the process fails to start if any is missing — even for users who never hit the Google login route. The `OAUTH_DISCOVERY_URL` (`https://accounts.google.com/.well-known/openid-configuration`) is hard-coded in `app/core/oauth.py:11`, not env-driven.
+All three are declared as required `str` in `app/core/config.py:45-47` (no default), so the process fails to start if any is missing — even for users who never hit the Google login route. The `OAUTH_DISCOVERY_URL` (`https://accounts.google.com/.well-known/openid-configuration`) is hard-coded in `app/core/oauth.py:11`, not env-driven.
 
 ### Celery
 

@@ -13,7 +13,7 @@ The project tracks schema and seed data as plain SQL files in `database/`:
 |---|---|
 | `database/parking_db_ddl.sql` | **Schema source of truth.** `CREATE TABLE`, `CREATE INDEX`, FK constraints. Run on a fresh dev DB. |
 | `database/parking_db_dml.sql` | Dev seed: roles, countries, optional demo data. **Never** run in production. |
-| `database/parking_db_view.sql` | A read-only `VIEW vw_parking_summary` for reporting. Run on a fresh dev DB. |
+| `database/parking_db_view.sql` | The `CREATE VIEW` for `vw_parking_summary` plus a `SELECT * FROM vw_parking_summary` verification query. Run on a fresh dev DB. |
 
 There is no `parking_db_*.sql` migration tool. The files are full re-creations (the DDL starts with `DROP DATABASE IF EXISTS parking_db; CREATE DATABASE …`). For dev, you re-run the DDL and DML from scratch.
 

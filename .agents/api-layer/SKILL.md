@@ -9,7 +9,7 @@ description: Routes, middlewares, rate limiting, response shapes and CORS for pa
 
 `app/main.py`:
 
-- `lifespan` (async context manager) initializes Redis (`init_redis(app)`) and `FastAPILimiter.init(redis)`. Closes Redis in the `finally`.
+- `lifespan` (async context manager) initializes Redis (`init_redis(app)`), `FastAPILimiter.init(redis)`, and — when `CHATBOT_ENABLED=True` — Qdrant (`init_qdrant()`). Closes Redis and Qdrant after the yield.
 - CORS: `allow_origins=["http://localhost:5173"]`, `allow_credentials=True`, `allow_methods=["*"]`, `allow_headers=["*"]`. **Do not** change `allow_origins` without coordinating with the frontend.
 - Health: `GET /` (`API funcionando`) and `GET /ping-db` (opens and closes a MySQL connection).
 - Each feature is included with `app.include_router(<feature>_routes.router)`.
@@ -36,18 +36,20 @@ router = APIRouter(prefix="/api/<domain>", tags=["<Domain>"])
 
 Typical values already in the repo:
 
-| Endpoint | Rate |
-|---|---|
-| `/api/auth/login` | 10/min |
-| `/api/auth/register` | 3/min |
-| `/api/auth/recover-password` | 3/min |
-| `/api/auth/refresh` | 30/min |
-| `/api/auth/complete-on-boarding` | 5/min |
-| `/api/users/*` (general) | 30/min |
-| `/api/users/update-password` | 10/min |
-| `/api/floors/create|update|delete` | 10/min |
-| `/api/spots/` (listing) | 300/min (high, consumed by dashboard) |
-| rest | 30/min |
+| Endpoint | Rate | Notes |
+|---|---|---|
+| `POST /api/auth/login` | 10/min | |
+| `POST /api/auth/google-login` | 10/min | |
+| `POST /api/auth/register` | 3/min | |
+| `POST /api/auth/recover-password` | 3/min | |
+| `POST /api/auth/refresh` | 30/min | |
+| `PUT /api/auth/complete-on-boarding` | 5/min | |
+| `GET /api/spots/` | 300/min | dashboard polling |
+| `GET /api/entries/` | 100/min | dashboard polling |
+| `POST/PUT /api/users/update/me`, `PUT /api/users/update-password` | 10/min | self-service, any role |
+| `POST/PUT/DELETE /api/floors/*` | 10/min | mutations |
+| `POST /api/chatbot/ask` | 20/min | Admin-only (see chatbot skill) |
+| everything else | 30/min | default |
 
 Rule of thumb: 30/min for admin endpoints, 10/min for sensitive actions, 100+ for dashboard reads.
 
