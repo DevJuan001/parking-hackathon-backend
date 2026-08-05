@@ -37,8 +37,8 @@ def login(credentials: LoginModelSchema, response: Response):
         Depends(RateLimiter(times=10, seconds=60))
     ]
 )
-def login(credentials: GoogleLoginModelSchema, response: Response):
-    return AuthController.google_login(credentials, response)
+async def google_login(credentials: GoogleLoginModelSchema, response: Response):
+    return await AuthController.google_login(credentials, response)
 
 
 # Endpoint para registrar un nuevo administrador
