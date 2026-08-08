@@ -15,8 +15,8 @@ class FilterReservationsSchema(BaseModel):
 
 
 class CreateReservationSchema(BaseModel):
-    client_id: int = Field(..., ge=1)
     name: str = safe_str(min_length=1, max_length=100)
+    email: EmailStr = safe_str(max_length=254)
     level: int = Field(..., ge=1)
     start_date: date
     start_time: time
@@ -37,8 +37,8 @@ class CreateSelfReservationSchema(BaseModel):
 
 class UpdateReservationSchema(BaseModel):
     name: Optional[str] = safe_optional_str(min_length=1, max_length=100)
-    client_id: Optional[int] = None
     level: Optional[int] = None
+    email: Optional[EmailStr] = safe_optional_str(max_length=254)
     start_date: Union[date, datetime] = None
     start_time: Optional[time] = None
     end_date: Union[date, datetime] = None
