@@ -158,7 +158,6 @@ class ReservationsRepository():
     @staticmethod
     def create_reservation(
         parking_id: int,
-        user_id: int,
         name: str,
         level: int,
         start_datetime,
@@ -170,19 +169,18 @@ class ReservationsRepository():
         query = """
         INSERT INTO RESERVATIONS (
             parking_id,
-            user_id,
             name,
             level,
             start_date,
             end_date
         )
-        VALUES (%s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s)
         """
 
         try:
             cursor.execute(
                 query,
-                (parking_id, user_id, name, level, start_datetime, end_datetime),
+                (parking_id, name, level, start_datetime, end_datetime),
             )
 
             return None, True, "Reserva creada correctamente"
