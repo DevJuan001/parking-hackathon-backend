@@ -1,3 +1,4 @@
+from pydantic import EmailStr
 from app.utils.logger import get_logger
 from app.features.reservations.models.reservations_responses import ReservationsResponse
 from app.features.reservations.models.reservations_schemas import FilterReservationsSchema, UpdateReservationSchema
@@ -15,8 +16,8 @@ class ReservationsRepository():
         query = """
         SELECT
             id,
-            user_id,
             name,
+            email,
             level,
             start_date,
             end_date,
@@ -53,8 +54,8 @@ class ReservationsRepository():
             data = [
                 ReservationsResponse(
                     id=item[0],
-                    user_id=item[1],
-                    name=item[2],
+                    name=item[1],
+                    email=item[2],
                     level=item[3],
                     start_date=item[4].date(),
                     start_time=item[4].time(),
@@ -87,8 +88,8 @@ class ReservationsRepository():
         query = """
         SELECT
             id,
-            user_id,
             name,
+            email,
             level,
             start_date,
             end_date,
@@ -105,8 +106,8 @@ class ReservationsRepository():
 
             return None, ReservationsResponse(
                 id=result[0],
-                user_id=result[1],
-                name=result[2],
+                name=result[1],
+                email=result[2],
                 level=result[3],
                 start_date=result[4].date(),
                 start_time=result[4].time(),
@@ -159,6 +160,7 @@ class ReservationsRepository():
     def create_reservation(
         parking_id: int,
         name: str,
+        email: EmailStr,
         level: int,
         start_datetime,
         end_datetime,
@@ -171,16 +173,23 @@ class ReservationsRepository():
             parking_id,
             name,
             level,
+            email,
             start_date,
             end_date
         )
-        VALUES (%s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s)
         """
 
         try:
             cursor.execute(
-                query,
-                (parking_id, name, level, start_datetime, end_datetime),
+                query, (
+                    parking_id,
+                    name,
+                    email,
+                    level,
+                    start_datetime,
+                    end_datetime
+                ),
             )
 
             return None, True, "Reserva creada correctamente"
