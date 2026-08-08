@@ -87,7 +87,6 @@ def send_reservation_created_email(
     self,
     user_email: EmailStr,
     user_name: str,
-    user_first_surname: str,
     reservation_name: str,
     start_date: str,
     start_time: str,
@@ -100,7 +99,6 @@ def send_reservation_created_email(
             recipients=[user_email],
             template_body={
                 "user_name": user_name,
-                "user_first_surname": user_first_surname,
                 "reservation_name": reservation_name,
                 "start_date": f"{date_formatter(start_date)} {time_to_12h(start_time)}",
                 "end_date": f"{date_formatter(end_date)} {time_to_12h(end_time)}",
