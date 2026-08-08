@@ -13,5 +13,10 @@ class ExitsFiltersSchema(BaseModel):
     per_page: int = Field(15, ge=1, le=100)
 
 
+class StatsExitsFiltersSchema(BaseModel):
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+
+
 class CreateExitSchema(BaseModel):
     plate: str = safe_str(min_length=6, max_length=6)
