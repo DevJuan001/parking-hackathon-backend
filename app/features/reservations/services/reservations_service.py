@@ -1,5 +1,7 @@
 from datetime import date, datetime, time
 
+from pydantic import EmailStr
+
 from app.utils.logger import get_logger
 from app.core.exception import ServiceError
 from app.core.database import get_connection
@@ -44,8 +46,8 @@ class ReservationsService():
     @staticmethod
     def create_reservation(
         parking_id: int,
-        client_id: int,
         name: str,
+        email: EmailStr,
         level: int,
         start_date,
         start_time,
@@ -55,15 +57,6 @@ class ReservationsService():
         connection = get_connection()
 
         try:
-            error, user = UsersRepository.find_user_by_id(
-                parking_id, client_id, connection
-            )
-
-            if error or not user:
-                raise ServiceError(error or "Usuario no encontrado")
-
-            if user.role != "Cliente":
-                raise ServiceError("El usuario elegido debe tener rol Cliente")
 
             start_datetime = datetime.combine(start_date, start_time)
 
@@ -75,7 +68,7 @@ class ReservationsService():
             else:
                 end_datetime = None
 
-            if start_date > end_date:
+            if end_date is not None and start_date > end_date:
                 raise ServiceError(
                     "La fecha de fin debe ser igual o posterior a la fecha de inicio"
                 )
@@ -89,7 +82,6 @@ class ReservationsService():
 
             error, success, message = ReservationsRepository.create_reservation(
                 parking_id=parking_id,
-                user_id=client_id,
                 name=name,
                 level=level,
                 start_datetime=start_datetime,
@@ -103,9 +95,8 @@ class ReservationsService():
             connection.commit()
 
             send_reservation_created_email.delay(
-                user_email=user.email,
-                user_name=user.name,
-                user_first_surname=user.first_surname,
+                user_email=email,
+                user_name=name,
                 reservation_name=name,
                 start_date=start_date.isoformat(),
                 start_time=start_time.strftime("%H:%M:%S"),
