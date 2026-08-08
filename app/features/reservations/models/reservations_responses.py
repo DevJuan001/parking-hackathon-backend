@@ -1,13 +1,13 @@
 from datetime import date, datetime, time
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class ReservationsResponse(BaseModel):
     id: int
-    user_id: int
     name: str
     level: int
+    email: EmailStr
     start_date: date
     start_time: time
     end_date: Optional[date] = None
