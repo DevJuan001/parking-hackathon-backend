@@ -137,9 +137,9 @@ class AuthService:
             if not user:
                 shell_user = CreateUserSchema(
                     role_id=1,
-                    name=name or "",
-                    first_surname=first_surname or "",
-                    second_surname=second_surname or "",
+                    name=name,
+                    first_surname=first_surname,
+                    second_surname=second_surname,
                     email=email,
                     onboarding_completed=False
                 )
