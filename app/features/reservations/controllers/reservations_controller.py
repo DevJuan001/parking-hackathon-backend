@@ -27,8 +27,8 @@ class ReservationsController:
     def create_reservation_for_user(data: CreateReservationSchema, payload: dict):
         error, success, message = ReservationsService.create_reservation(
             int(payload["parking_id"]),
-            data.client_id,
             data.name,
+            data.email,
             data.level,
             data.start_date,
             data.start_time,
