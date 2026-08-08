@@ -52,15 +52,12 @@ def create_reservation(
     "/create-self",
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
-        Depends(require_roles(["Cliente"])),
-        Depends(require_onboarded),
     ]
 )
 def create_self_reservation(
     data: CreateSelfReservationSchema,
-    payload: dict = Depends(verify_jwt)
 ):
-    return ReservationsController.create_reservation_for_self(data, payload)
+    return ReservationsController.create_reservation_for_self(data)
 
 
 @router.put(
