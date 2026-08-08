@@ -2,7 +2,7 @@
 import datetime
 from datetime import date, time, datetime
 from typing import Optional, Union
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
 
 from app.utils.safe_types import safe_optional_str, safe_str
 
@@ -25,7 +25,9 @@ class CreateReservationSchema(BaseModel):
 
 
 class CreateSelfReservationSchema(BaseModel):
+    parking_id: int = Field(..., ge=1)
     name: str = safe_str(min_length=1, max_length=100)
+    email: EmailStr = safe_str(max_length=254)
     level: int = Field(..., ge=1)
     start_date: date
     start_time: time
