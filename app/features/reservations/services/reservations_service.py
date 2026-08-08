@@ -83,6 +83,7 @@ class ReservationsService():
             error, success, message = ReservationsRepository.create_reservation(
                 parking_id=parking_id,
                 name=name,
+                email=email,
                 level=level,
                 start_datetime=start_datetime,
                 end_datetime=end_datetime,
