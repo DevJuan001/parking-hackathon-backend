@@ -7,7 +7,7 @@ from app.features.spots.repositories.spots_repository import SpotsRepository
 from app.features.parking.repositories.plates_repository import PlatesRepository
 from app.features.entries.repositories.entries_repository import EntriesRepository
 from app.features.payments.repositories.payments_repository import PaymentsRepository
-from app.features.exits.models.exits_schemas import CreateExitSchema, ExitsFiltersSchema
+from app.features.exits.models.exits_schemas import CreateExitSchema, ExitsFiltersSchema, StatsExitsFiltersSchema
 from app.features.exits.models.exits_responses import ExitStatsResponse
 
 
@@ -179,12 +179,12 @@ class ExitsService:
             connection.close()
 
     @staticmethod
-    def get_exit_stats(parking_id: int):
+    def get_exit_stats(filters: StatsExitsFiltersSchema, parking_id: int):
         connection = get_connection()
 
         try:
             error, exits = ExitsRepository.count_exit_stats(
-                parking_id, connection
+                filters, parking_id, connection
             )
 
             if error:

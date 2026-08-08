@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 from app.features.exits.services.exits_service import ExitsService
-from app.features.exits.models.exits_schemas import CreateExitSchema, ExitsFiltersSchema
+from app.features.exits.models.exits_schemas import CreateExitSchema, ExitsFiltersSchema, StatsExitsFiltersSchema
 
 
 class ExitsController:
@@ -63,8 +63,9 @@ class ExitsController:
         }
 
     @staticmethod
-    def get_exit_stats(payload: dict):
+    def get_exit_stats(filters: StatsExitsFiltersSchema, payload: dict):
         error, stats = ExitsService.get_exit_stats(
+            filters,
             int(payload["parking_id"])
         )
 

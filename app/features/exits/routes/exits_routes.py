@@ -3,7 +3,7 @@ from fastapi_limiter.depends import RateLimiter
 from app.middlewares.jwt_middleware import verify_jwt
 from app.middlewares.roles_middleware import require_roles
 from app.features.exits.controllers.exits_controller import ExitsController
-from app.features.exits.models.exits_schemas import CreateExitSchema, ExitsFiltersSchema
+from app.features.exits.models.exits_schemas import CreateExitSchema, ExitsFiltersSchema, StatsExitsFiltersSchema
 
 router = APIRouter(
     prefix="/api/exits",
@@ -40,14 +40,17 @@ def get_exits_by_plate(
 
 
 @router.get(
-    "/stats",
+    "/stats/",
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
         Depends(require_roles(["Admin"])),
     ]
 )
-def get_exit_stats(payload: dict = Depends(verify_jwt)):
-    return ExitsController.get_exit_stats(payload)
+def get_exit_stats(
+    filters: StatsExitsFiltersSchema = Depends(),
+    payload: dict = Depends(verify_jwt)
+):
+    return ExitsController.get_exit_stats(filters, payload)
 
 
 @router.get(

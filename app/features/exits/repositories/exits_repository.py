@@ -1,6 +1,6 @@
 from app.utils.logger import get_logger
 from app.features.exits.models.exits_responses import ExitResponse
-from app.features.exits.models.exits_schemas import ExitsFiltersSchema
+from app.features.exits.models.exits_schemas import ExitsFiltersSchema, StatsExitsFiltersSchema
 
 logger = get_logger("exits.repository")
 
@@ -251,7 +251,9 @@ class ExitsRepository:
             cursor.close()
 
     @staticmethod
-    def count_exit_stats(parking_id: int, connection):
+    def count_exit_stats(filters: StatsExitsFiltersSchema, parking_id: int, connection):
+        data = filters.model_dump(exclude_none=True)
+
         cursor = connection.cursor()
 
         query = """
@@ -265,11 +267,23 @@ class ExitsRepository:
                      THEN 1 ELSE 0 END
             ) AS this_month
         FROM EXITS AS e
-        WHERE e.parking_id = %s
         """
+        filters = ["e.parking_id = %s"]
+        values = [parking_id]
+
+        if "start_date" in data:
+            filters.append("DATE(e.created_at) >= %s")
+            values.append(data["start_date"])
+
+        if "end_date" in data:
+            filters.append("DATE(e.created_at) <= %s")
+            values.append(data["end_date"])
+
+        if filters:
+            query += " WHERE " + " AND ".join(filters)
 
         try:
-            cursor.execute(query, (parking_id,))
+            cursor.execute(query, values)
             result = cursor.fetchone()
 
             return None, {
