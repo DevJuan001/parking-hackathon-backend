@@ -101,7 +101,7 @@ def send_reservation_created_email(
                 "user_name": user_name,
                 "reservation_name": reservation_name,
                 "start_date": f"{date_formatter(start_date)} {time_to_12h(start_time)}",
-                "end_date": f"{date_formatter(end_date)} {time_to_12h(end_time)}",
+                "end_date": f"{date_formatter(end_date)} {time_to_12h(end_time)}" if end_date and end_time else "",
             },
             subtype="html",
         )
