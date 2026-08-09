@@ -260,13 +260,12 @@ class ReservationsService():
             send_reservation_cancelled_email.delay(
                 user_email=existing.email,
                 user_name=existing.name,
+                reservation_id=reservation_id,
                 reservation_name=existing.name,
-                start_date=existing.start_date.isoformat(),
-                start_time=existing.start_time.strftime("%H:%M:%S"),
-                end_date=existing.end_date.isoformat() if existing.end_date else None,
-                end_time=existing.end_time.strftime(
-                    "%H:%M:%S"
-                ) if existing.end_time else None,
+                start_date=existing.start_date,
+                start_time=existing.start_time,
+                end_date=existing.end_date if existing.end_date else None,
+                end_time=existing.end_time if existing.end_time else None,
             )
 
             return None, True, "Reserva eliminada correctamente"
