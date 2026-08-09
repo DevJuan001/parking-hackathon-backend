@@ -13,6 +13,16 @@ router = APIRouter(
 
 
 @router.get(
+    "/{parking_id}",
+    dependencies=[
+        Depends(RateLimiter(times=30, seconds=60)),
+    ]
+)
+def get_parking_by_id(parking_id: int):
+    return ParkingController.get_parking_by_id(parking_id)
+
+
+@router.get(
     "/plates",
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
