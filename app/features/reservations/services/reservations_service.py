@@ -211,6 +211,18 @@ class ReservationsService():
 
             connection.commit()
 
+            if (reservation_data.status == 1):
+                send_reservation_cancelled_email.delay(
+                    user_email=existing_reservation.email,
+                    user_name=existing_reservation.name,
+                    reservation_id=reservation_id,
+                    reservation_name=existing_reservation.name,
+                    start_date=existing_reservation.start_date,
+                    start_time=existing_reservation.start_time,
+                    end_date=existing_reservation.end_date if existing_reservation.end_date else None,
+                    end_time=existing_reservation.end_time if existing_reservation.end_time else None,
+                )
+
             return None, True, "Reserva actualizada correctamente"
 
         except ServiceError as e:
@@ -257,16 +269,17 @@ class ReservationsService():
 
             connection.commit()
 
-            send_reservation_cancelled_email.delay(
-                user_email=existing.email,
-                user_name=existing.name,
-                reservation_id=reservation_id,
-                reservation_name=existing.name,
-                start_date=existing.start_date,
-                start_time=existing.start_time,
-                end_date=existing.end_date if existing.end_date else None,
-                end_time=existing.end_time if existing.end_time else None,
-            )
+            if (existing.status != 1):
+                send_reservation_cancelled_email.delay(
+                    user_email=existing.email,
+                    user_name=existing.name,
+                    reservation_id=reservation_id,
+                    reservation_name=existing.name,
+                    start_date=existing.start_date,
+                    start_time=existing.start_time,
+                    end_date=existing.end_date if existing.end_date else None,
+                    end_time=existing.end_time if existing.end_time else None,
+                )
 
             return None, True, "Reserva eliminada correctamente"
 
