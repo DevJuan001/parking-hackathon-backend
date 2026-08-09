@@ -16,6 +16,7 @@ class FilterReservationsSchema(BaseModel):
 
 class CreateReservationSchema(BaseModel):
     name: str = safe_str(min_length=1, max_length=100)
+    plate: str = safe_str(min_length=6, max_length=6)
     email: EmailStr = safe_str(max_length=254)
     level: int = Field(..., ge=1)
     start_date: date
@@ -27,6 +28,7 @@ class CreateReservationSchema(BaseModel):
 class CreateSelfReservationSchema(BaseModel):
     parking_id: int = Field(..., ge=1)
     name: str = safe_str(min_length=1, max_length=100)
+    plate: str = safe_str(min_length=6, max_length=6)
     email: EmailStr = safe_str(max_length=254)
     level: int = Field(..., ge=1)
     start_date: date
