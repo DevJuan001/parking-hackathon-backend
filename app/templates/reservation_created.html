@@ -74,11 +74,15 @@
 
                   <tr>
                     <td>
-                      <span style="font-weight: 600">{{parking_location}}</span>
+                      <span style="font-size: 18px; font-weight: 600">
+                        {{parking_location}}
+                      </span>
                     </td>
 
                     <td>
-                      <span style="font-weight: 600">{{start_date}}</span>
+                      <span style="font-size: 18px; font-weight: 600">
+                        {{start_date}}
+                      </span>
                     </td>
                   </tr>
                 </table>
@@ -107,7 +111,9 @@
                         </tr>
 
                         <tr>
-                          <td style="font-weight: 600">${{total}}</td>
+                          <td style="font-size: 18px; font-weight: 600">
+                            ${{total}}
+                          </td>
                         </tr>
                       </table>
                     </td>
@@ -130,7 +136,9 @@
                         </tr>
 
                         <tr>
-                          <td style="font-weight: 600">{{payment_status}}</td>
+                          <td style="font-size: 18px; font-weight: 600">
+                            {{payment_status}}
+                          </td>
                         </tr>
                       </table>
                     </td>
@@ -183,7 +191,9 @@
                               />
                             </td>
 
-                            <td style="padding-left: 2px">Ver en maps</td>
+                            <td style="font-size: 14px; padding-left: 2px">
+                              Ver en maps
+                            </td>
                           </tr>
                         </table>
                       </a>
@@ -191,7 +201,7 @@
 
                     <td align="center" style="width: 33.33%">
                       <a
-                        href="https://calendar.google.com/calendar/render?action=TEMPLATE&text={{ reservation_id | urlencode }}&dates=<start>/<end> en YYYYMMDDTHHMMSSZ&location={{ parking_location | urlencode }}&details=Reserva #{{ reservation_id }}"
+                        href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Reserva en el parking {{parking_name | urlencode }}&dates={{raw_start_date}}/{{raw_end_date}}&location={{ parking_location | urlencode }}&details=Reserva #{{ reservation_id }}"
                         style="
                           display: block;
                           line-height: 15px;
@@ -218,7 +228,13 @@
                               />
                             </td>
 
-                            <td style="padding-left: 2px">
+                            <td
+                              style="
+                                font-size: 13px;
+                                text-wrap: nowrap;
+                                padding-left: 1px;
+                              "
+                            >
                               Agregar al calendario
                             </td>
                           </tr>
@@ -256,7 +272,9 @@
                               />
                             </td>
 
-                            <td style="padding-left: 2px">Cancelar reserva</td>
+                            <td style="font-size: 14px; padding-left: 2px">
+                              Cancelar reserva
+                            </td>
                           </tr>
                         </table>
                       </a>
