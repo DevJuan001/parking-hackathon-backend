@@ -5,7 +5,10 @@ from pydantic import EmailStr
 from app.utils.logger import get_logger
 from app.core.exception import ServiceError
 from app.core.database import get_connection
-from app.features.users.repositories.users_repository import UsersRepository
+from app.utils.round_to_50 import round_up_to_next_50
+from app.utils.plate_formatter import plate_formatter
+from app.features.tariffs.repositories.tariffs_repository import TariffsRepository
+from app.features.parking.repositories.parkings_repository import ParkingsRepository
 from app.features.reservations.repositories.reservations_repository import ReservationsRepository
 from app.tasks.email_tasks import send_reservation_created_email, send_reservation_cancelled_email
 from app.features.reservations.models.reservations_schemas import FilterReservationsSchema, UpdateReservationSchema
@@ -47,6 +50,7 @@ class ReservationsService():
     def create_reservation(
         parking_id: int,
         name: str,
+        plate: str,
         email: EmailStr,
         level: int,
         start_date,
@@ -57,7 +61,7 @@ class ReservationsService():
         connection = get_connection()
 
         try:
-
+            # Juntamos la fecha y la hora de inicio
             start_datetime = datetime.combine(start_date, start_time)
 
             if end_date is not None:
@@ -68,6 +72,7 @@ class ReservationsService():
             else:
                 end_datetime = None
 
+            # Validamos que la fecha de fin no sea mayor a la de inicio
             if end_date is not None and start_date > end_date:
                 raise ServiceError(
                     "La fecha de fin debe ser igual o posterior a la fecha de inicio"
@@ -80,10 +85,11 @@ class ReservationsService():
                     "No se puede crear una reserva en una fecha anterior a la actual"
                 )
 
-            error, success, message = ReservationsRepository.create_reservation(
+            error, success, message, reservation_id = ReservationsRepository.create_reservation(
                 parking_id=parking_id,
                 name=name,
                 email=email,
+                plate=plate,
                 level=level,
                 start_datetime=start_datetime,
                 end_datetime=end_datetime,
@@ -93,18 +99,53 @@ class ReservationsService():
             if error or not success:
                 raise ServiceError(error or message)
 
+            # Buscamos la información del parking mediante el id
+            error, parking = ParkingsRepository.find_parking_by_id(
+                parking_id, connection
+            )
+
+            if error:
+                raise ServiceError(error)
+
+            # Formateamos la placa
+            plate_text = plate_formatter(plate)
+
+            if not plate_text:
+                raise ServiceError("La placa no puede estar vacía")
+
+            if plate_text[-1].isalpha():
+                vehicle_type = 2
+            else:
+                vehicle_type = 1
+
+            total_time = start_datetime - end_datetime if end_datetime else 0
+
+            error, rate = TariffsRepository.find_rate_by_vehicle_type(
+                parking_id, vehicle_type, connection
+            )
+
+            if error or not rate:
+                raise ServiceError(error or "Tarifa no encontrada")
+
+            # Redondeamos el valor total a pagar
+            total_raw = round(total_time * rate.value, 2)
+            total = round_up_to_next_50(total_raw)
+
             connection.commit()
 
             send_reservation_created_email.delay(
                 user_email=email,
                 user_name=name,
+                parking_name=parking.name,
+                parking_location=parking.country,
+                reservation_id=reservation_id,
                 reservation_name=name,
-                start_date=start_date.isoformat(),
-                start_time=start_time.strftime("%H:%M:%S"),
-                end_date=end_date.isoformat() if end_date else None,
-                end_time=end_datetime.strftime(
-                    "%H:%M:%S"
-                ) if end_datetime else None,
+                total=total if total else rate.value * 2,
+                payment_status="Pagado",
+                start_date=start_date,
+                start_time=start_time,
+                end_date=end_date if end_date else None,
+                end_time=end_datetime if end_datetime else None,
             )
 
             return None, True, "Reserva creada correctamente"
@@ -205,28 +246,20 @@ class ReservationsService():
                     "No se puede eliminar una reserva que está en proceso"
                 )
 
-            error, user = UsersRepository.find_user_by_id(
-                parking_id, existing.user_id, connection
-            )
-
-            if error or not user:
-                raise ServiceError(
-                    "No se pudo obtener el usuario de la reserva")
-
             error, success, message = ReservationsRepository.delete_reservation(
                 reservation_id, parking_id, connection
             )
 
             if error or not success:
                 raise ServiceError(
-                    error or "Error al intentar eliminar la reserva")
+                    error or "Error al intentar eliminar la reserva"
+                )
 
             connection.commit()
 
             send_reservation_cancelled_email.delay(
-                user_email=user.email,
-                user_name=user.name,
-                user_first_surname=user.first_surname,
+                user_email=existing.email,
+                user_name=existing.name,
                 reservation_name=existing.name,
                 start_date=existing.start_date.isoformat(),
                 start_time=existing.start_time.strftime("%H:%M:%S"),
