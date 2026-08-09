@@ -106,7 +106,7 @@ class TariffsRepository:
             result = cursor.fetchone()
 
             if not result:
-                return "Tarifa no encontrada para ese tipo de vehículo", None
+                return "Lo sentimos, no hay una tarifa registrada para ese tipo de vehículo", None
 
             return None, TariffResponse(
                 id=result[0],
