@@ -1,6 +1,12 @@
 from pydantic import BaseModel
 
 
+class ParkingResponse(BaseModel):
+    id: int
+    name: str
+    country: str
+
+
 class PlateResponse(BaseModel):
     id: int
     plate: str
