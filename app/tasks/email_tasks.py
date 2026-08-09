@@ -1,4 +1,5 @@
 import asyncio
+from datetime import date, datetime, time, timedelta
 from typing import Optional
 
 from pydantic import EmailStr
@@ -94,11 +95,15 @@ def send_reservation_created_email(
     total: str,
     payment_status: str,
     start_date: str,
-    start_time: str,
+    start_time: time,
     end_date: Optional[str] = None,
-    end_time: Optional[str] = None,
+    end_time: Optional[time] = None,
 ):
     try:
+        raw_end_time = end_time if end_time else (
+            datetime.combine(date.min, start_time) + timedelta(minutes=30)
+        )
+
         message = MessageSchema(
             subject="Tu reserva está confirmada",
             recipients=[user_email],
@@ -110,6 +115,8 @@ def send_reservation_created_email(
                 "reservation_name": reservation_name,
                 "total": total,
                 "payment_status": payment_status,
+                "raw_start_date": f"{start_date}T{start_time}",
+                "raw_end_date": f"{end_date if end_date else start_date}T{raw_end_time}",
                 "start_date": f"{date_formatter(start_date)} {time_to_12h(start_time)}",
                 "end_date": f"{date_formatter(end_date)} {time_to_12h(end_time)}" if end_date and end_time else "",
             },
