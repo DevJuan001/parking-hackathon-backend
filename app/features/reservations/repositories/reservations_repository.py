@@ -34,7 +34,7 @@ class ReservationsRepository():
             values.append(data["start_date"])
 
         if "end_date" in data:
-            filters.append("DATE(end_date) <= %s")
+            filters.append("(end_date IS NULL OR DATE(end_date) <= %s)")
             values.append(data["end_date"])
 
         if filters:
@@ -124,34 +124,6 @@ class ReservationsRepository():
                 exc_info=True
             )
             return "Error al intentar obtener la reserva", None
-
-        finally:
-            cursor.close()
-
-    @staticmethod
-    def delete_reservation(reservation_id: int, parking_id: int, connection):
-        cursor = connection.cursor()
-
-        query = """
-        DELETE FROM RESERVATIONS
-        WHERE id = %s AND parking_id = %s
-        """
-
-        try:
-            cursor.execute(query, (reservation_id, parking_id))
-
-            if cursor.rowcount == 0:
-                return "Reserva no encontrada", False, None
-
-            return None, True, "Reserva eliminada correctamente"
-
-        except Exception as e:
-            logger.error(
-                "Error en delete_reservation: %s",
-                e,
-                exc_info=True
-            )
-            return "Error al intentar eliminar la reserva", False, None
 
         finally:
             cursor.close()
@@ -253,6 +225,34 @@ class ReservationsRepository():
                 exc_info=True
             )
             return "Error al intentar actualizar la reserva", False, None
+
+        finally:
+            cursor.close()
+
+    @staticmethod
+    def delete_reservation(reservation_id: int, parking_id: int, connection):
+        cursor = connection.cursor()
+
+        query = """
+        DELETE FROM RESERVATIONS
+        WHERE id = %s AND parking_id = %s
+        """
+
+        try:
+            cursor.execute(query, (reservation_id, parking_id))
+
+            if cursor.rowcount == 0:
+                return "Reserva no encontrada", False, None
+
+            return None, True, "Reserva eliminada correctamente"
+
+        except Exception as e:
+            logger.error(
+                "Error en delete_reservation: %s",
+                e,
+                exc_info=True
+            )
+            return "Error al intentar eliminar la reserva", False, None
 
         finally:
             cursor.close()
