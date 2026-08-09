@@ -1,9 +1,9 @@
 import asyncio
-from datetime import date, datetime, time, timedelta
 from typing import Optional
+from datetime import date, datetime, time, timedelta
 
-from pydantic import EmailStr
 from app.core.mail import fm
+from pydantic import EmailStr
 from app.core.celery_app import celery
 from fastapi_mail import MessageSchema
 
@@ -138,11 +138,12 @@ def send_reservation_cancelled_email(
     self,
     user_email: EmailStr,
     user_name: str,
+    reservation_id: int,
     reservation_name: str,
-    start_date: Optional[str] = None,
-    start_time: Optional[str] = None,
-    end_date: Optional[str] = None,
-    end_time: Optional[str] = None,
+    start_date: Optional[date] = None,
+    start_time: Optional[time] = None,
+    end_date: Optional[date] = None,
+    end_time: Optional[time] = None,
 ):
     try:
         message = MessageSchema(
@@ -150,9 +151,10 @@ def send_reservation_cancelled_email(
             recipients=[user_email],
             template_body={
                 "user_name": user_name,
+                "reservation_id": reservation_id,
                 "reservation_name": reservation_name,
                 "start_date": f"{date_formatter(start_date)} {time_to_12h(start_time)}",
-                "end_date": f"{date_formatter(end_date)} {time_to_12h(end_time)}",
+                "end_date": f"{date_formatter(end_date)} {time_to_12h(end_time)}" if end_date and end_time else "",
             },
             subtype="html",
         )
