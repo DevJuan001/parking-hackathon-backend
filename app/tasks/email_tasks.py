@@ -140,6 +140,7 @@ def send_reservation_cancelled_email(
     user_name: str,
     reservation_id: int,
     reservation_name: str,
+    template_name: str,
     start_date: Optional[date] = None,
     start_time: Optional[time] = None,
     end_date: Optional[date] = None,
@@ -161,7 +162,7 @@ def send_reservation_cancelled_email(
 
         asyncio.run(
             fm.send_message(
-                message, template_name="reservation_cancelled.html"
+                message, template_name=template_name
             )
         )
 
