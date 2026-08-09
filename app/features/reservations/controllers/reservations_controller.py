@@ -28,6 +28,7 @@ class ReservationsController:
         error, success, message = ReservationsService.create_reservation(
             int(payload["parking_id"]),
             data.name,
+            data.plate,
             data.email,
             data.level,
             data.start_date,
@@ -49,6 +50,7 @@ class ReservationsController:
         error, success, message = ReservationsService.create_reservation(
             data.parking_id,
             data.name,
+            data.plate,
             data.email,
             data.level,
             data.start_date,
