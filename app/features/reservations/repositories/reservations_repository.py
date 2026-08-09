@@ -161,6 +161,7 @@ class ReservationsRepository():
         parking_id: int,
         name: str,
         email: EmailStr,
+        plate: str,
         level: int,
         start_datetime,
         end_datetime,
@@ -172,12 +173,13 @@ class ReservationsRepository():
         INSERT INTO RESERVATIONS (
             parking_id,
             name,
-            level,
             email,
+            plate,
+            level,
             start_date,
             end_date
         )
-        VALUES (%s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
 
         try:
@@ -186,13 +188,16 @@ class ReservationsRepository():
                     parking_id,
                     name,
                     email,
+                    plate,
                     level,
                     start_datetime,
                     end_datetime
                 ),
             )
 
-            return None, True, "Reserva creada correctamente"
+            reservation_id = cursor.lastrowid
+
+            return None, True, "Reserva creada correctamente", reservation_id
 
         except Exception as e:
             logger.error(
@@ -200,7 +205,7 @@ class ReservationsRepository():
                 e,
                 exc_info=True
             )
-            return "Error al intentar crear la reserva", False, None
+            return "Error al intentar crear la reserva", False, None, None
 
         finally:
             cursor.close()
