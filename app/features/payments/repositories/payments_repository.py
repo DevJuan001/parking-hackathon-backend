@@ -9,12 +9,12 @@ logger = get_logger("payments.repository")
 class PaymentsRepository:
 
     @staticmethod
-    def find_all_payments(parking_id: int, connection):
+    def find_all_payments(parking_id: str, connection):
         cursor = connection.cursor()
 
         query = """
         SELECT
-            pay.id,
+            pay.uuid,
             p.plate,
             s.spot,
             pay.value,
@@ -33,7 +33,7 @@ class PaymentsRepository:
 
             payments = [
                 PaymentResponse(
-                    id=item[0],
+                    uuid=item[0],
                     plate=item[1],
                     spot=item[2],
                     value=item[3],
@@ -52,12 +52,12 @@ class PaymentsRepository:
             cursor.close()
 
     @staticmethod
-    def find_payment_by_id(parking_id: int, payment_id: int, connection):
+    def find_payment_by_id(parking_id: str, payment_id: int, connection):
         cursor = connection.cursor()
 
         query = """
         SELECT
-            pay.id,
+            pay.uuid,
             p.plate,
             s.spot,
             pay.value,
@@ -66,7 +66,7 @@ class PaymentsRepository:
         FROM PAYMENTS AS pay
         INNER JOIN PLATES AS p ON p.id = pay.plate_id
         INNER JOIN SPOTS  AS s ON s.spot_id = pay.spot_id
-        WHERE pay.parking_id = %s AND pay.id = %s
+        WHERE pay.parking_id = %s AND pay.uuid = %s
         """
 
         try:
@@ -77,7 +77,7 @@ class PaymentsRepository:
                 return "Pago no encontrado", None
 
             payment = PaymentResponse(
-                id=result[0],
+                uuid=result[0],
                 plate=result[1],
                 spot=result[2],
                 value=result[3],
@@ -94,12 +94,12 @@ class PaymentsRepository:
             cursor.close()
 
     @staticmethod
-    def find_payments_by_plate(parking_id: int, plate_id: int, connection):
+    def find_payments_by_plate(parking_id: str, plate_id: int, connection):
         cursor = connection.cursor()
 
         query = """
         SELECT
-            pay.id,
+            pay.uuid,
             p.plate,
             s.spot,
             pay.value,
@@ -141,17 +141,26 @@ class PaymentsRepository:
             cursor.close()
 
     @staticmethod
-    def create_payment(parking_id: int, plate_id: int, spot_id: int, value: float, payment_method_id: str, connection):
+    def create_payment(
+        uuid: str,
+        parking_id: str,
+        plate_id: int,
+        spot_id: int,
+        value: float,
+        payment_method_id: str,
+        connection
+    ):
         cursor = connection.cursor()
 
         query = """
-        INSERT INTO PAYMENTS (parking_id, plate_id, spot_id, value, payment_method_id)
-        VALUES (%s, %s, %s, %s, %s)
+        INSERT INTO PAYMENTS (uuid, parking_id, plate_id, spot_id, value, payment_method_id)
+        VALUES (%s, %s, %s, %s, %s, %s)
         """
 
         try:
             cursor.execute(
                 query, (
+                    uuid,
                     parking_id,
                     plate_id,
                     spot_id,
@@ -202,7 +211,7 @@ class PaymentsRepository:
             cursor.close()
 
     @staticmethod
-    def find_payments_growth(parking_id: int, period: str, connection):
+    def find_payments_growth(parking_id: str, period: str, connection):
         cursor = connection.cursor()
 
         if period not in period_map:
@@ -251,7 +260,7 @@ class PaymentsRepository:
             cursor.close()
 
     @staticmethod
-    def sum_payment_stats(parking_id: int, connection):
+    def sum_payment_stats(parking_id: str, connection):
         cursor = connection.cursor()
 
         query = """
