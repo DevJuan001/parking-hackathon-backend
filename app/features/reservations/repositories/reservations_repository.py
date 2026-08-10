@@ -8,14 +8,14 @@ logger = get_logger("reservations.repository")
 
 class ReservationsRepository():
     @staticmethod
-    def find_all_reservations(filters_data: FilterReservationsSchema, parking_id: int, connection):
+    def find_all_reservations(filters_data: FilterReservationsSchema, parking_id: str, connection):
         cursor = connection.cursor()
 
         data = filters_data.model_dump(exclude_none=True)
 
         query = """
         SELECT
-            id,
+            uuid,
             name,
             email,
             level,
@@ -40,7 +40,7 @@ class ReservationsRepository():
         if filters:
             query += " WHERE " + " AND ".join(filters)
 
-        query += " ORDER BY id LIMIT %s OFFSET %s"
+        query += " ORDER BY start_date LIMIT %s OFFSET %s"
 
         per_page = filters_data.per_page
         offset = (filters_data.page - 1) * per_page
@@ -53,7 +53,7 @@ class ReservationsRepository():
 
             data = [
                 ReservationsResponse(
-                    id=item[0],
+                    uuid=item[0],
                     name=item[1],
                     email=item[2],
                     level=item[3],
@@ -82,12 +82,12 @@ class ReservationsRepository():
             cursor.close()
 
     @staticmethod
-    def find_reservation_by_id(reservation_id: int, parking_id: int, connection):
+    def find_reservation_by_id(reservation_id: str, parking_id: str, connection):
         cursor = connection.cursor()
 
         query = """
         SELECT
-            id,
+            uuid,
             name,
             email,
             level,
@@ -96,7 +96,7 @@ class ReservationsRepository():
             created_at,
             status
         FROM RESERVATIONS
-        WHERE id = %s AND parking_id = %s
+        WHERE uuid = %s AND parking_id = %s
         """
 
         try:
@@ -105,7 +105,7 @@ class ReservationsRepository():
             result = cursor.fetchone()
 
             return None, ReservationsResponse(
-                id=result[0],
+                uuid=result[0],
                 name=result[1],
                 email=result[2],
                 level=result[3],
@@ -130,7 +130,8 @@ class ReservationsRepository():
 
     @staticmethod
     def create_reservation(
-        parking_id: int,
+        parking_id: str,
+        uuid: str,
         name: str,
         email: EmailStr,
         plate: str,
@@ -143,6 +144,7 @@ class ReservationsRepository():
 
         query = """
         INSERT INTO RESERVATIONS (
+            uuid,
             parking_id,
             name,
             email,
@@ -151,12 +153,13 @@ class ReservationsRepository():
             start_date,
             end_date
         )
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """
 
         try:
             cursor.execute(
                 query, (
+                    uuid,
                     parking_id,
                     name,
                     email,
@@ -183,7 +186,7 @@ class ReservationsRepository():
             cursor.close()
 
     @staticmethod
-    def update_reservation(reservation_id: int, parking_id: int, reservation_data: UpdateReservationSchema, connection):
+    def update_reservation(reservation_id: str, parking_id: str, reservation_data: UpdateReservationSchema, connection):
         data = reservation_data.model_dump(exclude_none=True)
 
         cursor = connection.cursor()
@@ -212,7 +215,7 @@ class ReservationsRepository():
                 values = list(mapped.values()) + [parking_id, reservation_id]
 
                 cursor.execute(
-                    f"UPDATE RESERVATIONS SET {columns} WHERE parking_id = %s AND id = %s",
+                    f"UPDATE RESERVATIONS SET {columns} WHERE parking_id = %s AND uuid = %s",
                     values
                 )
 
@@ -230,12 +233,12 @@ class ReservationsRepository():
             cursor.close()
 
     @staticmethod
-    def delete_reservation(reservation_id: int, parking_id: int, connection):
+    def delete_reservation(reservation_id: str, parking_id: str, connection):
         cursor = connection.cursor()
 
         query = """
         DELETE FROM RESERVATIONS
-        WHERE id = %s AND parking_id = %s
+        WHERE uuid = %s AND parking_id = %s
         """
 
         try:
