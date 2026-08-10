@@ -8,7 +8,7 @@ logger = get_logger("entries.repository")
 class EntriesRepository:
 
     @staticmethod
-    def find_all_entries(parking_id: int, filters_data: EntriesFiltersSchema, connection):
+    def find_all_entries(parking_id: str, filters_data: EntriesFiltersSchema, connection):
         cursor = connection.cursor()
 
         data = filters_data.model_dump(exclude_none=True)
@@ -79,7 +79,7 @@ class EntriesRepository:
             cursor.close()
 
     @staticmethod
-    def find_entry_by_id(parking_id: int, entry_id: int, connection):
+    def find_entry_by_id(parking_id: str, entry_id: int, connection):
         cursor = connection.cursor()
 
         query = """
@@ -122,7 +122,7 @@ class EntriesRepository:
             cursor.close()
 
     @staticmethod
-    def find_recent_entries(parking_id: int, connection):
+    def find_recent_entries(parking_id: str, connection):
         cursor = connection.cursor()
 
         query = """
@@ -168,7 +168,7 @@ class EntriesRepository:
 
     # Obtener estadisticas de ingresos del parking
     @staticmethod
-    def count_entry_stats(parking_id: int, connection):
+    def count_entry_stats(parking_id: str, connection):
         cursor = connection.cursor()
 
         query = """
@@ -205,7 +205,7 @@ class EntriesRepository:
             cursor.close()
 
     @staticmethod
-    def find_entries_by_plate(parking_id: int, plate_id: int, connection):
+    def find_entries_by_plate(parking_id: str, plate_id: int, connection):
         cursor = connection.cursor()
 
         query = """
@@ -253,7 +253,7 @@ class EntriesRepository:
             cursor.close()
 
     @staticmethod
-    def has_active_entry(parking_id: int, plate_id: int, connection):
+    def has_active_entry(parking_id: str, plate_id: int, connection):
         cursor = connection.cursor()
 
         query = """
@@ -285,7 +285,7 @@ class EntriesRepository:
             cursor.close()
 
     @staticmethod
-    def find_latest_entry(parking_id: int, plate_id: int, connection):
+    def find_latest_entry(parking_id: str, plate_id: int, connection):
         cursor = connection.cursor()
 
         query = """
@@ -332,7 +332,7 @@ class EntriesRepository:
             cursor.close()
 
     @staticmethod
-    def find_latest_entry_spot(parking_id: int, plate_id: int, connection):
+    def find_latest_entry_spot(parking_id: str, plate_id: int, connection):
         cursor = connection.cursor()
 
         query = """
@@ -363,7 +363,7 @@ class EntriesRepository:
             cursor.close()
 
     @staticmethod
-    def create_entry(parking_id: int, plate_id: int, spot_id: int, connection):
+    def create_entry(parking_id: str, plate_id: int, spot_id: int, connection):
         cursor = connection.cursor()
 
         query = """
