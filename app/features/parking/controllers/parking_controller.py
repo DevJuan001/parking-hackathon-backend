@@ -6,7 +6,7 @@ from app.features.spots.models.spots_schemas import SpotsFiltersSchema
 
 class ParkingController:
     @staticmethod
-    def get_parking_by_id(parking_id: int):
+    def get_parking_by_id(parking_id: str):
         error, parking = ParkingService.get_parking_by_id(
             parking_id
         )
@@ -21,7 +21,8 @@ class ParkingController:
     @staticmethod
     def get_all_plates(payload: dict):
         error, plates = ParkingService.get_all_plates(
-            int(payload["parking_id"]))
+            str(payload["parking_id"])
+        )
 
         if error:
             raise HTTPException(status_code=404, detail=error)
@@ -44,7 +45,7 @@ class ParkingController:
     @staticmethod
     def get_all_spots(payload: dict, filters: SpotsFiltersSchema):
         error, spots = ParkingService.get_all_spots(
-            int(payload["parking_id"]), filters
+            str(payload["parking_id"]), filters
         )
 
         if error:
@@ -57,7 +58,7 @@ class ParkingController:
     @staticmethod
     def get_plate_by_name(plate: str, payload: dict):
         error, plate_response = ParkingService.get_plate_by_name(
-            int(payload["parking_id"]),
+            str(payload["parking_id"]),
             plate
         )
 
@@ -71,7 +72,7 @@ class ParkingController:
     @staticmethod
     async def create_plate(plate_data: CreatePlateSchema, payload: dict):
         error, success, message = await ParkingService.create_plate(
-            int(payload["parking_id"]),
+            str(payload["parking_id"]),
             plate_data
         )
 
