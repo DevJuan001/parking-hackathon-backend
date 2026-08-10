@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from fastapi_limiter.depends import RateLimiter
-from app.features.spots.models.spots_schemas import SpotsFiltersSchema
 from app.middlewares.jwt_middleware import verify_jwt
 from app.middlewares.roles_middleware import require_roles
+from app.features.spots.models.spots_schemas import SpotsFiltersSchema
 from app.features.parking.models.parking_schemas import CreatePlateSchema
 from app.features.parking.controllers.parking_controller import ParkingController
 
@@ -10,16 +10,6 @@ router = APIRouter(
     prefix="/api/parking",
     tags=["Parking"]
 )
-
-
-@router.get(
-    "/{parking_id}",
-    dependencies=[
-        Depends(RateLimiter(times=30, seconds=60)),
-    ]
-)
-def get_parking_by_id(parking_id: int):
-    return ParkingController.get_parking_by_id(parking_id)
 
 
 @router.get(
@@ -67,6 +57,16 @@ def get_all_spots(
 )
 def get_plate_by_name(plate: str, payload: dict = Depends(verify_jwt)):
     return ParkingController.get_plate_by_name(plate, payload)
+
+
+@router.get(
+    "/{parking_id}",
+    dependencies=[
+        Depends(RateLimiter(times=30, seconds=60)),
+    ]
+)
+def get_parking_by_id(parking_id: str):
+    return ParkingController.get_parking_by_id(parking_id)
 
 
 @router.post(
