@@ -170,9 +170,7 @@ class ReservationsRepository():
                 ),
             )
 
-            reservation_id = cursor.lastrowid
-
-            return None, True, "Reserva creada correctamente", reservation_id
+            return None, True, "Reserva creada correctamente", uuid
 
         except Exception as e:
             logger.error(
