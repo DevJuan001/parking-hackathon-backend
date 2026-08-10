@@ -13,11 +13,11 @@ class ConversationService:
     MAX_MESSAGES = 40
 
     @staticmethod
-    def key(parking_id: int, user_id: int) -> str:
+    def key(parking_id: str, user_id: int) -> str:
         return f"{ConversationService.HISTORY_PREFIX}{parking_id}:{user_id}"
 
     @staticmethod
-    async def get_history(parking_id: int, user_id: int, limit: int = 15) -> list:
+    async def get_history(parking_id: str, user_id: int, limit: int = 15) -> list:
         redis = await get_redis()
 
         key = ConversationService.key(parking_id, user_id)
@@ -72,7 +72,7 @@ class ConversationService:
 
     @staticmethod
     async def add_message(
-        parking_id: int,
+        parking_id: str,
         user_id: int,
         role: str,
         content: str,
@@ -109,7 +109,7 @@ class ConversationService:
             )
 
     @staticmethod
-    async def clear_history(parking_id: int, user_id: int) -> None:
+    async def clear_history(parking_id: str, user_id: int) -> None:
         redis = await get_redis()
 
         key = ConversationService.key(parking_id, user_id)
