@@ -21,7 +21,7 @@ class UsersFiltersSchema(BaseModel):
 
 class CreateUserSchema(BaseModel):
     role_id: int
-    name: str = safe_str(min_length=1, max_length=128)
+    name: Optional[str] = safe_optional_str(max_length=128)
     first_surname: Optional[str] = safe_optional_str(max_length=128)
     second_surname: Optional[str] = safe_optional_str(max_length=128)
     email: EmailStr = safe_str(max_length=254)

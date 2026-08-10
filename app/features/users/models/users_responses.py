@@ -21,9 +21,9 @@ class UserResponse(BaseModel):
 class UserByIdResponse(BaseModel):
     role: str
     id: int
-    name: str
-    first_surname: str
-    second_surname: str
+    name: Optional[str]
+    first_surname: Optional[str]
+    second_surname: Optional[str]
     email: EmailStr
     created_at: str
     status: int
@@ -31,11 +31,11 @@ class UserByIdResponse(BaseModel):
 
 class UserByEmailResponse(BaseModel):
     role: str
-    parking_id: Optional[int] = None
+    parking_id: Optional[str] = None
     id: int
-    name: str
-    first_surname: str
-    second_surname: str
+    name: Optional[str] = None
+    first_surname: Optional[str] = None
+    second_surname: Optional[str] = None
     email: EmailStr
     password: Optional[str] = None
     onboarding_completed: int
