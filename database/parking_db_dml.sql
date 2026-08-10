@@ -202,14 +202,19 @@ INSERT INTO COUNTRIES (name, iso_code) VALUES
   ('Zambia', 'ZM'),
   ('Zimbabwe', 'ZW');
 
+INSERT INTO PLANS (name, value, status) VALUES
+ ('Básico', 17900.0, 2),
+ ('Empresarial', 149900.0, 2),
+ ('Profesional', 49900.0, 2);
+
 -- PARKINGS
-INSERT INTO PARKINGS (name, country_id) VALUES
-  ('Parking Central', 1);
+INSERT INTO PARKINGS (uuid, plan_id, name, country_id) VALUES
+ ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 2, 'Parking Central', 1);
 
 -- USERS
 INSERT INTO USERS (role_id, parking_id, name, first_surname, second_surname, email, password, onboarding_completed, provider, status) VALUES
-  (1, 1, 'Juan', 'Test', 'Test', 'juanesyt7@gmail.com', '$2b$12$ZWxjTBVABd85Ux4eg3tacO7xRzdbsW8/QclK7b.7hkqZTrqohFi7.', TRUE, "Local", 2),
-  (2, 1, 'Juan', 'Cliente', 'Test', 'juanalvout38@gmail.com', '$2b$12$ZWxjTBVABd85Ux4eg3tacO7xRzdbsW8/QclK7b.7hkqZTrqohFi7.', TRUE, "Local", 2);
+  (1, 'f47ac10b-58cc-4372-a567-0e02b2c3d479', 'Juan', 'Test', 'Test', 'juanesyt7@gmail.com', '$2b$12$ZWxjTBVABd85Ux4eg3tacO7xRzdbsW8/QclK7b.7hkqZTrqohFi7.', TRUE, "Local", 2),
+  (2, 'f47ac10b-58cc-4372-a567-0e02b2c3d479', 'Juan', 'Cliente', 'Test', 'juanalvout38@gmail.com', '$2b$12$ZWxjTBVABd85Ux4eg3tacO7xRzdbsW8/QclK7b.7hkqZTrqohFi7.', TRUE, "Local", 2);
 
 -- VEHICLE_TYPES
 INSERT INTO VEHICLE_TYPES (name) VALUES
@@ -221,22 +226,22 @@ INSERT INTO VEHICLE_TYPES (name) VALUES
 
 -- PLATES
 INSERT INTO PLATES (parking_id, plate, vehicle_type_id) VALUES
-  (1, 'ABC123', 1),
-  (1, 'XYZ456', 1),
-  (1, 'DEF789', 1),
-  (1, 'GHI321', 1),
-  (1, 'JKL654', 1),
-  (1, 'MNO987', 1),
-  (1, 'PQR111', 1),
-  (1, 'STU222', 1),
-  (1, 'VWX333', 1),
-  (1, 'YZA444', 1);
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 'ABC123', 1),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 'XYZ456', 1),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 'DEF789', 1),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 'GHI321', 1),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 'JKL654', 1),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 'MNO987', 1),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 'PQR111', 1),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 'STU222', 1),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 'VWX333', 1),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 'YZA444', 1);
 
 -- FLOORS
 INSERT INTO FLOORS (parking_id, name) VALUES
-  (1, 'Piso 1'),
-  (1, 'Piso 2'),
-  (1, 'Piso 3');
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 'Piso 1'),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 'Piso 2'),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 'Piso 3');
 
 -- SPOTS
 INSERT INTO SPOTS (floor_id, spot, spot_status, vehicle_type_id) VALUES
@@ -253,37 +258,37 @@ INSERT INTO SPOTS (floor_id, spot, spot_status, vehicle_type_id) VALUES
 
 -- RATES
 INSERT INTO RATES (parking_id, vehicle_type_id, value) VALUES
-  (1, 1, 3500.00),
-  (1, 2, 2000.00),
-  (1, 3, 5000.00),
-  (1, 4, 4500.00),
-  (1, 5, 6000.00);
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 1, 3500.00),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 2, 2000.00),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 3, 5000.00),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 4, 4500.00),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 5, 6000.00);
 
 -- ENTRIES
 INSERT INTO ENTRIES (parking_id, plate_id, spot_id, created_at) VALUES
-  (1, 1,  1,  '2026-06-01 08:00:00'),
-  (1, 2,  2,  '2026-06-01 08:30:00'),
-  (1, 3,  3,  '2026-06-01 09:00:00'),
-  (1, 4,  4,  '2026-06-01 09:15:00'),
-  (1, 5,  5,  '2026-06-01 10:00:00'),
-  (1, 6,  6,  '2026-06-01 10:45:00'),
-  (1, 7,  7,  '2026-06-01 11:00:00'),
-  (1, 8,  8,  '2026-06-01 11:30:00'),
-  (1, 9,  9,  '2026-06-01 12:00:00'),
-  (1, 10, 10, '2026-06-01 12:15:00');
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 1,  1,  '2026-06-01 08:00:00'),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 2,  2,  '2026-06-01 08:30:00'),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 3,  3,  '2026-06-01 09:00:00'),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 4,  4,  '2026-06-01 09:15:00'),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 5,  5,  '2026-06-01 10:00:00'),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 6,  6,  '2026-06-01 10:45:00'),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 7,  7,  '2026-06-01 11:00:00'),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 8,  8,  '2026-06-01 11:30:00'),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 9,  9,  '2026-06-01 12:00:00'),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 10, 10, '2026-06-01 12:15:00');
 
 -- EXITS
 INSERT INTO EXITS (parking_id, plate_id, created_at) VALUES
-  (1, 1,  '2026-06-01 10:00:00'),
-  (1, 2,  '2026-06-01 11:00:00'),
-  (1, 3,  '2026-06-01 12:00:00'),
-  (1, 4,  '2026-06-01 12:30:00'),
-  (1, 5,  '2026-06-01 13:00:00'),
-  (1, 6,  '2026-06-01 14:00:00'),
-  (1, 7,  '2026-06-01 14:30:00'),
-  (1, 8,  '2026-06-01 15:00:00'),
-  (1, 9,  '2026-06-01 15:45:00'),
-  (1, 10, '2026-06-01 16:00:00');
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 1,  '2026-06-01 10:00:00'),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 2,  '2026-06-01 11:00:00'),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 3,  '2026-06-01 12:00:00'),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 4,  '2026-06-01 12:30:00'),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 5,  '2026-06-01 13:00:00'),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 6,  '2026-06-01 14:00:00'),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 7,  '2026-06-01 14:30:00'),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 8,  '2026-06-01 15:00:00'),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 9,  '2026-06-01 15:45:00'),
+  ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 10, '2026-06-01 16:00:00');
 
 -- PAYMENT_METHODS
 INSERT INTO PAYMENT_METHODS (name, icon) VALUES
@@ -293,21 +298,21 @@ INSERT INTO PAYMENT_METHODS (name, icon) VALUES
   ("Bitcoin", "savings");
 
 -- PAYMENTS
-INSERT INTO PAYMENTS (parking_id, plate_id, spot_id, value, created_at, payment_method_id) VALUES
-  (1, 1,  1,  7000.00,  '2026-06-01 10:05:00', 1),
-  (1, 2,  2,  5000.00,  '2026-06-01 11:05:00', 1),
-  (1, 3,  3,  10500.00, '2026-06-01 12:05:00', 1),
-  (1, 4,  4,  7000.00,  '2026-06-01 12:35:00', 1),
-  (1, 5,  5,  9000.00,  '2026-06-01 13:05:00', 1),
-  (1, 6,  6,  14000.00, '2026-06-01 14:05:00', 1),
-  (1, 7,  7,  10500.00, '2026-06-01 14:35:00', 1),
-  (1, 8,  8,  10500.00, '2026-06-01 15:05:00', 1),
-  (1, 9,  9,  14000.00, '2026-06-01 15:50:00', 1),
-  (1, 10, 10, 7000.00,  '2026-06-01 16:05:00', 1);
+INSERT INTO PAYMENTS (uuid, parking_id, plate_id, spot_id, value, created_at, payment_method_id) VALUES
+  ('e556087b-e24a-4878-bd69-aa75092321f1', 'f47ac10b-58cc-4372-a567-0e02b2c3d479', 1,  1,  7000.00,  '2026-06-01 10:05:00', 1),
+  ('8ebaad3b-c310-4d87-9772-25c08cb5d52a', 'f47ac10b-58cc-4372-a567-0e02b2c3d479', 2,  2,  5000.00,  '2026-06-01 11:05:00', 1),
+  ('52ac894b-d730-4abc-af9c-0134df87160f', 'f47ac10b-58cc-4372-a567-0e02b2c3d479', 3,  3,  10500.00, '2026-06-01 12:05:00', 1),
+  ('7faf8479-085d-4aff-99d5-7dd90a7312f3', 'f47ac10b-58cc-4372-a567-0e02b2c3d479', 4,  4,  7000.00,  '2026-06-01 12:35:00', 1),
+  ('a795a9a5-53f8-4c76-9fd5-ad5778522e46', 'f47ac10b-58cc-4372-a567-0e02b2c3d479', 5,  5,  9000.00,  '2026-06-01 13:05:00', 1),
+  ('e1b07923-e122-406b-9543-e88e589667d3', 'f47ac10b-58cc-4372-a567-0e02b2c3d479', 6,  6,  14000.00, '2026-06-01 14:05:00', 1),
+  ('528dc3f5-b4c4-44ec-8d09-3771c12602f9', 'f47ac10b-58cc-4372-a567-0e02b2c3d479', 7,  7,  10500.00, '2026-06-01 14:35:00', 1),
+  ('9eb59040-b6ba-485c-a693-933668001c80', 'f47ac10b-58cc-4372-a567-0e02b2c3d479', 8,  8,  10500.00, '2026-06-01 15:05:00', 1),
+  ('5abde6cf-696c-4dd1-93ee-c45467d76f5b', 'f47ac10b-58cc-4372-a567-0e02b2c3d479', 9,  9,  14000.00, '2026-06-01 15:50:00', 1),
+  ('270a08b2-e033-4b55-a2af-d960edcdd948', 'f47ac10b-58cc-4372-a567-0e02b2c3d479', 10, 10, 7000.00,  '2026-06-01 16:05:00', 1);
 
 -- RESERVATIONS
-INSERT INTO RESERVATIONS (parking_id, name, email, plate, level, start_date, end_date, status) VALUES
-  (1, "Test1", 'juanesyt7@gmail.com', 'aaa000', 1, '2026-07-01T18:37:31', '2026-07-01T19:37:31', 2),
-  (1, "Test2", 'juanesyt7@gmail.com', 'aaa000', 2, '2026-07-01T18:37:31', '2026-07-01T19:37:31', 2),
-  (1, "Test3", 'juanesyt7@gmail.com', 'aaa000', 2, '2026-07-01T18:37:31', '2026-07-01T19:37:31', 2),
-  (1, "Test3", 'juanesyt7@gmail.com', 'aaa000', 2, '2026-07-01T18:37:31', '2026-07-01T00:37:31', 2);
+INSERT INTO RESERVATIONS (uuid, parking_id, name, email, plate, level, start_date, end_date, status) VALUES
+  ('66da0f60-103c-4773-a673-3525160da355', 'f47ac10b-58cc-4372-a567-0e02b2c3d479', "Test1", 'juanesyt7@gmail.com', 'aaa000', 1, '2026-07-01T18:37:31', '2026-07-01T19:37:31', 2),
+  ('3f86973e-ba56-40ce-b0af-16d5befe4b4b', 'f47ac10b-58cc-4372-a567-0e02b2c3d479', "Test2", 'juanesyt7@gmail.com', 'aaa000', 2, '2026-07-01T18:37:31', '2026-07-01T19:37:31', 2),
+  ('b55fa205-9da6-4526-9d85-72f5f13d9e1d', 'f47ac10b-58cc-4372-a567-0e02b2c3d479', "Test3", 'juanesyt7@gmail.com', 'aaa000', 2, '2026-07-01T18:37:31', '2026-07-01T19:37:31', 2),
+  ('270a08b2-e033-4b55-a2af-d960edcdd948', 'f47ac10b-58cc-4372-a567-0e02b2c3d479', "Test3", 'juanesyt7@gmail.com', 'aaa000', 2, '2026-07-01T18:37:31', '2026-07-01T00:37:31', 2);
