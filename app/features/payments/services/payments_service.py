@@ -20,7 +20,7 @@ logger = get_logger("payments.service")
 class PaymentsService:
 
     @staticmethod
-    def get_all_payments(parking_id: int, filters: PaymentsFiltersSchema):
+    def get_all_payments(parking_id: str, filters: PaymentsFiltersSchema):
         connection = get_connection()
 
         try:
@@ -48,7 +48,7 @@ class PaymentsService:
             connection.close()
 
     @staticmethod
-    def get_payment_by_id(parking_id: int, payment_id: int):
+    def get_payment_by_id(parking_id: str, payment_id: int):
         connection = get_connection()
 
         try:
@@ -76,7 +76,7 @@ class PaymentsService:
             connection.close()
 
     @staticmethod
-    def get_payments_by_plate(parking_id: int, plate_id: int):
+    def get_payments_by_plate(parking_id: str, plate_id: int):
         connection = get_connection()
 
         try:
@@ -104,7 +104,7 @@ class PaymentsService:
             connection.close()
 
     @staticmethod
-    def get_payments_growth(parking_id: int, period: str):
+    def get_payments_growth(parking_id: str, period: str):
         connection = get_connection()
 
         try:
@@ -160,7 +160,7 @@ class PaymentsService:
             connection.close()
 
     @staticmethod
-    def calculate_payment(parking_id: int, plate: str):
+    def calculate_payment(parking_id: str, plate: str):
         connection = get_connection()
 
         try:
@@ -248,7 +248,7 @@ class PaymentsService:
             connection.close()
 
     @staticmethod
-    async def create_payment(parking_id: int, payment_data: CreatePaymentSchema):
+    async def create_payment(parking_id: str, payment_data: CreatePaymentSchema):
         connection = get_connection()
 
         try:
