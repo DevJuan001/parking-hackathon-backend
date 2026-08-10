@@ -13,6 +13,35 @@ logger = get_logger("parking.service")
 
 
 class ParkingService:
+    @staticmethod
+    def get_parking_by_id(parking_id: int):
+        connection = get_connection()
+
+        try:
+            error, parking = ParkingsRepository.find_parking_by_id(
+                parking_id, connection
+            )
+
+            if error:
+                raise ServiceError(
+                    "No se encontro información sobre este parqueadero"
+                )
+
+            return None, parking
+       
+        except ServiceError as e:
+            return e.message, None
+
+        except Exception as e:
+            logger.error(
+                "Error en get_parking_by_id: %s",
+                e,
+                exc_info=True
+            )
+            return "Error al intentar crear el parking", None
+
+        finally:
+            connection.close()
 
     @staticmethod
     def create_parking(name: str, country_id: int):

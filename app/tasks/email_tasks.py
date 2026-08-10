@@ -1,8 +1,9 @@
 import asyncio
 from typing import Optional
+from datetime import date, datetime, time, timedelta
 
-from pydantic import EmailStr
 from app.core.mail import fm
+from pydantic import EmailStr
 from app.core.celery_app import celery
 from fastapi_mail import MessageSchema
 
@@ -87,23 +88,37 @@ def send_reservation_created_email(
     self,
     user_email: EmailStr,
     user_name: str,
-    user_first_surname: str,
+    parking_name: str,
+    parking_location: str,
+    reservation_id: int,
     reservation_name: str,
+    total: str,
+    payment_status: str,
     start_date: str,
-    start_time: str,
+    start_time: time,
     end_date: Optional[str] = None,
-    end_time: Optional[str] = None,
+    end_time: Optional[time] = None,
 ):
     try:
+        raw_end_time = end_time if end_time else (
+            datetime.combine(date.min, start_time) + timedelta(minutes=30)
+        )
+
         message = MessageSchema(
             subject="Tu reserva está confirmada",
             recipients=[user_email],
             template_body={
                 "user_name": user_name,
-                "user_first_surname": user_first_surname,
+                "parking_name": parking_name,
+                "parking_location": parking_location,
+                "reservation_id": reservation_id,
                 "reservation_name": reservation_name,
+                "total": total,
+                "payment_status": payment_status,
+                "raw_start_date": f"{start_date}T{start_time}",
+                "raw_end_date": f"{end_date if end_date else start_date}T{raw_end_time}",
                 "start_date": f"{date_formatter(start_date)} {time_to_12h(start_time)}",
-                "end_date": f"{date_formatter(end_date)} {time_to_12h(end_time)}",
+                "end_date": f"{date_formatter(end_date)} {time_to_12h(end_time)}" if end_date and end_time else "",
             },
             subtype="html",
         )
@@ -123,12 +138,13 @@ def send_reservation_cancelled_email(
     self,
     user_email: EmailStr,
     user_name: str,
-    user_first_surname: str,
+    reservation_id: int,
     reservation_name: str,
-    start_date: Optional[str] = None,
-    start_time: Optional[str] = None,
-    end_date: Optional[str] = None,
-    end_time: Optional[str] = None,
+    template_name: str,
+    start_date: Optional[date] = None,
+    start_time: Optional[time] = None,
+    end_date: Optional[date] = None,
+    end_time: Optional[time] = None,
 ):
     try:
         message = MessageSchema(
@@ -136,17 +152,17 @@ def send_reservation_cancelled_email(
             recipients=[user_email],
             template_body={
                 "user_name": user_name,
-                "user_first_surname": user_first_surname,
+                "reservation_id": reservation_id,
                 "reservation_name": reservation_name,
                 "start_date": f"{date_formatter(start_date)} {time_to_12h(start_time)}",
-                "end_date": f"{date_formatter(end_date)} {time_to_12h(end_time)}",
+                "end_date": f"{date_formatter(end_date)} {time_to_12h(end_time)}" if end_date and end_time else "",
             },
             subtype="html",
         )
 
         asyncio.run(
             fm.send_message(
-                message, template_name="reservation_cancelled.html"
+                message, template_name=template_name
             )
         )
 

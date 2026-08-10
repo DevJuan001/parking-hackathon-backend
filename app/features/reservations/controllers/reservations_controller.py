@@ -27,8 +27,9 @@ class ReservationsController:
     def create_reservation_for_user(data: CreateReservationSchema, payload: dict):
         error, success, message = ReservationsService.create_reservation(
             int(payload["parking_id"]),
-            data.client_id,
             data.name,
+            data.plate,
+            data.email,
             data.level,
             data.start_date,
             data.start_time,
@@ -45,11 +46,12 @@ class ReservationsController:
         }
 
     @staticmethod
-    def create_reservation_for_self(data: CreateSelfReservationSchema, payload: dict):
+    def create_reservation_for_self(data: CreateSelfReservationSchema):
         error, success, message = ReservationsService.create_reservation(
-            int(payload["parking_id"]),
-            int(payload["user_id"]),
+            data.parking_id,
             data.name,
+            data.plate,
+            data.email,
             data.level,
             data.start_date,
             data.start_time,

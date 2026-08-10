@@ -1,3 +1,4 @@
+from pydantic import EmailStr
 from app.utils.logger import get_logger
 from app.features.reservations.models.reservations_responses import ReservationsResponse
 from app.features.reservations.models.reservations_schemas import FilterReservationsSchema, UpdateReservationSchema
@@ -15,8 +16,8 @@ class ReservationsRepository():
         query = """
         SELECT
             id,
-            user_id,
             name,
+            email,
             level,
             start_date,
             end_date,
@@ -33,7 +34,7 @@ class ReservationsRepository():
             values.append(data["start_date"])
 
         if "end_date" in data:
-            filters.append("DATE(end_date) <= %s")
+            filters.append("(end_date IS NULL OR DATE(end_date) <= %s)")
             values.append(data["end_date"])
 
         if filters:
@@ -53,8 +54,8 @@ class ReservationsRepository():
             data = [
                 ReservationsResponse(
                     id=item[0],
-                    user_id=item[1],
-                    name=item[2],
+                    name=item[1],
+                    email=item[2],
                     level=item[3],
                     start_date=item[4].date(),
                     start_time=item[4].time(),
@@ -87,8 +88,8 @@ class ReservationsRepository():
         query = """
         SELECT
             id,
-            user_id,
             name,
+            email,
             level,
             start_date,
             end_date,
@@ -105,8 +106,8 @@ class ReservationsRepository():
 
             return None, ReservationsResponse(
                 id=result[0],
-                user_id=result[1],
-                name=result[2],
+                name=result[1],
+                email=result[2],
                 level=result[3],
                 start_date=result[4].date(),
                 start_time=result[4].time(),
@@ -128,38 +129,11 @@ class ReservationsRepository():
             cursor.close()
 
     @staticmethod
-    def delete_reservation(reservation_id: int, parking_id: int, connection):
-        cursor = connection.cursor()
-
-        query = """
-        DELETE FROM RESERVATIONS
-        WHERE id = %s AND parking_id = %s
-        """
-
-        try:
-            cursor.execute(query, (reservation_id, parking_id))
-
-            if cursor.rowcount == 0:
-                return "Reserva no encontrada", False, None
-
-            return None, True, "Reserva eliminada correctamente"
-
-        except Exception as e:
-            logger.error(
-                "Error en delete_reservation: %s",
-                e,
-                exc_info=True
-            )
-            return "Error al intentar eliminar la reserva", False, None
-
-        finally:
-            cursor.close()
-
-    @staticmethod
     def create_reservation(
         parking_id: int,
-        user_id: int,
         name: str,
+        email: EmailStr,
+        plate: str,
         level: int,
         start_datetime,
         end_datetime,
@@ -170,22 +144,32 @@ class ReservationsRepository():
         query = """
         INSERT INTO RESERVATIONS (
             parking_id,
-            user_id,
             name,
+            email,
+            plate,
             level,
             start_date,
             end_date
         )
-        VALUES (%s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
 
         try:
             cursor.execute(
-                query,
-                (parking_id, user_id, name, level, start_datetime, end_datetime),
+                query, (
+                    parking_id,
+                    name,
+                    email,
+                    plate,
+                    level,
+                    start_datetime,
+                    end_datetime
+                ),
             )
 
-            return None, True, "Reserva creada correctamente"
+            reservation_id = cursor.lastrowid
+
+            return None, True, "Reserva creada correctamente", reservation_id
 
         except Exception as e:
             logger.error(
@@ -193,7 +177,7 @@ class ReservationsRepository():
                 e,
                 exc_info=True
             )
-            return "Error al intentar crear la reserva", False, None
+            return "Error al intentar crear la reserva", False, None, None
 
         finally:
             cursor.close()
@@ -241,6 +225,34 @@ class ReservationsRepository():
                 exc_info=True
             )
             return "Error al intentar actualizar la reserva", False, None
+
+        finally:
+            cursor.close()
+
+    @staticmethod
+    def delete_reservation(reservation_id: int, parking_id: int, connection):
+        cursor = connection.cursor()
+
+        query = """
+        DELETE FROM RESERVATIONS
+        WHERE id = %s AND parking_id = %s
+        """
+
+        try:
+            cursor.execute(query, (reservation_id, parking_id))
+
+            if cursor.rowcount == 0:
+                return "Reserva no encontrada", False, None
+
+            return None, True, "Reserva eliminada correctamente"
+
+        except Exception as e:
+            logger.error(
+                "Error en delete_reservation: %s",
+                e,
+                exc_info=True
+            )
+            return "Error al intentar eliminar la reserva", False, None
 
         finally:
             cursor.close()
