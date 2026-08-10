@@ -9,7 +9,7 @@ logger = get_logger("spots.repository")
 class SpotsRepository:
 
     @staticmethod
-    def find_all_spots(parking_id: int, filters_data: SpotsFiltersSchema, connection):
+    def find_all_spots(parking_id: str, filters_data: SpotsFiltersSchema, connection):
         data = filters_data.model_dump(exclude_none=True)
 
         cursor = connection.cursor()
@@ -86,7 +86,7 @@ class SpotsRepository:
             cursor.close()
 
     @staticmethod
-    def find_spot_by_id(parking_id: int, spot_id: int, connection):
+    def find_spot_by_id(parking_id: str, spot_id: int, connection):
         cursor = connection.cursor()
 
         query = """
@@ -141,7 +141,7 @@ class SpotsRepository:
             cursor.close()
 
     @staticmethod
-    def find_spot_id_by_label(parking_id: int, label: str, connection):
+    def find_spot_id_by_label(parking_id: str, label: str, connection):
         cursor = connection.cursor()
 
         query = """
@@ -169,7 +169,7 @@ class SpotsRepository:
             cursor.close()
 
     @staticmethod
-    def find_available_spot(parking_id: int, vehicle_type_id: int, connection):
+    def find_available_spot(parking_id: str, vehicle_type_id: int, connection):
         cursor = connection.cursor()
 
         query = """
@@ -224,7 +224,7 @@ class SpotsRepository:
             cursor.close()
 
     @staticmethod
-    def update_spot_status(parking_id: int, spot_id: int, status: int, connection):
+    def update_spot_status(parking_id: str, spot_id: int, status: int, connection):
         cursor = connection.cursor()
 
         query = """
@@ -246,7 +246,7 @@ class SpotsRepository:
             cursor.close()
 
     @staticmethod
-    def delete_spot(parking_id: int, spot_id: int, connection):
+    def delete_spot(parking_id: str, spot_id: int, connection):
         cursor = connection.cursor()
 
         query = """
@@ -272,7 +272,7 @@ class SpotsRepository:
 
     @staticmethod
     def count_occupied_spots_by_floor(
-        parking_id: int, floor_id: int, connection
+        parking_id: str, floor_id: int, connection
     ):
         cursor = connection.cursor()
 
@@ -299,7 +299,7 @@ class SpotsRepository:
             cursor.close()
 
     @staticmethod
-    def delete_spots_by_floor(parking_id: int, floor_id: int, connection):
+    def delete_spots_by_floor(parking_id: str, floor_id: int, connection):
         cursor = connection.cursor()
 
         query = """
@@ -323,7 +323,7 @@ class SpotsRepository:
 
     @staticmethod
     def update_spot(
-        parking_id: int,
+        parking_id: str,
         spot_id: int,
         floor_id: int | None,
         spot_label: str | None,
