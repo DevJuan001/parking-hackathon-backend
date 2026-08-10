@@ -20,19 +20,39 @@ CREATE TABLE COUNTRIES (
   UNIQUE INDEX uq_countries_iso_code (iso_code)
 );
 
-CREATE TABLE PARKINGS (
+CREATE TABLE PLANS (
   id INT NOT NULL AUTO_INCREMENT,
+  name TEXT NOT NULL,
+  value FLOAT NOT NULL,
+  status INT NOT NULL,
+  PRIMARY KEY(id),
+  INDEX idx_plans_id (id)
+);
+
+CREATE TABLE PARKINGS (
+  uuid CHAR(36) UNIQUE NOT NULL,
+  plan_id INT NOT NULL,
   country_id INT NOT NULL,
   name TEXT NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY(id),
+  state INT NOT NULL DEFAULT 2,
+  PRIMARY KEY(uuid),
   FOREIGN KEY (country_id) REFERENCES COUNTRIES(id),
-  INDEX idx_parkings_country_id (country_id)
+  FOREIGN KEY (plan_id) REFERENCES PLANS(id),
+  INDEX idx_parkings_country_id (country_id),
+  UNIQUE INDEX uq_parkings_uuid (uuid)
+);
+
+CREATE TABLE SUSCRIPTIONS (
+  uuid CHAR(36) UNIQUE NOT NULL,
+  parking_id INT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE INDEX uq_suscriptions_uuid (uuid)
 );
 
 CREATE TABLE USERS (
   role_id INT NOT NULL,
-  parking_id INT NULL,
+  parking_id CHAR(36) NOT NULL,
 	id INT NOT NULL AUTO_INCREMENT,
   name TEXT NULL,
   first_surname TEXT NULL,
@@ -46,17 +66,17 @@ CREATE TABLE USERS (
   status INT NOT NULL DEFAULT 2,
   PRIMARY KEY(id),
   FOREIGN KEY (role_id) REFERENCES ROLES(id),
-  FOREIGN KEY (parking_id) REFERENCES PARKINGS(id),
+  FOREIGN KEY (parking_id) REFERENCES PARKINGS(uuid),
   UNIQUE INDEX uq_users_google_id (google_id)
 );
 
 CREATE TABLE FLOORS (
   id INT NOT NULL AUTO_INCREMENT,
-  parking_id INT NOT NULL,
+  parking_id CHAR(36) NOT NULL,
   name TEXT NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
-  FOREIGN KEY (parking_id) REFERENCES PARKINGS(id),
+  FOREIGN KEY (parking_id) REFERENCES PARKINGS(uuid),
   INDEX idx_floors_parking_id (parking_id)
 );
 
@@ -68,12 +88,12 @@ CREATE TABLE VEHICLE_TYPES (
 
 CREATE TABLE PLATES (
   id               INT          NOT NULL AUTO_INCREMENT,
-  parking_id       INT          NOT NULL,
+  parking_id CHAR(36) NOT NULL,
   plate            VARCHAR(6)  NOT NULL,
   vehicle_type_id  INT          NOT NULL,
   created_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
-  FOREIGN KEY (parking_id) REFERENCES PARKINGS(id),
+  FOREIGN KEY (parking_id) REFERENCES PARKINGS(uuid),
   FOREIGN KEY (vehicle_type_id) REFERENCES VEHICLE_TYPES(id),
   UNIQUE INDEX uq_plates_parking_plate (parking_id, plate),
   INDEX idx_plates_parking_id (parking_id)
@@ -96,12 +116,12 @@ CREATE TABLE SPOTS (
 -- Dependent tables
 CREATE TABLE ENTRIES (
   id          INT       NOT NULL AUTO_INCREMENT,
-  parking_id  INT       NOT NULL,
+  parking_id CHAR(36) NOT NULL,
   plate_id    INT       NOT NULL,
   spot_id     INT       NULL,
   created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
-  FOREIGN KEY (parking_id) REFERENCES PARKINGS(id),
+  FOREIGN KEY (parking_id) REFERENCES PARKINGS(uuid),
   FOREIGN KEY (plate_id) REFERENCES PLATES(id),
   FOREIGN KEY (spot_id)  REFERENCES SPOTS(spot_id) ON DELETE SET NULL,
   INDEX idx_entries_parking_id (parking_id)
@@ -109,25 +129,25 @@ CREATE TABLE ENTRIES (
 
 CREATE TABLE EXITS (
   id          INT       NOT NULL AUTO_INCREMENT,
-  parking_id  INT       NOT NULL,
+  parking_id CHAR(36) NOT NULL,
   plate_id    INT       NOT NULL,
   created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
-  FOREIGN KEY (parking_id) REFERENCES PARKINGS(id),
+  FOREIGN KEY (parking_id) REFERENCES PARKINGS(uuid),
   FOREIGN KEY (plate_id) REFERENCES PLATES(id),
   INDEX idx_exits_parking_id (parking_id)
 );
 
 CREATE TABLE RATES (
   id                INT       NOT NULL AUTO_INCREMENT,
-  parking_id        INT       NOT NULL,
+  parking_id CHAR(36) NOT NULL,
   vehicle_type_id   INT      NOT NULL,
   value          FLOAT     NOT NULL,
   created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
                            ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
-  FOREIGN KEY (parking_id) REFERENCES PARKINGS(id),
+  FOREIGN KEY (parking_id) REFERENCES PARKINGS(uuid),
   FOREIGN KEY (vehicle_type_id) REFERENCES VEHICLE_TYPES(id),
   UNIQUE INDEX uq_rates_parking_vehicle_type (parking_id, vehicle_type_id),
   INDEX idx_rates_parking_id (parking_id)
@@ -143,24 +163,25 @@ CREATE TABLE PAYMENT_METHODS (
 
 
 CREATE TABLE PAYMENTS (
-  id          INT       NOT NULL AUTO_INCREMENT,
-  parking_id  INT       NOT NULL,
+  uuid CHAR(36) UNIQUE NOT NULL,
+  parking_id CHAR(36) NOT NULL,
   plate_id    INT       NOT NULL,
   spot_id     INT       NULL,
   value       FLOAT     NOT NULL,
   payment_method_id INT NOT NULL,
   created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (id),
-  FOREIGN KEY (parking_id) REFERENCES PARKINGS(id),
+  PRIMARY KEY (uuid),
+  FOREIGN KEY (parking_id) REFERENCES PARKINGS(uuid),
   FOREIGN KEY (plate_id) REFERENCES PLATES(id),
   FOREIGN KEY (spot_id)  REFERENCES SPOTS(spot_id) ON DELETE SET NULL,
   FOREIGN KEY (payment_method_id)  REFERENCES PAYMENT_METHODS(id),
+  UNIQUE INDEX uq_payments_uuid (uuid),
   INDEX idx_payments_parking_id (parking_id)
 );
 
 CREATE TABLE RESERVATIONS (
-  id INT NOT NULL AUTO_INCREMENT,
-  parking_id INT NOT NULL,
+  uuid CHAR(36) UNIQUE NOT NULL,
+  parking_id CHAR(36) NOT NULL,
   name TEXT NOT NULL,
   email VARCHAR(256) NOT NULL,
   plate VARCHAR(8) NOT NULL,
@@ -169,7 +190,7 @@ CREATE TABLE RESERVATIONS (
   end_date TIMESTAMP NULL DEFAULT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   status INT NOT NULL DEFAULT 2,
-  PRIMARY KEY (id),
-  FOREIGN KEY (parking_id) REFERENCES PARKINGS(id),
+  PRIMARY KEY (uuid),
+  FOREIGN KEY (parking_id) REFERENCES PARKINGS(uuid),
   INDEX idx_payments_parking_id (parking_id)
 );
