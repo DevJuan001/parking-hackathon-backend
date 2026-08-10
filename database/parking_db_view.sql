@@ -1,3 +1,5 @@
+USE parking_db;
+
 CREATE VIEW vw_parking_summary AS
 SELECT
   p.plate AS plate,
