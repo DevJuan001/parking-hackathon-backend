@@ -14,7 +14,7 @@ logger = get_logger("spots.service")
 class SpotsService:
 
     @staticmethod
-    def get_all_spots(parking_id: int, filters: SpotsFiltersSchema):
+    def get_all_spots(parking_id: str, filters: SpotsFiltersSchema):
         connection = get_connection()
 
         try:
@@ -42,7 +42,7 @@ class SpotsService:
             connection.close()
 
     @staticmethod
-    def get_spot_by_id(parking_id: int, spot_id: int):
+    def get_spot_by_id(parking_id: str, spot_id: int):
         connection = get_connection()
 
         try:
@@ -70,7 +70,7 @@ class SpotsService:
             connection.close()
 
     @staticmethod
-    def find_spot_id_by_label(parking_id: int, label: str):
+    def find_spot_id_by_label(parking_id: str, label: str):
         connection = get_connection()
 
         try:
@@ -94,7 +94,7 @@ class SpotsService:
 
     @staticmethod
     def create_spot(
-        parking_id: int,
+        parking_id: str,
         floor_id: int,
         spot_label: str,
         vehicle_type_id: int,
@@ -146,7 +146,7 @@ class SpotsService:
             connection.close()
 
     @staticmethod
-    def update_spot_status(parking_id: int, spot_id: int, status: int):
+    def update_spot_status(parking_id: str, spot_id: int, status: int):
         connection = get_connection()
 
         try:
@@ -179,7 +179,7 @@ class SpotsService:
 
     @staticmethod
     def update_spot(
-        parking_id: int,
+        parking_id: str,
         spot_id: int,
         floor_id: int | None,
         spot_label: str | None,
@@ -253,7 +253,7 @@ class SpotsService:
             connection.close()
 
     @staticmethod
-    def delete_spot(parking_id: int, spot_id: int):
+    def delete_spot(parking_id: str, spot_id: int):
         connection = get_connection()
 
         try:
