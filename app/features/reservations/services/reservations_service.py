@@ -12,6 +12,7 @@ from app.features.parking.repositories.parkings_repository import ParkingsReposi
 from app.features.reservations.repositories.reservations_repository import ReservationsRepository
 from app.tasks.email_tasks import send_reservation_created_email, send_reservation_cancelled_email
 from app.features.reservations.models.reservations_schemas import FilterReservationsSchema, UpdateReservationSchema
+from app.utils.uuid import generate_uuid
 
 
 logger = get_logger("reservations.service")
@@ -19,7 +20,7 @@ logger = get_logger("reservations.service")
 
 class ReservationsService():
     @staticmethod
-    def get_all_reservations(filters: FilterReservationsSchema, parking_id: int):
+    def get_all_reservations(filters: FilterReservationsSchema, parking_id: str):
         connection = get_connection()
 
         try:
@@ -48,7 +49,7 @@ class ReservationsService():
 
     @staticmethod
     def create_reservation(
-        parking_id: int,
+        parking_id: str,
         name: str,
         plate: str,
         email: EmailStr,
@@ -85,8 +86,11 @@ class ReservationsService():
                     "No se puede crear una reserva en una fecha anterior a la actual"
                 )
 
+            uuid = generate_uuid()
+
             error, success, message, reservation_id = ReservationsRepository.create_reservation(
                 parking_id=parking_id,
+                uuid=uuid,
                 name=name,
                 email=email,
                 plate=plate,
@@ -167,7 +171,7 @@ class ReservationsService():
             connection.close()
 
     @staticmethod
-    def update_reservation(reservation_id: int, reservation_data: UpdateReservationSchema, parking_id: int):
+    def update_reservation(reservation_id: int, reservation_data: UpdateReservationSchema, parking_id: str):
         connection = get_connection()
 
         try:
@@ -243,7 +247,7 @@ class ReservationsService():
             connection.close()
 
     @staticmethod
-    def delete_reservation(reservation_id: int, parking_id: int):
+    def delete_reservation(reservation_id: int, parking_id: str):
         connection = get_connection()
 
         try:
