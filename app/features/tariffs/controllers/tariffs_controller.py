@@ -8,7 +8,7 @@ class TariffsController:
     @staticmethod
     def get_all_tariffs(payload: dict):
         error, tariffs = TariffsService.get_all_tariffs(
-            int(payload["parking_id"])
+            str(payload["parking_id"])
         )
 
         if error:
@@ -21,7 +21,7 @@ class TariffsController:
     @staticmethod
     def get_tariff_by_id(tariff_id: int, payload: dict):
         error, tariff = TariffsService.get_tariff_by_id(
-            int(payload["parking_id"]),
+            str(payload["parking_id"]),
             tariff_id
         )
 
@@ -35,7 +35,7 @@ class TariffsController:
     @staticmethod
     def get_available_vehicle_types(payload: dict):
         error, vehicle_types = TariffsService.get_available_vehicle_types(
-            int(payload["parking_id"])
+            str(payload["parking_id"])
         )
 
         if error:
@@ -48,7 +48,7 @@ class TariffsController:
     @staticmethod
     async def create_tariff(tariff_data: CreateTariffSchema, payload: dict):
         error, success, message = await TariffsService.create_tariff(
-            int(payload["parking_id"]),
+            str(payload["parking_id"]),
             tariff_data
         )
 
@@ -63,7 +63,7 @@ class TariffsController:
     @staticmethod
     def update_tariff(tariff_id: int, tariff_data: UpdateTariffSchema, payload: dict):
         error, success, message = TariffsService.update_tariff(
-            int(payload["parking_id"]),
+            str(payload["parking_id"]),
             tariff_id,
             tariff_data
         )
@@ -79,7 +79,7 @@ class TariffsController:
     @staticmethod
     def delete_tariff(tariff_id: int, payload: dict):
         error, success, message = TariffsService.delete_tariff(
-            int(payload["parking_id"]),
+            str(payload["parking_id"]),
             tariff_id
         )
 
