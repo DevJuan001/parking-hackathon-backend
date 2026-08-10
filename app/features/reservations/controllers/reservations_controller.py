@@ -13,7 +13,7 @@ class ReservationsController:
     @staticmethod
     def get_all_reservations(filters: FilterReservationsSchema, payload: dict):
         error, reservations = ReservationsService.get_all_reservations(
-            filters, int(payload["parking_id"])
+            filters, str(payload["parking_id"])
         )
 
         if error:
@@ -26,7 +26,7 @@ class ReservationsController:
     @staticmethod
     def create_reservation_for_user(data: CreateReservationSchema, payload: dict):
         error, success, message = ReservationsService.create_reservation(
-            int(payload["parking_id"]),
+            str(payload["parking_id"]),
             data.name,
             data.plate,
             data.email,
@@ -70,7 +70,7 @@ class ReservationsController:
     @staticmethod
     def update_reservation(reservation_id: int, data: UpdateReservationSchema, payload: dict):
         error, success, message = ReservationsService.update_reservation(
-            reservation_id, data, int(payload["parking_id"])
+            reservation_id, data, str(payload["parking_id"])
         )
 
         if error:
@@ -84,7 +84,7 @@ class ReservationsController:
     @staticmethod
     def delete_reservation(reservation_id: int, payload: dict):
         error, success, message = ReservationsService.delete_reservation(
-            reservation_id, int(payload["parking_id"])
+            reservation_id, str(payload["parking_id"])
         )
 
         if error:
