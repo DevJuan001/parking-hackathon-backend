@@ -11,7 +11,7 @@ logger = get_logger("tariffs.service")
 class TariffsService:
 
     @staticmethod
-    def get_all_tariffs(parking_id: int):
+    def get_all_tariffs(parking_id: str):
         connection = get_connection()
 
         try:
@@ -39,7 +39,7 @@ class TariffsService:
             connection.close()
 
     @staticmethod
-    def get_tariff_by_id(parking_id: int, tariff_id: int):
+    def get_tariff_by_id(parking_id: str, tariff_id: int):
         connection = get_connection()
 
         try:
@@ -67,7 +67,7 @@ class TariffsService:
             connection.close()
 
     @staticmethod
-    def get_available_vehicle_types(parking_id: int):
+    def get_available_vehicle_types(parking_id: str):
         connection = get_connection()
 
         try:
@@ -97,7 +97,7 @@ class TariffsService:
             connection.close()
 
     @staticmethod
-    def find_tariff_id_by_vehicle_type(parking_id: int, vehicle_type_id: int):
+    def find_tariff_id_by_vehicle_type(parking_id: str, vehicle_type_id: int):
         connection = get_connection()
 
         try:
@@ -120,7 +120,7 @@ class TariffsService:
             connection.close()
 
     @staticmethod
-    async def create_tariff(parking_id: int, tariff_data: CreateTariffSchema):
+    async def create_tariff(parking_id: str, tariff_data: CreateTariffSchema):
         connection = get_connection()
 
         try:
@@ -159,7 +159,7 @@ class TariffsService:
             connection.close()
 
     @staticmethod
-    def update_tariff(parking_id: int, tariff_id: int, tariff_data: UpdateTariffSchema):
+    def update_tariff(parking_id: str, tariff_id: int, tariff_data: UpdateTariffSchema):
         connection = get_connection()
 
         try:
@@ -202,7 +202,7 @@ class TariffsService:
             connection.close()
 
     @staticmethod
-    def delete_tariff(parking_id: int, tariff_id: int):
+    def delete_tariff(parking_id: str, tariff_id: int):
         connection = get_connection()
 
         try:
