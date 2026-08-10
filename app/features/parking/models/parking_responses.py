@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 
 class ParkingResponse(BaseModel):
-    id: int
+    uuid: str
     name: str
     country: str
 
