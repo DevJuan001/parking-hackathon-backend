@@ -6,7 +6,7 @@ from app.utils.logger import get_logger
 from app.utils.date_formatter import date_formatter
 from app.features.users.types.users_types import VALID_PROVIDERS, ProviderType
 from app.features.users.models.users_schemas import CompleteUserOnboardingSchema, CreateUserSchema, UpdateUserSchema, UsersFiltersSchema
-from app.features.users.models.users_responses import SurnameResponse, UserByEmailResponse, UserByIdResponse, UserResponse, UserStatsResponse
+from app.features.users.models.users_responses import SurnameResponse, UserByEmailResponse, UserByIdGlobalResponse, UserByIdResponse, UserResponse, UserStatsResponse
 
 logger = get_logger("users.repository")
 
@@ -228,6 +228,7 @@ class UsersRepository:
         SELECT
             r.name,
             u.id,
+            u.parking_id,
             u.name,
             u.first_surname,
             u.second_surname,
@@ -249,15 +250,16 @@ class UsersRepository:
                 return "Usuario no encontrado", None
 
             data = [
-                UserByIdResponse(
+                UserByIdGlobalResponse(
                     role=item[0],
                     id=item[1],
-                    name=item[2],
-                    first_surname=item[3],
-                    second_surname=item[4],
-                    email=item[5],
-                    created_at=date_formatter(item[6]),
-                    status=item[7]
+                    parking_id=item[2],
+                    name=item[3],
+                    first_surname=item[4],
+                    second_surname=item[5],
+                    email=item[6],
+                    created_at=date_formatter(item[7]),
+                    status=item[8]
                 )
                 for item in result
             ]
