@@ -45,8 +45,10 @@ CREATE TABLE PARKINGS (
 
 CREATE TABLE SUSCRIPTIONS (
   uuid CHAR(36) UNIQUE NOT NULL,
-  parking_id INT NOT NULL,
+  parking_id CHAR(36) NULL,
+  next_payment_at TIMESTAMP NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  status INT NOT NULL DEFAULT 2,
   UNIQUE INDEX uq_suscriptions_uuid (uuid)
 );
 
