@@ -13,6 +13,17 @@ router = APIRouter(
 
 
 @router.get(
+    "/me/private-info",
+    dependencies=[
+        Depends(RateLimiter(times=30, seconds=60)),
+        Depends(require_roles(["Admin"])),
+    ]
+)
+def get_parking_by_private_info(payload: dict = Depends(verify_jwt)):
+    return ParkingController.get_parking_by_private_info(payload)
+
+
+@router.get(
     "/plates",
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
