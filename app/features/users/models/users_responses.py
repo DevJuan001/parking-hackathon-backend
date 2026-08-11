@@ -5,7 +5,6 @@ from pydantic import BaseModel, EmailStr
 from app.features.users.types.users_types import ProviderType
 
 
-
 class UserResponse(BaseModel):
     role_id: int
     role_name: str
@@ -21,6 +20,18 @@ class UserResponse(BaseModel):
 class UserByIdResponse(BaseModel):
     role: str
     id: int
+    name: Optional[str]
+    first_surname: Optional[str]
+    second_surname: Optional[str]
+    email: EmailStr
+    created_at: str
+    status: int
+
+
+class UserByIdGlobalResponse(BaseModel):
+    role: str
+    id: int
+    parking_id: str
     name: Optional[str]
     first_surname: Optional[str]
     second_surname: Optional[str]
