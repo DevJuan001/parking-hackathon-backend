@@ -6,6 +6,19 @@ from app.features.spots.models.spots_schemas import SpotsFiltersSchema
 
 class ParkingController:
     @staticmethod
+    def get_parking_by_private_info(payload):
+        error, parking = ParkingService.get_parking_by_private_info(
+            str(payload["parking_id"])
+        )
+
+        if error:
+            raise HTTPException(status_code=404, detail=error)
+
+        return {
+            "data": parking
+        }
+
+    @staticmethod
     def get_parking_by_id(parking_id: str):
         error, parking = ParkingService.get_parking_by_id(
             parking_id
