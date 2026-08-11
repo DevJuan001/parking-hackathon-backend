@@ -8,7 +8,7 @@ logger = get_logger("exits.repository")
 class ExitsRepository:
 
     @staticmethod
-    def find_all_exits(parking_id: int, filters_data: ExitsFiltersSchema, connection):
+    def find_all_exits(parking_id: str, filters_data: ExitsFiltersSchema, connection):
         cursor = connection.cursor()
 
         data = filters_data.model_dump(exclude_none=True)
@@ -84,7 +84,7 @@ class ExitsRepository:
             cursor.close()
 
     @staticmethod
-    def find_exit_by_id(parking_id: int, exit_id: int, connection):
+    def find_exit_by_id(parking_id: str, exit_id: int, connection):
         cursor = connection.cursor()
 
         query = """
@@ -131,7 +131,7 @@ class ExitsRepository:
             cursor.close()
 
     @staticmethod
-    def find_exits_by_plate(parking_id: int, plate_id: int, connection):
+    def find_exits_by_plate(parking_id: str, plate_id: int, connection):
         cursor = connection.cursor()
 
         query = """
@@ -181,7 +181,7 @@ class ExitsRepository:
             cursor.close()
 
     @staticmethod
-    def find_latest_exit(parking_id: int, plate_id: int, connection):
+    def find_latest_exit(parking_id: str, plate_id: int, connection):
         cursor = connection.cursor()
 
         query = """
@@ -231,7 +231,7 @@ class ExitsRepository:
             cursor.close()
 
     @staticmethod
-    def create_exit(parking_id: int, plate_id: int, connection):
+    def create_exit(parking_id: str, plate_id: int, connection):
         cursor = connection.cursor()
 
         query = """
@@ -251,7 +251,7 @@ class ExitsRepository:
             cursor.close()
 
     @staticmethod
-    def count_exit_stats(filters: StatsExitsFiltersSchema, parking_id: int, connection):
+    def count_exit_stats(filters: StatsExitsFiltersSchema, parking_id: str, connection):
         data = filters.model_dump(exclude_none=True)
 
         cursor = connection.cursor()

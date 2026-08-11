@@ -9,7 +9,7 @@ logger = get_logger("tariffs.repository")
 class TariffsRepository:
 
     @staticmethod
-    def find_all_tariffs(parking_id: int, connection):
+    def find_all_tariffs(parking_id: str, connection):
         cursor = connection.cursor()
 
         query = """
@@ -48,7 +48,7 @@ class TariffsRepository:
             cursor.close()
 
     @staticmethod
-    def find_tariff_by_id(parking_id: int, tariff_id: int, connection):
+    def find_tariff_by_id(parking_id: str, tariff_id: int, connection):
         cursor = connection.cursor()
 
         query = """
@@ -86,7 +86,7 @@ class TariffsRepository:
             cursor.close()
 
     @staticmethod
-    def find_rate_by_vehicle_type(parking_id: int, vehicle_type: int, connection):
+    def find_rate_by_vehicle_type(parking_id: str, vehicle_type: int, connection):
         cursor = connection.cursor()
 
         query = """
@@ -128,7 +128,7 @@ class TariffsRepository:
             cursor.close()
 
     @staticmethod
-    def find_tariff_id_by_vehicle_type(parking_id: int, vehicle_type_id: int, connection):
+    def find_tariff_id_by_vehicle_type(parking_id: str, vehicle_type_id: int, connection):
         cursor = connection.cursor()
 
         query = """
@@ -157,7 +157,7 @@ class TariffsRepository:
             cursor.close()
 
     @staticmethod
-    def find_vehicle_types_without_tariff(parking_id: int, connection):
+    def find_vehicle_types_without_tariff(parking_id: str, connection):
         cursor = connection.cursor()
 
         query = """
@@ -194,7 +194,7 @@ class TariffsRepository:
             cursor.close()
 
     @staticmethod
-    def create_tariff(parking_id: int, vehicle_type_id: int, value: float, connection):
+    def create_tariff(parking_id: str, vehicle_type_id: int, value: float, connection):
         cursor = connection.cursor()
 
         query = """
@@ -218,7 +218,7 @@ class TariffsRepository:
             cursor.close()
 
     @staticmethod
-    def update_tariff(parking_id: int, tariff_id: int, value: float, connection):
+    def update_tariff(parking_id: str, tariff_id: int, value: float, connection):
         cursor = connection.cursor()
 
         query = """
@@ -244,7 +244,7 @@ class TariffsRepository:
 
     @staticmethod
     def count_active_vehicles_by_type(
-        parking_id: int, vehicle_type_id: int, connection
+        parking_id: str, vehicle_type_id: int, connection
     ):
         cursor = connection.cursor()
 
@@ -293,7 +293,7 @@ class TariffsRepository:
             cursor.close()
 
     @staticmethod
-    def delete_tariff(parking_id: int, tariff_id: int, connection):
+    def delete_tariff(parking_id: str, tariff_id: int, connection):
         cursor = connection.cursor()
 
         query = """

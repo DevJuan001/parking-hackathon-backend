@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 
 class PaymentResponse(BaseModel):
-    id: int
+    uuid: int
     plate: str
     spot: str
     value: float

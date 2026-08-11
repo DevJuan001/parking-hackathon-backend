@@ -1,20 +1,51 @@
 from app.utils.logger import get_logger
+from app.utils.uuid import generate_uuid
 from app.core.exception import ServiceError
 from app.core.database import get_connection
 from app.utils.plate_formatter import plate_formatter
-from app.features.parking.models.parking_schemas import CreatePlateSchema, UpdateParkingSchema
-from app.features.parking.repositories.parkings_repository import ParkingsRepository
-from app.features.parking.repositories.plates_repository import PlatesRepository
-from app.features.parking.repositories.vehicle_types_repository import VehicleTypesRepository
 from app.features.spots.models.spots_schemas import SpotsFiltersSchema
 from app.features.spots.repositories.spots_repository import SpotsRepository
+from app.features.parking.repositories.plates_repository import PlatesRepository
+from app.features.parking.repositories.parkings_repository import ParkingsRepository
+from app.features.parking.models.parking_schemas import CreatePlateSchema, UpdateParkingSchema
+from app.features.parking.repositories.vehicle_types_repository import VehicleTypesRepository
 
 logger = get_logger("parking.service")
 
 
 class ParkingService:
     @staticmethod
-    def get_parking_by_id(parking_id: int):
+    def get_parking_by_private_info(parking_id: str):
+        connection = get_connection()
+
+        try:
+            error, parking = ParkingsRepository.find_parking_by_private_info(
+                parking_id, connection
+            )
+
+            if error:
+                raise ServiceError(
+                    "No se encontro información sobre este parqueadero"
+                )
+
+            return None, parking
+
+        except ServiceError as e:
+            return e.message, None
+
+        except Exception as e:
+            logger.error(
+                "Error en get_parking_by_private_info: %s",
+                e,
+                exc_info=True
+            )
+            return "Error al intentar crear el parking", None
+
+        finally:
+            connection.close()
+
+    @staticmethod
+    def get_parking_by_id(parking_id: str):
         connection = get_connection()
 
         try:
@@ -28,7 +59,7 @@ class ParkingService:
                 )
 
             return None, parking
-       
+
         except ServiceError as e:
             return e.message, None
 
@@ -58,7 +89,10 @@ class ParkingService:
                     "El pais del parking es obligatorio, selecciona uno e intentalo nuevamente"
                 )
 
+            uuid = generate_uuid()
+
             error, success, parking_id = ParkingsRepository.create_parking(
+                uuid=uuid,
                 name=name.strip(),
                 country_id=country_id,
                 connection=connection
@@ -88,7 +122,7 @@ class ParkingService:
             connection.close()
 
     @staticmethod
-    def get_all_plates(parking_id: int):
+    def get_all_plates(parking_id: str):
         connection = get_connection()
 
         try:
@@ -144,7 +178,7 @@ class ParkingService:
             connection.close()
 
     @staticmethod
-    def get_all_spots(parking_id: int, filters: SpotsFiltersSchema):
+    def get_all_spots(parking_id: str, filters: SpotsFiltersSchema):
         connection = get_connection()
 
         try:
@@ -172,7 +206,7 @@ class ParkingService:
             connection.close()
 
     @staticmethod
-    def get_plate_by_name(parking_id: int, plate: str):
+    def get_plate_by_name(parking_id: str, plate: str):
         connection = get_connection()
 
         try:
@@ -200,7 +234,7 @@ class ParkingService:
             connection.close()
 
     @staticmethod
-    async def create_plate(parking_id: int, plate_data: CreatePlateSchema):
+    async def create_plate(parking_id: str, plate_data: CreatePlateSchema):
         connection = get_connection()
 
         try:
@@ -264,7 +298,7 @@ class ParkingService:
             connection.close()
 
     @staticmethod
-    def update_parking(parking_id: int, parking_data: UpdateParkingSchema):
+    def update_parking(parking_id: str, parking_data: UpdateParkingSchema):
         connection = get_connection()
 
         try:

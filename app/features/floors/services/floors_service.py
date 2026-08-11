@@ -10,7 +10,7 @@ logger = get_logger("floors.service")
 class FloorsService:
 
     @staticmethod
-    def get_all_floors(parking_id: int):
+    def get_all_floors(parking_id: str):
         connection = get_connection()
 
         try:
@@ -38,7 +38,7 @@ class FloorsService:
             connection.close()
 
     @staticmethod
-    def get_floor_by_id(parking_id: int, floor_id: int):
+    def get_floor_by_id(parking_id: str, floor_id: int):
         connection = get_connection()
 
         try:
@@ -66,7 +66,7 @@ class FloorsService:
             connection.close()
 
     @staticmethod
-    def find_floor_id_by_name(parking_id: int, name: str):
+    def find_floor_id_by_name(parking_id: str, name: str):
         connection = get_connection()
 
         try:
@@ -89,7 +89,7 @@ class FloorsService:
             connection.close()
 
     @staticmethod
-    def create_floor(parking_id: int, name: str):
+    def create_floor(parking_id: str, name: str):
         connection = get_connection()
 
         try:
@@ -123,7 +123,7 @@ class FloorsService:
             connection.close()
 
     @staticmethod
-    def update_floor(parking_id: int, floor_id: int, name: str):
+    def update_floor(parking_id: str, floor_id: int, name: str):
         connection = get_connection()
 
         try:
@@ -166,7 +166,7 @@ class FloorsService:
             connection.close()
 
     @staticmethod
-    def delete_floor(parking_id: int, floor_id: int):
+    def delete_floor(parking_id: str, floor_id: int):
         connection = get_connection()
 
         try:

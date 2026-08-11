@@ -14,7 +14,7 @@ logger = get_logger("users.service")
 
 class UsersService:
     @staticmethod
-    def get_all_users(parking_id: int, filters: UsersFiltersSchema):
+    def get_all_users(parking_id: str, filters: UsersFiltersSchema):
         connection = get_connection()
 
         try:
@@ -44,7 +44,7 @@ class UsersService:
             connection.close()
 
     @staticmethod
-    def get_user_stats(parking_id: int):
+    def get_user_stats(parking_id: str):
         connection = get_connection()
 
         try:
@@ -72,7 +72,7 @@ class UsersService:
             connection.close()
 
     @staticmethod
-    def get_user_by_id(parking_id: int, user_id: int):
+    def get_user_by_id(parking_id: str, user_id: int):
         connection = get_connection()
 
         try:
@@ -188,7 +188,7 @@ class UsersService:
             connection.close()
 
     @staticmethod
-    def get_all_surnames(parking_id: int):
+    def get_all_surnames(parking_id: str):
         connection = get_connection()
 
         try:
@@ -285,7 +285,7 @@ class UsersService:
             connection.close()
 
     @staticmethod
-    def update_user(parking_id: int, user_id: int, user_data: UpdateUserSchema):
+    def update_user(parking_id: str, user_id: int, user_data: UpdateUserSchema):
         data = user_data.model_dump(exclude_none=True)
         connection = get_connection()
 
@@ -337,7 +337,7 @@ class UsersService:
             connection.close()
 
     @staticmethod
-    def update_user_password(parking_id: int, password_data: UpdatePasswordSchema, user_id: int):
+    def update_user_password(parking_id: str, password_data: UpdatePasswordSchema, user_id: int):
         data = password_data.model_dump()
 
         connection = get_connection()
@@ -392,7 +392,7 @@ class UsersService:
             connection.close()
 
     @staticmethod
-    def disable_user(parking_id: int, user_id: int):
+    def disable_user(parking_id: str, user_id: int):
         connection = get_connection()
 
         try:
@@ -432,7 +432,7 @@ class UsersService:
             connection.close()
 
     @staticmethod
-    def enable_user(parking_id: int, user_id: int):
+    def enable_user(parking_id: str, user_id: int):
         connection = get_connection()
 
         try:

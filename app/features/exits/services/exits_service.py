@@ -17,7 +17,7 @@ logger = get_logger("exits.service")
 class ExitsService:
 
     @staticmethod
-    def get_all_exits(parking_id: int, filters: ExitsFiltersSchema):
+    def get_all_exits(parking_id: str, filters: ExitsFiltersSchema):
         connection = get_connection()
 
         try:
@@ -45,7 +45,7 @@ class ExitsService:
             connection.close()
 
     @staticmethod
-    def get_exit_by_id(parking_id: int, exit_id: int):
+    def get_exit_by_id(parking_id: str, exit_id: int):
         connection = get_connection()
 
         try:
@@ -73,7 +73,7 @@ class ExitsService:
             connection.close()
 
     @staticmethod
-    def get_exits_by_plate(parking_id: int, plate_id: int):
+    def get_exits_by_plate(parking_id: str, plate_id: int):
         connection = get_connection()
 
         try:
@@ -101,7 +101,7 @@ class ExitsService:
             connection.close()
 
     @staticmethod
-    async def create_exit(parking_id: int, exit_data: CreateExitSchema):
+    async def create_exit(parking_id: str, exit_data: CreateExitSchema):
         connection = get_connection()
 
         try:
@@ -179,7 +179,7 @@ class ExitsService:
             connection.close()
 
     @staticmethod
-    def get_exit_stats(filters: StatsExitsFiltersSchema, parking_id: int):
+    def get_exit_stats(filters: StatsExitsFiltersSchema, parking_id: str):
         connection = get_connection()
 
         try:

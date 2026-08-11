@@ -13,7 +13,7 @@ logger = get_logger("entries.service")
 class EntriesService:
 
     @staticmethod
-    def get_all_entries(parking_id: int, filters: EntriesFiltersSchema):
+    def get_all_entries(parking_id: str, filters: EntriesFiltersSchema):
         connection = get_connection()
 
         try:
@@ -41,7 +41,7 @@ class EntriesService:
             connection.close()
 
     @staticmethod
-    def get_entry_by_id(parking_id: int, entry_id: int):
+    def get_entry_by_id(parking_id: str, entry_id: int):
         connection = get_connection()
 
         try:
@@ -69,7 +69,7 @@ class EntriesService:
             connection.close()
 
     @staticmethod
-    def get_recent_entries(parking_id: int):
+    def get_recent_entries(parking_id: str):
         connection = get_connection()
 
         try:
@@ -97,7 +97,7 @@ class EntriesService:
             connection.close()
 
     @staticmethod
-    def get_entry_stats(parking_id: int):
+    def get_entry_stats(parking_id: str):
         connection = get_connection()
 
         try:
@@ -125,7 +125,7 @@ class EntriesService:
             connection.close()
 
     @staticmethod
-    def get_entries_by_plate(parking_id: int, plate_id: int):
+    def get_entries_by_plate(parking_id: str, plate_id: int):
         connection = get_connection()
 
         try:
@@ -153,7 +153,7 @@ class EntriesService:
             connection.close()
 
     @staticmethod
-    async def create_entry(parking_id: int, entry_data: CreateEntrySchema):
+    async def create_entry(parking_id: str, entry_data: CreateEntrySchema):
         data = entry_data.model_dump()
 
         connection = get_connection()

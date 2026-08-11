@@ -69,7 +69,7 @@ def create_self_reservation(
     ]
 )
 def update_reservation(
-    reservation_id: int,
+    reservation_id: str,
     data: UpdateReservationSchema,
     payload: dict = Depends(verify_jwt)
 ):
@@ -85,7 +85,7 @@ def update_reservation(
     ]
 )
 def delete_reservation(
-    reservation_id: int,
+    reservation_id: str,
     payload: dict = Depends(verify_jwt)
 ):
     return ReservationsController.delete_reservation(reservation_id, payload)

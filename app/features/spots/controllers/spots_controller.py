@@ -13,7 +13,7 @@ class SpotsController:
     @staticmethod
     def get_all_spots(filters: SpotsFiltersSchema, payload: dict):
         error, spots = SpotsService.get_all_spots(
-            int(payload["parking_id"]),
+            str(payload["parking_id"]),
             filters
         )
 
@@ -27,7 +27,7 @@ class SpotsController:
     @staticmethod
     def get_spot_by_id(spot_id: int, payload: dict):
         error, spot = SpotsService.get_spot_by_id(
-            int(payload["parking_id"]),
+            str(payload["parking_id"]),
             spot_id
         )
 
@@ -41,7 +41,7 @@ class SpotsController:
     @staticmethod
     def create_spot(spot_data: CreateSpotSchema, payload: dict):
         error, success, message = SpotsService.create_spot(
-            int(payload["parking_id"]),
+            str(payload["parking_id"]),
             spot_data.floor_id,
             spot_data.spot,
             spot_data.vehicle_type_id,
@@ -58,7 +58,7 @@ class SpotsController:
     @staticmethod
     def update_spot_status(spot_id: int, status_data: UpdateSpotStatusSchema, payload: dict):
         error, success, message = SpotsService.update_spot_status(
-            int(payload["parking_id"]),
+            str(payload["parking_id"]),
             spot_id,
             status_data.spot_status
         )
@@ -74,7 +74,7 @@ class SpotsController:
     @staticmethod
     def update_spot(spot_id: int, spot_data: UpdateSpotSchema, payload: dict):
         error, success, message = SpotsService.update_spot(
-            int(payload["parking_id"]),
+            str(payload["parking_id"]),
             spot_id,
             spot_data.floor_id,
             spot_data.spot,
@@ -93,7 +93,7 @@ class SpotsController:
     @staticmethod
     def delete_spot(spot_id: int, payload: dict):
         error, success, message = SpotsService.delete_spot(
-            int(payload["parking_id"]),
+            str(payload["parking_id"]),
             spot_id
         )
 

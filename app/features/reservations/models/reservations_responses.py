@@ -4,7 +4,7 @@ from pydantic import BaseModel, EmailStr
 
 
 class ReservationsResponse(BaseModel):
-    id: int
+    uuid: str
     name: str
     level: int
     email: EmailStr

@@ -10,6 +10,7 @@ from fastapi import Request, Response
 from app.core.oauth import oauth
 from app.core.config import settings
 from app.utils.logger import get_logger
+from app.utils.uuid import generate_uuid
 from app.core.exception import ServiceError
 from app.core.database import get_connection
 from app.tasks.knowledge_tasks import rebuild_parking_knowledge
@@ -227,9 +228,6 @@ class AuthService:
             # Creamos un modelo del usuario poniendo strings vacios en los datos que faltan
             shell_user = CreateUserSchema(
                 role_id=1,
-                name="",
-                first_surname="",
-                second_surname="",
                 email=data.email,
                 onboarding_completed=False
             )
@@ -310,8 +308,12 @@ class AuthService:
             if payload.get("onboarding_completed"):
                 raise ServiceError("El usuario ya completó el onboarding")
 
+            uuid = generate_uuid()
+
             # Creamos un parking nuevo para ese usuario
             error, success, parking_id = ParkingsRepository.create_parking(
+                uuid=uuid,
+                plan_id=1,
                 name=data.parking_name.strip(),
                 country_id=data.parking_country,
                 connection=connection,

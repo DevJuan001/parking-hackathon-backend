@@ -8,7 +8,7 @@ class ExitsController:
     @staticmethod
     def get_all_exits(filters: ExitsFiltersSchema, payload: dict):
         error, exits = ExitsService.get_all_exits(
-            int(payload["parking_id"]),
+            str(payload["parking_id"]),
             filters
         )
 
@@ -22,7 +22,7 @@ class ExitsController:
     @staticmethod
     def get_exit_by_id(exit_id: int, payload: dict):
         error, exit_record = ExitsService.get_exit_by_id(
-            int(payload["parking_id"]),
+            str(payload["parking_id"]),
             exit_id
         )
 
@@ -36,7 +36,7 @@ class ExitsController:
     @staticmethod
     def get_exits_by_plate(plate_id: int, payload: dict):
         error, exits = ExitsService.get_exits_by_plate(
-            int(payload["parking_id"]),
+            str(payload["parking_id"]),
             plate_id
         )
 
@@ -50,7 +50,7 @@ class ExitsController:
     @staticmethod
     async def create_exit(exit_data: CreateExitSchema, payload: dict):
         error, success, message = await ExitsService.create_exit(
-            int(payload["parking_id"]),
+            str(payload["parking_id"]),
             exit_data
         )
 
@@ -66,7 +66,7 @@ class ExitsController:
     def get_exit_stats(filters: StatsExitsFiltersSchema, payload: dict):
         error, stats = ExitsService.get_exit_stats(
             filters,
-            int(payload["parking_id"])
+            str(payload["parking_id"])
         )
 
         if error:

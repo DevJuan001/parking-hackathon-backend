@@ -57,7 +57,7 @@ class VectorRepository:
             return "Error al guardar los fragmentos de conocimiento", False
 
     @staticmethod
-    def search_chunks(parking_id: int, query: str, limit: int = 5) -> tuple:
+    def search_chunks(parking_id: str, query: str, limit: int = 5) -> tuple:
         qdrant = get_qdrant()
 
         query_vector = embed_text(query)

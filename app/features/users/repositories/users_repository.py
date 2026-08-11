@@ -6,7 +6,7 @@ from app.utils.logger import get_logger
 from app.utils.date_formatter import date_formatter
 from app.features.users.types.users_types import VALID_PROVIDERS, ProviderType
 from app.features.users.models.users_schemas import CompleteUserOnboardingSchema, CreateUserSchema, UpdateUserSchema, UsersFiltersSchema
-from app.features.users.models.users_responses import SurnameResponse, UserByEmailResponse, UserByIdResponse, UserResponse, UserStatsResponse
+from app.features.users.models.users_responses import SurnameResponse, UserByEmailResponse, UserByIdGlobalResponse, UserByIdResponse, UserResponse, UserStatsResponse
 
 logger = get_logger("users.repository")
 
@@ -15,7 +15,7 @@ class UsersRepository:
 
     # Obtener todos los usuarios
     @staticmethod
-    def find_all_users(parking_id: int, filters_data: UsersFiltersSchema, connection):
+    def find_all_users(parking_id: str, filters_data: UsersFiltersSchema, connection):
         data = filters_data.model_dump(exclude_none=True)
 
         cursor = connection.cursor()
@@ -100,7 +100,7 @@ class UsersRepository:
 
     # Obtener los apellidos (first_surname) distintos de los usuarios del parking
     @staticmethod
-    def find_all_surnames(parking_id: int, connection):
+    def find_all_surnames(parking_id: str, connection):
         cursor = connection.cursor()
 
         query = """
@@ -130,7 +130,7 @@ class UsersRepository:
 
     # Obtener estadisticas de usuarios del parking
     @staticmethod
-    def count_user_stats(parking_id: int, connection):
+    def count_user_stats(parking_id: str, connection):
         cursor = connection.cursor()
 
         query = """
@@ -167,7 +167,7 @@ class UsersRepository:
 
     # Obtener un usuario por el ID
     @staticmethod
-    def find_user_by_id(parking_id: int, user_id: int, connection):
+    def find_user_by_id(parking_id: str, user_id: int, connection):
         cursor = connection.cursor()
 
         # Petición a la base de datos
@@ -228,6 +228,7 @@ class UsersRepository:
         SELECT
             r.name,
             u.id,
+            u.parking_id,
             u.name,
             u.first_surname,
             u.second_surname,
@@ -249,15 +250,16 @@ class UsersRepository:
                 return "Usuario no encontrado", None
 
             data = [
-                UserByIdResponse(
+                UserByIdGlobalResponse(
                     role=item[0],
                     id=item[1],
-                    name=item[2],
-                    first_surname=item[3],
-                    second_surname=item[4],
-                    email=item[5],
-                    created_at=date_formatter(item[6]),
-                    status=item[7]
+                    parking_id=item[2],
+                    name=item[3],
+                    first_surname=item[4],
+                    second_surname=item[5],
+                    email=item[6],
+                    created_at=date_formatter(item[7]),
+                    status=item[8]
                 )
                 for item in result
             ]
@@ -273,7 +275,7 @@ class UsersRepository:
             cursor.close()
 
     @staticmethod
-    def find_user_password_by_id(parking_id: int, user_id: int, connection):
+    def find_user_password_by_id(parking_id: str, user_id: int, connection):
         cursor = connection.cursor()
 
         # Petición a la base de datos
@@ -342,9 +344,9 @@ class UsersRepository:
                     role=result[0],
                     parking_id=result[1],
                     id=result[2],
-                    name=result[3],
-                    first_surname=result[4],
-                    second_surname=result[5],
+                    name=result[3] if result[3] else None,
+                    first_surname=result[4] if result[4] else None,
+                    second_surname=result[5] if result[5] else None,
                     email=result[6],
                     password=result[7] if result[7] else None,
                     onboarding_completed=result[8],
@@ -366,7 +368,7 @@ class UsersRepository:
     def create_user(
         user_data: CreateUserSchema,
         hash_password: Optional[str],
-        parking_id: Optional[int],
+        parking_id: Optional[str],
         onboarding_completed: bool,
         connection,
         provider: ProviderType,
@@ -432,7 +434,7 @@ class UsersRepository:
     @staticmethod
     def complete_user_onboarding(
         user_id: int,
-        parking_id: int,
+        parking_id: str,
         user_data: CompleteUserOnboardingSchema,
         connection
     ):
@@ -473,7 +475,7 @@ class UsersRepository:
 
     # Actualizar la información de un usuario
     @staticmethod
-    def update_user(parking_id: int, user_id: int, user_data: UpdateUserSchema, connection):
+    def update_user(parking_id: str, user_id: int, user_data: UpdateUserSchema, connection):
         data = user_data.model_dump(exclude_none=True)
 
         USER_FIELDS = {
@@ -516,7 +518,7 @@ class UsersRepository:
             cursor.close()
 
     @staticmethod
-    def update_user_password(parking_id: int, user_id: int, password: str, connection):
+    def update_user_password(parking_id: str, user_id: int, password: str, connection):
         cursor = connection.cursor()
 
         query = """
@@ -541,7 +543,7 @@ class UsersRepository:
 
     # Deshabilitar un usuario
     @staticmethod
-    def disable_user(parking_id: int, user_id: int, connection):
+    def disable_user(parking_id: str, user_id: int, connection):
         cursor = connection.cursor()
 
         query = "UPDATE USERS SET status = 1 WHERE parking_id = %s AND id = %s"
@@ -559,7 +561,7 @@ class UsersRepository:
 
     # Habilitar un usuario
     @staticmethod
-    def enable_user(parking_id: int, user_id: int, connection):
+    def enable_user(parking_id: str, user_id: int, connection):
         cursor = connection.cursor()
 
         query = "UPDATE USERS SET status = 2 WHERE parking_id = %s AND id = %s"
