@@ -1,3 +1,4 @@
+from datetime import date
 from pydantic import BaseModel
 
 
@@ -5,6 +6,14 @@ class ParkingResponse(BaseModel):
     uuid: str
     name: str
     country: str
+
+class ParkingPrivateResponse(BaseModel):
+    uuid: str
+    name: str
+    country: str
+    plan: str
+    plan_value: float
+    next_payment_at: date
 
 
 class PlateResponse(BaseModel):
