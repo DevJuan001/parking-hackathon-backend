@@ -212,7 +212,11 @@ INSERT INTO PLANS (name, value, status) VALUES
 
 -- PARKINGS
 INSERT INTO PARKINGS (uuid, plan_id, name, country_id) VALUES
- ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 2, 'Parking Central', 1);
+ ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 4, 'Parking Central', 1);
+
+-- SUSCRIPTIONS
+INSERT INTO SUSCRIPTIONS(uuid, parking_id, next_payment_at, status) VALUES
+ ('8ebaad3b-c310-4d87-9772-25c08cb5d52a', 'f47ac10b-58cc-4372-a567-0e02b2c3d479', '2026-12-21 00:00:00', 2);
 
 -- USERS
 INSERT INTO USERS (role_id, parking_id, name, first_surname, second_surname, email, password, onboarding_completed, provider, status) VALUES
