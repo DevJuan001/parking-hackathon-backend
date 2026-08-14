@@ -342,7 +342,7 @@ class UsersRepository:
             if result:
                 data = UserByEmailResponse(
                     role=result[0],
-                    parking_id=result[1],
+                    parking_id=result[1] if result[1] else None,
                     id=result[2],
                     name=result[3] if result[3] else None,
                     first_surname=result[4] if result[4] else None,
