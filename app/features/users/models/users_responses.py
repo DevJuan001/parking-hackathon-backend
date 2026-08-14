@@ -31,7 +31,7 @@ class UserByIdResponse(BaseModel):
 class UserByIdGlobalResponse(BaseModel):
     role: str
     id: int
-    parking_id: str
+    parking_id: Optional[str] = None
     name: Optional[str]
     first_surname: Optional[str]
     second_surname: Optional[str]
