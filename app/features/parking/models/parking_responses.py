@@ -1,4 +1,5 @@
 from datetime import date
+from typing import Optional
 from pydantic import BaseModel
 
 
@@ -13,7 +14,7 @@ class ParkingPrivateResponse(BaseModel):
     country: str
     plan: str
     plan_value: float
-    next_payment_at: date
+    next_payment_at: Optional[date] = None
 
 
 class PlateResponse(BaseModel):

@@ -1,8 +1,8 @@
 from datetime import datetime
 from app.utils.logger import get_logger
+from app.utils.uuid import generate_uuid
 from app.core.exception import ServiceError
 from app.core.database import get_connection
-from app.utils.date_formatter import date_formatter
 from app.utils.plate_formatter import plate_formatter
 from app.utils.round_to_50 import round_up_to_next_50
 from app.features.exits.repositories.exits_repository import ExitsRepository
@@ -324,8 +324,11 @@ class PaymentsService:
                 raise ServiceError(
                     error or "Error al intentar crear la salida"
                 )
+                
+            uuid = generate_uuid()
 
             error, success, message = PaymentsRepository.create_payment(
+                uuid=uuid,
                 parking_id=parking_id,
                 plate_id=plate_id,
                 spot_id=entry.spot_id,

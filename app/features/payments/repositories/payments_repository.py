@@ -153,7 +153,14 @@ class PaymentsRepository:
         cursor = connection.cursor()
 
         query = """
-        INSERT INTO PAYMENTS (uuid, parking_id, plate_id, spot_id, value, payment_method_id)
+        INSERT INTO PAYMENTS (
+            uuid,
+            parking_id,
+            plate_id,
+            spot_id,
+            value,
+            payment_method_id
+        )
         VALUES (%s, %s, %s, %s, %s, %s)
         """
 
@@ -182,7 +189,10 @@ class PaymentsRepository:
         cursor = connection.cursor()
 
         query = """
-        SELECT id, name, icon
+        SELECT
+            id,
+            name,
+            icon
         FROM PAYMENT_METHODS
         ORDER BY id ASC
         """

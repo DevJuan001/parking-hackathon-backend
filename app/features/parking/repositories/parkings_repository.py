@@ -24,7 +24,7 @@ class ParkingsRepository:
             ON p.country_id = c.id
         INNER JOIN PLANS AS pl
             ON p.plan_id = pl.id
-        INNER JOIN SUSCRIPTIONS AS s
+        LEFT JOIN SUSCRIPTIONS AS s
             ON s.parking_id = p.uuid 
         WHERE p.uuid = %s
         """
@@ -40,7 +40,7 @@ class ParkingsRepository:
                 country=result[2],
                 plan=result[3],
                 plan_value=result[4],
-                next_payment_at=result[5].date(),
+                next_payment_at=result[5].date() if result[5] else None,
             )
 
         except Exception as e:
