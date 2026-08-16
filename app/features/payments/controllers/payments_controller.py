@@ -8,7 +8,7 @@ class PaymentsController:
     @staticmethod
     def get_all_payments(filters: PaymentsFiltersSchema, payload: dict):
         error, payments = PaymentsService.get_all_payments(
-            int(payload["parking_id"]),
+            str(payload["parking_id"]),
             filters
         )
 
@@ -20,9 +20,9 @@ class PaymentsController:
         }
 
     @staticmethod
-    def get_payment_by_id(payment_id: int, payload: dict):
+    def get_payment_by_id(payment_id: str, payload: dict):
         error, payment = PaymentsService.get_payment_by_id(
-            int(payload["parking_id"]),
+            str(payload["parking_id"]),
             payment_id
         )
 
@@ -36,7 +36,7 @@ class PaymentsController:
     @staticmethod
     def get_payments_growth(period: str, payload: dict):
         error, payments = PaymentsService.get_payments_growth(
-            int(payload["parking_id"]),
+            str(payload["parking_id"]),
             period,
         )
 
@@ -50,7 +50,7 @@ class PaymentsController:
     @staticmethod
     def get_payments_by_plate(plate_id: int, payload: dict):
         error, payments = PaymentsService.get_payments_by_plate(
-            int(payload["parking_id"]),
+            str(payload["parking_id"]),
             plate_id
         )
 
@@ -75,7 +75,7 @@ class PaymentsController:
     @staticmethod
     def calculate_payment(params: CalculatePaymentSchema, payload: dict):
         error, result = PaymentsService.calculate_payment(
-            int(payload["parking_id"]),
+            str(payload["parking_id"]),
             params.plate
         )
 
@@ -89,7 +89,7 @@ class PaymentsController:
     @staticmethod
     async def create_payment(payment_data: CreatePaymentSchema, payload: dict):
         error, success, message = await PaymentsService.create_payment(
-            int(payload["parking_id"]),
+            str(payload["parking_id"]),
             payment_data
         )
 
