@@ -12,8 +12,6 @@ class ParkingResponse(BaseModel):
 class ParkingPrivateResponse(BaseModel):
     uuid: str
     name: str
-    country_id: int
-    country: str
     address: str
     start_day: int
     start_time: time
