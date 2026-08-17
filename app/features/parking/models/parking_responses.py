@@ -1,7 +1,11 @@
-from typing import Optional
+from typing import Literal, Optional
 from pydantic import BaseModel, field_validator
 from datetime import date, datetime, time, timedelta
 
+
+class TimeRemaining(BaseModel):
+    value: int
+    unit: Literal["months", "days", "hours"]
 
 class ParkingResponse(BaseModel):
     uuid: str
@@ -20,6 +24,7 @@ class ParkingPrivateResponse(BaseModel):
     plan: str
     plan_value: float
     next_payment_at: Optional[date] = None
+    time_remaining: Optional[TimeRemaining] = None
 
     @field_validator("start_time", "end_time", mode="before")
     @classmethod
