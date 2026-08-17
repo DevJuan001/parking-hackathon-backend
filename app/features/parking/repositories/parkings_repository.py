@@ -1,7 +1,7 @@
 from datetime import time
 from app.utils.logger import get_logger
 from app.features.parking.models.parking_schemas import UpdateParkingSchema
-from app.features.parking.models.parking_responses import ParkingPrivateResponse, ParkingResponse
+from app.features.parking.models.parking_responses import ParkingPrivateResponse, ParkingResponse, TimeRemaining
 
 logger = get_logger("parkings.repository")
 
@@ -23,7 +23,10 @@ class ParkingsRepository:
             p.end_time,
             pl.name,
             pl.value,
-            s.next_payment_at
+            s.next_payment_at,
+            TIMESTAMPDIFF(MONTH, s.created_at, NOW())  AS tr_months,
+            TIMESTAMPDIFF(DAY,   s.created_at, NOW())  AS tr_days,
+            TIMESTAMPDIFF(HOUR,  s.created_at, NOW())  AS tr_hours
         FROM PARKINGS AS p
         INNER JOIN PLANS AS pl
             ON p.plan_id = pl.id
@@ -37,6 +40,15 @@ class ParkingsRepository:
 
             result = cursor.fetchone()
 
+            if result[10] is None:
+                time_remaining = None
+            elif result[10] >= 1:
+                time_remaining = TimeRemaining(value=result[10], unit="months")
+            elif result[11] >= 1:
+                time_remaining = TimeRemaining(value=result[11], unit="days")
+            else:
+                time_remaining = TimeRemaining(value=result[12], unit="hours")
+
             return None, ParkingPrivateResponse(
                 uuid=result[0],
                 name=result[1],
@@ -48,6 +60,7 @@ class ParkingsRepository:
                 plan=result[7],
                 plan_value=result[8],
                 next_payment_at=result[9].date() if result[9] else None,
+                time_remaining=time_remaining,
             )
 
         except Exception as e:
