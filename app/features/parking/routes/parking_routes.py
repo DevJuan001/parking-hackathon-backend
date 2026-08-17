@@ -3,8 +3,8 @@ from fastapi_limiter.depends import RateLimiter
 from app.middlewares.jwt_middleware import verify_jwt
 from app.middlewares.roles_middleware import require_roles
 from app.features.spots.models.spots_schemas import SpotsFiltersSchema
-from app.features.parking.models.parking_schemas import CreatePlateSchema
 from app.features.parking.controllers.parking_controller import ParkingController
+from app.features.parking.models.parking_schemas import CreatePlateSchema, UpdateParkingSchema
 
 router = APIRouter(
     prefix="/api/parking",
@@ -92,3 +92,17 @@ async def create_plate(
     payload: dict = Depends(verify_jwt)
 ):
     return await ParkingController.create_plate(plate_data, payload)
+
+
+@router.put(
+    "/update/me",
+    dependencies=[
+        Depends(RateLimiter(times=30, seconds=60)),
+        Depends(require_roles(["Admin"])),
+    ]
+)
+def update_parking(
+    data: UpdateParkingSchema,
+    payload: dict = Depends(verify_jwt)
+):
+    return ParkingController.update_parking(data, payload)
