@@ -25,8 +25,6 @@ class ParkingsRepository:
             pl.value,
             s.next_payment_at
         FROM PARKINGS AS p
-        INNER JOIN COUNTRIES AS c
-            ON p.country_id = c.id
         INNER JOIN PLANS AS pl
             ON p.plan_id = pl.id
         LEFT JOIN SUSCRIPTIONS AS s
