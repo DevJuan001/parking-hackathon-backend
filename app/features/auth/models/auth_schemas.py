@@ -1,3 +1,4 @@
+from datetime import time
 from typing import Optional
 from pydantic import BaseModel, EmailStr, Field
 
@@ -28,4 +29,8 @@ class OnboardingSchema(BaseModel):
     first_surname: str = safe_str(min_length=3, max_length=100)
     second_surname: Optional[str] = safe_optional_str(max_length=100)
     parking_name: str = safe_str(min_length=3, max_length=100)
-    parking_country: int
+    address: str = safe_str(min_length=3, max_length=100)
+    start_day: int
+    start_time: time
+    end_day: int
+    end_time: time
