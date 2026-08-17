@@ -211,8 +211,8 @@ INSERT INTO PLANS (name, value, status) VALUES
  ('Profesional', 49900.0, 2);
 
 -- PARKINGS
-INSERT INTO PARKINGS (uuid, plan_id, name, country_id, address, start_day, start_time, end_day, end_time) VALUES
- ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 4, 'Parking Central', 1, 'KR 15, Bogotá', 1, '12:00', 5, '23:00');
+INSERT INTO PARKINGS (uuid, plan_id, name, address, start_day, start_time, end_day, end_time) VALUES
+ ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 4, 'Parking Central', 'KR 15, Bogotá', 1, '12:00', 5, '23:00');
 
 -- SUSCRIPTIONS
 INSERT INTO SUSCRIPTIONS(uuid, parking_id, next_payment_at, status) VALUES
