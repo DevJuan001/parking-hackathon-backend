@@ -7,8 +7,8 @@ from app.features.spots.models.spots_schemas import SpotsFiltersSchema
 from app.features.spots.repositories.spots_repository import SpotsRepository
 from app.features.parking.repositories.plates_repository import PlatesRepository
 from app.features.parking.repositories.parkings_repository import ParkingsRepository
-from app.features.parking.models.parking_schemas import CreatePlateSchema, UpdateParkingSchema
 from app.features.parking.repositories.vehicle_types_repository import VehicleTypesRepository
+from app.features.parking.models.parking_schemas import CreatePlateSchema, UpdateParkingSchema
 
 logger = get_logger("parking.service")
 
@@ -70,53 +70,6 @@ class ParkingService:
                 exc_info=True
             )
             return "Error al intentar crear el parking", None
-
-        finally:
-            connection.close()
-
-    @staticmethod
-    def create_parking(name: str, country_id: int):
-        connection = get_connection()
-
-        try:
-            if not name or not name.strip():
-                raise ServiceError(
-                    "El nombre del parking no puede estar vacío"
-                )
-
-            if not isinstance(country_id, int) or country_id <= 0:
-                raise ServiceError(
-                    "El pais del parking es obligatorio, selecciona uno e intentalo nuevamente"
-                )
-
-            uuid = generate_uuid()
-
-            error, success, parking_id = ParkingsRepository.create_parking(
-                uuid=uuid,
-                name=name.strip(),
-                country_id=country_id,
-                connection=connection
-            )
-
-            if error or not success or not parking_id:
-                raise ServiceError(error or "No se pudo crear el parking")
-
-            connection.commit()
-
-            return None, parking_id, "Parking creado correctamente"
-
-        except ServiceError as e:
-            connection.rollback()
-            return e.message, None, None
-
-        except Exception as e:
-            connection.rollback()
-            logger.error(
-                "Error en create_parking: %s",
-                e,
-                exc_info=True
-            )
-            return "Error al intentar crear el parking", None, None
 
         finally:
             connection.close()
