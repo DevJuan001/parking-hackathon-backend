@@ -1,3 +1,4 @@
+from datetime import time
 from typing import Optional
 from pydantic import BaseModel
 
@@ -14,3 +15,9 @@ class FindPlateSchema(BaseModel):
 
 class UpdateParkingSchema(BaseModel):
     name: Optional[str] = safe_optional_str(min_length=1, max_length=100)
+    country_id: Optional[int] = None
+    address: Optional[str] = safe_optional_str(min_length=1, max_length=256)
+    start_day: Optional[int] = None
+    start_time: Optional[time] = None
+    end_day: Optional[int] = None
+    end_time: Optional[time] = None
