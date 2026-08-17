@@ -205,7 +205,7 @@ INSERT INTO COUNTRIES (name, iso_code) VALUES
   ('Zimbabwe', 'ZW');
 
 INSERT INTO PLANS (name, value, status) VALUES
- ('Gratuito', 17900.0, 2),
+ ('Gratuito', 0.0, 2),
  ('Básico', 17900.0, 2),
  ('Empresarial', 149900.0, 2),
  ('Profesional', 49900.0, 2);
