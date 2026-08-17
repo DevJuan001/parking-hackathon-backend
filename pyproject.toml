@@ -22,4 +22,6 @@ dependencies = [
     "sentence-transformers>=3.0.0",
     "openai>=1.40.0",
     "authlib>=1.7.2",
+    "ruff>=0.16.3",
+    "pytest>=9.1.1",
 ]
