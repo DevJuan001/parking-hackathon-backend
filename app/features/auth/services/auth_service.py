@@ -130,10 +130,11 @@ class AuthService:
                 )
 
             sub = user_info.get("sub")
-            
-            if not sub:
-                raise ServiceError("Google no proporcionó un identificador de usuario (sub)")
 
+            if not sub:
+                raise ServiceError(
+                    "Google no proporcionó un identificador de usuario"
+                )
 
             if not user:
                 shell_user = CreateUserSchema(
@@ -315,7 +316,11 @@ class AuthService:
                 uuid=uuid,
                 plan_id=1,
                 name=data.parking_name.strip(),
-                country_id=data.parking_country,
+                address=data.address,
+                start_day=data.start_day,
+                start_time=data.start_time,
+                end_day=data.end_day,
+                end_time=data.end_time,
                 connection=connection,
             )
 
