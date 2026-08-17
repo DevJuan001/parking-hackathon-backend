@@ -205,14 +205,14 @@ INSERT INTO COUNTRIES (name, iso_code) VALUES
   ('Zimbabwe', 'ZW');
 
 INSERT INTO PLANS (name, value, status) VALUES
- ('Gratuito', 17900.0, 2),
+ ('Gratuito', 0.0, 2),
  ('Básico', 17900.0, 2),
  ('Empresarial', 149900.0, 2),
  ('Profesional', 49900.0, 2);
 
 -- PARKINGS
-INSERT INTO PARKINGS (uuid, plan_id, name, country_id) VALUES
- ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 4, 'Parking Central', 1);
+INSERT INTO PARKINGS (uuid, plan_id, name, address, start_day, start_time, end_day, end_time) VALUES
+ ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 4, 'Parking Central', 'KR 15, Bogotá', 1, '12:00', 5, '23:00');
 
 -- SUSCRIPTIONS
 INSERT INTO SUSCRIPTIONS(uuid, parking_id, next_payment_at, status) VALUES

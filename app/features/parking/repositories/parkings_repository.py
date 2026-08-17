@@ -1,6 +1,7 @@
-from app.features.parking.models.parking_responses import ParkingPrivateResponse, ParkingResponse
+from datetime import time
 from app.utils.logger import get_logger
 from app.features.parking.models.parking_schemas import UpdateParkingSchema
+from app.features.parking.models.parking_responses import ParkingPrivateResponse, ParkingResponse, TimeRemaining
 
 logger = get_logger("parkings.repository")
 
@@ -15,13 +16,18 @@ class ParkingsRepository:
         SELECT
             p.uuid,
             p.name,
-            c.name,
+            p.address,
+            p.start_day,
+            p.start_time,
+            p.end_day,
+            p.end_time,
             pl.name,
             pl.value,
-            s.next_payment_at
+            s.next_payment_at,
+            TIMESTAMPDIFF(MONTH, s.created_at, NOW())  AS tr_months,
+            TIMESTAMPDIFF(DAY,   s.created_at, NOW())  AS tr_days,
+            TIMESTAMPDIFF(HOUR,  s.created_at, NOW())  AS tr_hours
         FROM PARKINGS AS p
-        INNER JOIN COUNTRIES AS c
-            ON p.country_id = c.id
         INNER JOIN PLANS AS pl
             ON p.plan_id = pl.id
         LEFT JOIN SUSCRIPTIONS AS s
@@ -34,13 +40,27 @@ class ParkingsRepository:
 
             result = cursor.fetchone()
 
+            if result[10] is None:
+                time_remaining = None
+            elif result[10] >= 1:
+                time_remaining = TimeRemaining(value=result[10], unit="months")
+            elif result[11] >= 1:
+                time_remaining = TimeRemaining(value=result[11], unit="days")
+            else:
+                time_remaining = TimeRemaining(value=result[12], unit="hours")
+
             return None, ParkingPrivateResponse(
                 uuid=result[0],
                 name=result[1],
-                country=result[2],
-                plan=result[3],
-                plan_value=result[4],
-                next_payment_at=result[5].date() if result[5] else None,
+                address=result[2],
+                start_day=result[3],
+                start_time=result[4],
+                end_day=result[5],
+                end_time=result[6],
+                plan=result[7],
+                plan_value=result[8],
+                next_payment_at=result[9].date() if result[9] else None,
+                time_remaining=time_remaining,
             )
 
         except Exception as e:
@@ -88,16 +108,47 @@ class ParkingsRepository:
             cursor.close()
 
     @staticmethod
-    def create_parking(uuid: str, plan_id: int, name: str, country_id: int, connection):
+    def create_parking(
+        uuid: str,
+        plan_id: int,
+        name: str,
+        address: str,
+        start_day: int,
+        start_time: time,
+        end_day: int,
+        end_time: time,
+        connection
+    ):
         cursor = connection.cursor()
 
         query = """
-        INSERT INTO PARKINGS (uuid, plan_id, name, country_id)
-        VALUES (%s, %s, %s, %s)
+        INSERT INTO PARKINGS (
+            uuid,
+            plan_id,
+            name,
+            address,
+            start_day,
+            start_time,
+            end_day,
+            end_time
+        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """
 
         try:
-            cursor.execute(query, (uuid, plan_id, name, country_id))
+            cursor.execute(
+                query,
+                (
+                    uuid,
+                    plan_id,
+                    name,
+                    address,
+                    start_day,
+                    start_time,
+                    end_day,
+                    end_time
+                )
+            )
 
             return None, True, uuid
 
@@ -117,7 +168,14 @@ class ParkingsRepository:
     ):
         data = parking_data.model_dump(exclude_none=True)
 
-        PARKING_FIELDS = {"name": "name"}
+        PARKING_FIELDS = {
+            "name": "name",
+            "address": "address",
+            "start_day": "start_day",
+            "start_time": "start_time",
+            "end_day": "end_day",
+            "end_time": "end_time"
+        }
 
         cursor = connection.cursor()
 
@@ -137,7 +195,7 @@ class ParkingsRepository:
                 values = list(mapped.values()) + [parking_id]
 
                 cursor.execute(
-                    f"UPDATE PARKINGS SET {columns} WHERE id = %s",
+                    f"UPDATE PARKINGS SET {columns} WHERE uuid = %s",
                     values,
                 )
 

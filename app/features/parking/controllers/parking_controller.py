@@ -1,7 +1,7 @@
 from fastapi import HTTPException
-from app.features.parking.services.parking_service import ParkingService
-from app.features.parking.models.parking_schemas import CreatePlateSchema
 from app.features.spots.models.spots_schemas import SpotsFiltersSchema
+from app.features.parking.services.parking_service import ParkingService
+from app.features.parking.models.parking_schemas import CreatePlateSchema, UpdateParkingSchema
 
 
 class ParkingController:
@@ -87,6 +87,21 @@ class ParkingController:
         error, success, message = await ParkingService.create_plate(
             str(payload["parking_id"]),
             plate_data
+        )
+
+        if error:
+            raise HTTPException(status_code=400, detail=error)
+
+        return {
+            "success": success,
+            "message": message
+        }
+
+    @staticmethod
+    def update_parking(parking_data: UpdateParkingSchema, payload: dict):
+        error, success, message = ParkingService.update_parking(
+            str(payload["parking_id"]),
+            parking_data,
         )
 
         if error:

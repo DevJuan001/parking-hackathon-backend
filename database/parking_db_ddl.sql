@@ -32,14 +32,17 @@ CREATE TABLE PLANS (
 CREATE TABLE PARKINGS (
   uuid CHAR(36) UNIQUE NOT NULL,
   plan_id INT NOT NULL DEFAULT 1,
-  country_id INT NOT NULL,
   name TEXT NOT NULL,
+  address TEXT NOT NULL,
+  start_day INT NOT NULL,
+  start_time TIME NOT NULL,
+  end_day INT NOT NULL,
+  end_time TIME NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   state INT NOT NULL DEFAULT 2,
   PRIMARY KEY(uuid),
-  FOREIGN KEY (country_id) REFERENCES COUNTRIES(id),
   FOREIGN KEY (plan_id) REFERENCES PLANS(id),
-  INDEX idx_parkings_country_id (country_id),
   UNIQUE INDEX uq_parkings_uuid (uuid)
 );
 
