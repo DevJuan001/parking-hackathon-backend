@@ -7,6 +7,7 @@ class TimeRemaining(BaseModel):
     value: int
     unit: Literal["months", "days", "hours"]
 
+
 class ParkingResponse(BaseModel):
     uuid: str
     name: str
