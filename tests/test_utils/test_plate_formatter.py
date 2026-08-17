@@ -6,7 +6,7 @@ from app.utils.plate_formatter import plate_formatter
 @pytest.mark.parametrize(
     "raw, expected",
     [
-        ("ABC-123", "ABC123"),  # Strip "#"
+        ("ABC-123", "ABC123"),  # Strip "-"
         ("abc 123", "ABC123"),  # Strip " " y UpperCase
         ("  abc123", "ABC123"),  # Strip espacios vacíos
         ("ab-c12-3", "ABC123"),  # Multiples "-"
