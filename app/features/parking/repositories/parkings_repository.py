@@ -15,7 +15,13 @@ class ParkingsRepository:
         SELECT
             p.uuid,
             p.name,
+            p.country_id,
             c.name,
+            p.address,
+            p.start_day,
+            p.start_time,
+            p.end_day,
+            p.end_time,
             pl.name,
             pl.value,
             s.next_payment_at
@@ -37,10 +43,16 @@ class ParkingsRepository:
             return None, ParkingPrivateResponse(
                 uuid=result[0],
                 name=result[1],
-                country=result[2],
-                plan=result[3],
-                plan_value=result[4],
-                next_payment_at=result[5].date() if result[5] else None,
+                country_id=result[2],
+                country=result[3],
+                address=result[4],
+                start_day=result[5],
+                start_time=result[6],
+                end_day=result[7],
+                end_time=result[8],
+                plan=result[9],
+                plan_value=result[10],
+                next_payment_at=result[11].date() if result[11] else None,
             )
 
         except Exception as e:
@@ -117,7 +129,15 @@ class ParkingsRepository:
     ):
         data = parking_data.model_dump(exclude_none=True)
 
-        PARKING_FIELDS = {"name": "name"}
+        PARKING_FIELDS = {
+            "name": "name",
+            "country_id": "country_id",
+            "address": "address",
+            "start_day": "start_day",
+            "start_time": "start_time",
+            "end_day": "end_day",
+            "end_time": "end_time"
+        }
 
         cursor = connection.cursor()
 
@@ -137,7 +157,7 @@ class ParkingsRepository:
                 values = list(mapped.values()) + [parking_id]
 
                 cursor.execute(
-                    f"UPDATE PARKINGS SET {columns} WHERE id = %s",
+                    f"UPDATE PARKINGS SET {columns} WHERE uuid = %s",
                     values,
                 )
 
