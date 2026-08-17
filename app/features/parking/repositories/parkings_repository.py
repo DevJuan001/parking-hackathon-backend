@@ -1,6 +1,7 @@
-from app.features.parking.models.parking_responses import ParkingPrivateResponse, ParkingResponse
+from datetime import time
 from app.utils.logger import get_logger
 from app.features.parking.models.parking_schemas import UpdateParkingSchema
+from app.features.parking.models.parking_responses import ParkingPrivateResponse, ParkingResponse
 
 logger = get_logger("parkings.repository")
 
@@ -15,8 +16,6 @@ class ParkingsRepository:
         SELECT
             p.uuid,
             p.name,
-            p.country_id,
-            c.name,
             p.address,
             p.start_day,
             p.start_time,
@@ -43,16 +42,14 @@ class ParkingsRepository:
             return None, ParkingPrivateResponse(
                 uuid=result[0],
                 name=result[1],
-                country_id=result[2],
-                country=result[3],
-                address=result[4],
-                start_day=result[5],
-                start_time=result[6],
-                end_day=result[7],
-                end_time=result[8],
-                plan=result[9],
-                plan_value=result[10],
-                next_payment_at=result[11].date() if result[11] else None,
+                address=result[2],
+                start_day=result[3],
+                start_time=result[4],
+                end_day=result[5],
+                end_time=result[6],
+                plan=result[7],
+                plan_value=result[8],
+                next_payment_at=result[9].date() if result[9] else None,
             )
 
         except Exception as e:
@@ -100,16 +97,47 @@ class ParkingsRepository:
             cursor.close()
 
     @staticmethod
-    def create_parking(uuid: str, plan_id: int, name: str, country_id: int, connection):
+    def create_parking(
+        uuid: str,
+        plan_id: int,
+        name: str,
+        address: str,
+        start_day: int,
+        start_time: time,
+        end_day: int,
+        end_time: time,
+        connection
+    ):
         cursor = connection.cursor()
 
         query = """
-        INSERT INTO PARKINGS (uuid, plan_id, name, country_id)
-        VALUES (%s, %s, %s, %s)
+        INSERT INTO PARKINGS (
+            uuid,
+            plan_id,
+            name,
+            address,
+            start_day,
+            start_time,
+            end_day,
+            end_time
+        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """
 
         try:
-            cursor.execute(query, (uuid, plan_id, name, country_id))
+            cursor.execute(
+                query,
+                (
+                    uuid,
+                    plan_id,
+                    name,
+                    address,
+                    start_day,
+                    start_time,
+                    end_day,
+                    end_time
+                )
+            )
 
             return None, True, uuid
 
@@ -131,7 +159,6 @@ class ParkingsRepository:
 
         PARKING_FIELDS = {
             "name": "name",
-            "country_id": "country_id",
             "address": "address",
             "start_day": "start_day",
             "start_time": "start_time",
