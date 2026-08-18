@@ -1,8 +1,8 @@
-from app.utils.logger import get_logger
-from app.core.exception import ServiceError
 from app.core.database import get_connection
+from app.core.exception import ServiceError
 from app.features.floors.repositories.floors_repository import FloorsRepository
 from app.features.spots.repositories.spots_repository import SpotsRepository
+from app.utils.logger import get_logger
 
 logger = get_logger("floors.service")
 
@@ -236,10 +236,13 @@ class FloorsService:
 
 def _format_floor_name(name: str) -> str:
     cleaned = name.strip()
+    
     if not cleaned:
         raise ServiceError(
             "El nombre del piso no puede estar vacio, ingresa un valor e intentalo nuevamente"
         )
+    
     if "piso" in cleaned.lower():
         return cleaned
+    
     return f"Piso {cleaned}"

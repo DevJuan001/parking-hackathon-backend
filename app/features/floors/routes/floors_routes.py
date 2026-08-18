@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends
 from fastapi_limiter.depends import RateLimiter
-from app.middlewares.jwt_middleware import verify_jwt
+
 from app.features.floors.controllers.floors_controller import FloorsController
 from app.features.floors.models.floors_schemas import (
     CreateFloorSchema,
-    UpdateFloorSchema
+    UpdateFloorSchema,
 )
+from app.middlewares.jwt_middleware import verify_jwt
 
 router = APIRouter(
     prefix="/api/floors",
