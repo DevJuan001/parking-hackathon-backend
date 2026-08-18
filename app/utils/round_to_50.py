@@ -8,7 +8,7 @@ def round_up_to_next_50(value: float) -> float:
     siempre termina en .00 o .50.
 
     Ejemplos:
-        round_up_to_next_50(0)    -> 0
+        round_up_to_next_50(0)    -> 50
         round_up_to_next_50(1)    -> 50
         round_up_to_next_50(49)   -> 50
         round_up_to_next_50(50)   -> 50
