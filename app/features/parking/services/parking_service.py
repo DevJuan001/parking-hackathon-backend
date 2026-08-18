@@ -1,14 +1,18 @@
-from app.utils.logger import get_logger
-from app.utils.uuid import generate_uuid
-from app.core.exception import ServiceError
 from app.core.database import get_connection
-from app.utils.plate_formatter import plate_formatter
+from app.core.exception import ServiceError
+from app.features.parking.models.parking_schemas import (
+    CreatePlateSchema,
+    UpdateParkingSchema,
+)
+from app.features.parking.repositories.parkings_repository import ParkingsRepository
+from app.features.parking.repositories.plates_repository import PlatesRepository
+from app.features.parking.repositories.vehicle_types_repository import (
+    VehicleTypesRepository,
+)
 from app.features.spots.models.spots_schemas import SpotsFiltersSchema
 from app.features.spots.repositories.spots_repository import SpotsRepository
-from app.features.parking.repositories.plates_repository import PlatesRepository
-from app.features.parking.repositories.parkings_repository import ParkingsRepository
-from app.features.parking.repositories.vehicle_types_repository import VehicleTypesRepository
-from app.features.parking.models.parking_schemas import CreatePlateSchema, UpdateParkingSchema
+from app.utils.logger import get_logger
+from app.utils.plate_formatter import plate_formatter
 
 logger = get_logger("parking.service")
 

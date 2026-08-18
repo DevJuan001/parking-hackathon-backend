@@ -1,7 +1,11 @@
 from fastapi import HTTPException
-from app.features.spots.models.spots_schemas import SpotsFiltersSchema
+
+from app.features.parking.models.parking_schemas import (
+    CreatePlateSchema,
+    UpdateParkingSchema,
+)
 from app.features.parking.services.parking_service import ParkingService
-from app.features.parking.models.parking_schemas import CreatePlateSchema, UpdateParkingSchema
+from app.features.spots.models.spots_schemas import SpotsFiltersSchema
 
 
 class ParkingController:
