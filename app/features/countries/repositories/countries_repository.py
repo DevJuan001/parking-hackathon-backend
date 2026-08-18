@@ -1,5 +1,5 @@
-from app.utils.logger import get_logger
 from app.features.countries.models.countries_responses import CountryResponse
+from app.utils.logger import get_logger
 
 logger = get_logger("countries.repository")
 
