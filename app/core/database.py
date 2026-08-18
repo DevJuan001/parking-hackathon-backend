@@ -22,12 +22,8 @@ def get_connection():
 
         return connection
 
-    except Error as e:
-        logger.error(
-            "Error al intentar conectar con la base de datos: %s",
-            e,
-            exc_info=True
-        )
+    except Error:
+        logger.exception("Error al intentar conectar con la base de datos")
 
         return None
 
