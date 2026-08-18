@@ -1,7 +1,8 @@
-from datetime import datetime, time
-import pytest
-from app.utils.date_formatter import MONTHS_ES, date_formatter, time_to_12h
+from datetime import UTC, datetime, time
 
+import pytest
+
+from app.utils.date_formatter import MONTHS_ES, date_formatter, time_to_12h
 
 # ---------- date_formatter ----------
 
@@ -52,7 +53,7 @@ def test_MONTHS_ES_has_all_expected_keys():
         (time(23, 59), "11:59 P.M."),
         ("00:00", "12:00 A.M."),
         ("14:30", "2:30 P.M."),
-        (datetime(2026, 1, 1, 15, 45), "3:45 P.M."),
+        (datetime(2026, 1, 1, 15, 45, tzinfo=UTC), "3:45 P.M."),
     ]
 )
 def test_time_to_12h_normalizes(raw: time, expected: str):
