@@ -1,5 +1,5 @@
 from datetime import date, datetime, time
-from typing import Optional
+
 from pydantic import BaseModel, EmailStr
 
 
@@ -10,7 +10,7 @@ class ReservationsResponse(BaseModel):
     email: EmailStr
     start_date: date
     start_time: time
-    end_date: Optional[date] = None
-    end_time: Optional[time] = None
+    end_date: date | None = None
+    end_time: time | None = None
     created_at: datetime
     status: int

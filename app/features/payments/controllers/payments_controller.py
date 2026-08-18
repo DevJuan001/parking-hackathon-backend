@@ -1,6 +1,11 @@
 from fastapi import HTTPException
+
+from app.features.payments.models.payments_schemas import (
+    CalculatePaymentSchema,
+    CreatePaymentSchema,
+    PaymentsFiltersSchema,
+)
 from app.features.payments.services.payments_service import PaymentsService
-from app.features.payments.models.payments_schemas import CreatePaymentSchema, PaymentsFiltersSchema, CalculatePaymentSchema
 
 
 class PaymentsController:

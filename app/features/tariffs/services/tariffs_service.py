@@ -1,9 +1,12 @@
-from app.utils.logger import get_logger
-from app.core.exception import ServiceError
 from app.core.database import get_connection
-from app.tasks.knowledge_tasks import rebuild_parking_knowledge
+from app.core.exception import ServiceError
+from app.features.tariffs.models.tariffs_schemas import (
+    CreateTariffSchema,
+    UpdateTariffSchema,
+)
 from app.features.tariffs.repositories.tariffs_repository import TariffsRepository
-from app.features.tariffs.models.tariffs_schemas import CreateTariffSchema, UpdateTariffSchema
+from app.tasks.knowledge_tasks import rebuild_parking_knowledge
+from app.utils.logger import get_logger
 
 logger = get_logger("tariffs.service")
 
@@ -124,7 +127,7 @@ class TariffsService:
         connection = get_connection()
 
         try:
-            error, success, message = TariffsRepository.create_tariff(
+            error, success, _message = TariffsRepository.create_tariff(
                 parking_id=parking_id,
                 vehicle_type_id=tariff_data.vehicle_type,
                 value=tariff_data.value,
@@ -173,7 +176,7 @@ class TariffsService:
             if tariff_data.value is None:
                 raise ServiceError("Debes enviar el valor a actualizar")
 
-            error, success, message = TariffsRepository.update_tariff(
+            error, success, _message = TariffsRepository.update_tariff(
                 parking_id, tariff_id, tariff_data.value, connection
             )
 

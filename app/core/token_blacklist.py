@@ -1,10 +1,9 @@
 import hashlib
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import jwt
 
 from app.core.redis import get_redis
-
 
 BLACKLIST_PREFIX = "blacklist:access_token:"
 
@@ -22,7 +21,7 @@ def get_token_remaining_ttl(token: str) -> int:
         if exp is None:
             return 0
 
-        remaining = int(exp - datetime.now(timezone.utc).timestamp())
+        remaining = int(exp - datetime.now(UTC).timestamp())
 
         return max(0, remaining)
     except Exception:

@@ -1,6 +1,13 @@
 from fastapi import HTTPException
+
+from app.features.users.models.users_schemas import (
+    CreateUserSchema,
+    UpdateCurrentUserSchema,
+    UpdatePasswordSchema,
+    UpdateUserSchema,
+    UsersFiltersSchema,
+)
 from app.features.users.services.users_service import UsersService
-from app.features.users.models.users_schemas import CreateUserSchema, UpdateCurrentUserSchema, UpdatePasswordSchema, UpdateUserSchema, UsersFiltersSchema
 
 
 class UsersController:

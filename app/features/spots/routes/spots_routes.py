@@ -1,13 +1,14 @@
 from fastapi import APIRouter, Depends
 from fastapi_limiter.depends import RateLimiter
-from app.middlewares.jwt_middleware import verify_jwt
+
 from app.features.spots.controllers.spots_controller import SpotsController
 from app.features.spots.models.spots_schemas import (
-    SpotsFiltersSchema,
     CreateSpotSchema,
-    UpdateSpotStatusSchema,
+    SpotsFiltersSchema,
     UpdateSpotSchema,
+    UpdateSpotStatusSchema,
 )
+from app.middlewares.jwt_middleware import verify_jwt
 
 router = APIRouter(
     prefix="/api/spots",

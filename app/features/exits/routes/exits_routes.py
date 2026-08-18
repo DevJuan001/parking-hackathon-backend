@@ -1,9 +1,14 @@
 from fastapi import APIRouter, Depends
 from fastapi_limiter.depends import RateLimiter
+
+from app.features.exits.controllers.exits_controller import ExitsController
+from app.features.exits.models.exits_schemas import (
+    CreateExitSchema,
+    ExitsFiltersSchema,
+    StatsExitsFiltersSchema,
+)
 from app.middlewares.jwt_middleware import verify_jwt
 from app.middlewares.roles_middleware import require_roles
-from app.features.exits.controllers.exits_controller import ExitsController
-from app.features.exits.models.exits_schemas import CreateExitSchema, ExitsFiltersSchema, StatsExitsFiltersSchema
 
 router = APIRouter(
     prefix="/api/exits",

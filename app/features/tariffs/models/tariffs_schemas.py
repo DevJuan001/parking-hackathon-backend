@@ -1,4 +1,4 @@
-from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -8,5 +8,5 @@ class CreateTariffSchema(BaseModel):
 
 
 class UpdateTariffSchema(BaseModel):
-    vehicle_type: Optional[int] = None
-    value: Optional[float] = None
+    vehicle_type: int | None = None
+    value: float | None = None

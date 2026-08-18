@@ -1,5 +1,6 @@
-from fastapi import FastAPI
 import redis.asyncio as redis
+from fastapi import FastAPI
+
 from app.core.config import settings
 
 redis_client: redis.Redis = None

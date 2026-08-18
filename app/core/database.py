@@ -1,5 +1,6 @@
 import mysql.connector
 from mysql.connector import Error
+
 from app.core.config import settings
 from app.utils.logger import get_logger
 

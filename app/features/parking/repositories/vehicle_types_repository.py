@@ -1,5 +1,5 @@
-from app.utils.logger import get_logger
 from app.features.parking.models.parking_responses import VehicleTypeResponse
+from app.utils.logger import get_logger
 
 logger = get_logger("vehicle_types.repository")
 

@@ -1,6 +1,9 @@
-from app.utils.logger import get_logger
+from app.features.entries.models.entries_schemas import (
+    CreateEntrySchema,
+    EntriesFiltersSchema,
+)
 from app.features.entries.services.entries_service import EntriesService
-from app.features.entries.models.entries_schemas import CreateEntrySchema, EntriesFiltersSchema
+from app.utils.logger import get_logger
 
 logger = get_logger("chatbot.tools.entries")
 
@@ -38,7 +41,7 @@ async def tool_register_entry(parking_id: int, plate: str, spot_id: int | None =
         }
 
     return {
-        "success": True,
+        "success": success,
         "data": {
             "message": message
         }

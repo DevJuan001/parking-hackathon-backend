@@ -1,7 +1,12 @@
 from datetime import time
-from app.utils.logger import get_logger
+
+from app.features.parking.models.parking_responses import (
+    ParkingPrivateResponse,
+    ParkingResponse,
+    TimeRemaining,
+)
 from app.features.parking.models.parking_schemas import UpdateParkingSchema
-from app.features.parking.models.parking_responses import ParkingPrivateResponse, ParkingResponse, TimeRemaining
+from app.utils.logger import get_logger
 
 logger = get_logger("parkings.repository")
 
@@ -182,7 +187,7 @@ class ParkingsRepository:
         try:
             parking_fields = {
                 key: data[key]
-                for key in PARKING_FIELDS.keys()
+                for key in PARKING_FIELDS
                 if key in data
             }
 
@@ -191,7 +196,7 @@ class ParkingsRepository:
                     PARKING_FIELDS[k]: v for k, v in parking_fields.items()
                 }
 
-                columns = ", ".join(f"{col} = %s" for col in mapped.keys())
+                columns = ", ".join(f"{col} = %s" for col in mapped)
                 values = list(mapped.values()) + [parking_id]
 
                 cursor.execute(

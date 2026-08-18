@@ -1,29 +1,40 @@
 
 
-import jwt
-import bcrypt
-from pydantic import EmailStr
 from datetime import timedelta
-from jwt.exceptions import PyJWTError
-from fastapi import Request, Response
 
-from app.core.oauth import oauth
+import bcrypt
+import jwt
+from fastapi import Request, Response
+from jwt.exceptions import PyJWTError
+from pydantic import EmailStr
+
 from app.core.config import settings
+from app.core.database import get_connection
+from app.core.exception import ServiceError
+from app.core.oauth import oauth
+from app.core.security import (
+    create_access_token,
+    create_refresh_token,
+    set_auth_cookies,
+    verify_password,
+)
+from app.core.token_blacklist import add_to_blacklist, get_token_remaining_ttl
+from app.features.auth.models.auth_schemas import OnboardingSchema, RegisterSchema
+from app.features.floors.repositories.floors_repository import FloorsRepository
+from app.features.parking.repositories.parkings_repository import ParkingsRepository
+from app.features.users.models.users_schemas import (
+    CompleteUserOnboardingSchema,
+    CreateUserSchema,
+)
+from app.features.users.repositories.users_repository import UsersRepository
+from app.features.users.services.users_service import UsersService
+from app.tasks.email_tasks import (
+    recovery_password_email,
+    send_welcome_registration_email,
+)
+from app.tasks.knowledge_tasks import rebuild_parking_knowledge
 from app.utils.logger import get_logger
 from app.utils.uuid import generate_uuid
-from app.core.exception import ServiceError
-from app.core.database import get_connection
-from app.tasks.knowledge_tasks import rebuild_parking_knowledge
-from app.features.users.services.users_service import UsersService
-from app.features.users.repositories.users_repository import UsersRepository
-from app.core.token_blacklist import add_to_blacklist, get_token_remaining_ttl
-from app.features.floors.repositories.floors_repository import FloorsRepository
-from app.features.auth.models.auth_schemas import OnboardingSchema, RegisterSchema
-from app.features.parking.repositories.parkings_repository import ParkingsRepository
-from app.tasks.email_tasks import recovery_password_email, send_welcome_registration_email
-from app.features.users.models.users_schemas import CompleteUserOnboardingSchema, CreateUserSchema
-from app.core.security import create_access_token, create_refresh_token, set_auth_cookies, verify_password
-
 
 logger = get_logger("auth.service")
 
@@ -529,7 +540,7 @@ class AuthService:
     @staticmethod
     def recover_password(email: EmailStr):
         try:
-            error, user = UsersService.get_user_by_email(email)
+            _error, user = UsersService.get_user_by_email(email)
 
             if user and user.provider == "Local":
                 recovery_password_email.delay(

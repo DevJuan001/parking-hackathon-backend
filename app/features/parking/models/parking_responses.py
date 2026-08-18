@@ -1,6 +1,7 @@
-from typing import Literal, Optional
-from pydantic import BaseModel, field_validator
 from datetime import date, datetime, time, timedelta
+from typing import Literal
+
+from pydantic import BaseModel, field_validator
 
 
 class TimeRemaining(BaseModel):
@@ -24,8 +25,8 @@ class ParkingPrivateResponse(BaseModel):
     end_time: time
     plan: str
     plan_value: float
-    next_payment_at: Optional[date] = None
-    time_remaining: Optional[TimeRemaining] = None
+    next_payment_at: date | None = None
+    time_remaining: TimeRemaining | None = None
 
     @field_validator("start_time", "end_time", mode="before")
     @classmethod

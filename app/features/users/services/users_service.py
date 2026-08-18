@@ -1,13 +1,19 @@
 import bcrypt
 from pydantic import EmailStr
-from app.utils.logger import get_logger
-from app.core.exception import ServiceError
+
 from app.core.database import get_connection
-from app.tasks.email_tasks import send_welcome_email
+from app.core.exception import ServiceError
 from app.core.security import generate_temporal_password, verify_password
+from app.features.users.models.users_schemas import (
+    CreateUserSchema,
+    UpdatePasswordSchema,
+    UpdateUserSchema,
+    UsersFiltersSchema,
+)
 from app.features.users.repositories.roles_repository import RolesRepository
 from app.features.users.repositories.users_repository import UsersRepository
-from app.features.users.models.users_schemas import CreateUserSchema, UpdatePasswordSchema, UpdateUserSchema, UsersFiltersSchema
+from app.tasks.email_tasks import send_welcome_email
+from app.utils.logger import get_logger
 
 logger = get_logger("users.service")
 
@@ -245,7 +251,7 @@ class UsersService:
                 password, bcrypt.gensalt(rounds=12)
             ).decode("utf-8")
 
-            error, success, message = UsersRepository.create_user(
+            error, success, _message = UsersRepository.create_user(
                 user_data=user_data,
                 hash_password=hash_password,
                 parking_id=parking_id,
@@ -309,7 +315,7 @@ class UsersService:
                         "El correo ya está registrado, ingresa un correo diferente e intentalo nuevamente"
                     )
 
-            error, success, message = UsersRepository.update_user(
+            error, success, _message = UsersRepository.update_user(
                 parking_id, user_id, user_data, connection
             )
 
@@ -364,7 +370,7 @@ class UsersService:
                     "Verifique que su contraseña anterior sea la correcta y vuelva a intentarlo"
                 )
 
-            error, success, message = UsersRepository.update_user_password(
+            error, success, _message = UsersRepository.update_user_password(
                 parking_id, user_id, data["new_password"], connection
             )
 
@@ -404,7 +410,7 @@ class UsersService:
             if error or not user:
                 raise ServiceError(error)
 
-            error, success, message = UsersRepository.disable_user(
+            error, success, _message = UsersRepository.disable_user(
                 parking_id, user_id, connection
             )
 
@@ -444,7 +450,7 @@ class UsersService:
             if error or not user:
                 raise ServiceError(error)
 
-            error, success, message = UsersRepository.enable_user(
+            error, success, _message = UsersRepository.enable_user(
                 parking_id, user_id, connection
             )
 

@@ -1,9 +1,10 @@
 from fastapi import HTTPException
-from app.features.floors.services.floors_service import FloorsService
+
 from app.features.floors.models.floors_schemas import (
     CreateFloorSchema,
-    UpdateFloorSchema
+    UpdateFloorSchema,
 )
+from app.features.floors.services.floors_service import FloorsService
 
 
 class FloorsController:

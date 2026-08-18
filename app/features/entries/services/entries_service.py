@@ -1,11 +1,14 @@
-from app.utils.logger import get_logger
-from app.core.exception import ServiceError
 from app.core.database import get_connection
-from app.utils.plate_formatter import plate_formatter
+from app.core.exception import ServiceError
+from app.features.entries.models.entries_schemas import (
+    CreateEntrySchema,
+    EntriesFiltersSchema,
+)
 from app.features.entries.repositories.entries_repository import EntriesRepository
 from app.features.parking.repositories.plates_repository import PlatesRepository
 from app.features.spots.repositories.spots_repository import SpotsRepository
-from app.features.entries.models.entries_schemas import CreateEntrySchema, EntriesFiltersSchema
+from app.utils.logger import get_logger
+from app.utils.plate_formatter import plate_formatter
 
 logger = get_logger("entries.service")
 
@@ -229,7 +232,7 @@ class EntriesService:
             if error or not success:
                 raise ServiceError(error)
 
-            error, success, message = SpotsRepository.update_spot_status(
+            error, success, _message = SpotsRepository.update_spot_status(
                 parking_id, spot_id, 3, connection
             )
 

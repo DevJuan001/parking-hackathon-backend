@@ -1,4 +1,3 @@
-from typing import Optional
 
 from pydantic import BaseModel, EmailStr
 
@@ -20,9 +19,9 @@ class UserResponse(BaseModel):
 class UserByIdResponse(BaseModel):
     role: str
     id: int
-    name: Optional[str]
-    first_surname: Optional[str]
-    second_surname: Optional[str]
+    name: str | None
+    first_surname: str | None
+    second_surname: str | None
     email: EmailStr
     created_at: str
     status: int
@@ -31,10 +30,10 @@ class UserByIdResponse(BaseModel):
 class UserByIdGlobalResponse(BaseModel):
     role: str
     id: int
-    parking_id: Optional[str] = None
-    name: Optional[str]
-    first_surname: Optional[str]
-    second_surname: Optional[str]
+    parking_id: str | None = None
+    name: str | None
+    first_surname: str | None
+    second_surname: str | None
     email: EmailStr
     created_at: str
     status: int
@@ -42,16 +41,16 @@ class UserByIdGlobalResponse(BaseModel):
 
 class UserByEmailResponse(BaseModel):
     role: str
-    parking_id: Optional[str] = None
+    parking_id: str | None = None
     id: int
-    name: Optional[str] = None
-    first_surname: Optional[str] = None
-    second_surname: Optional[str] = None
+    name: str | None = None
+    first_surname: str | None = None
+    second_surname: str | None = None
     email: EmailStr
-    password: Optional[str] = None
+    password: str | None = None
     onboarding_completed: int
     provider: ProviderType
-    google_id: Optional[str] = None
+    google_id: str | None = None
 
 
 class UserStatsResponse(BaseModel):

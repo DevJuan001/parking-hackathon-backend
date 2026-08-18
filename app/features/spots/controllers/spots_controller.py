@@ -1,11 +1,12 @@
 from fastapi import HTTPException
-from app.features.spots.services.spots_service import SpotsService
+
 from app.features.spots.models.spots_schemas import (
-    SpotsFiltersSchema,
     CreateSpotSchema,
-    UpdateSpotStatusSchema,
+    SpotsFiltersSchema,
     UpdateSpotSchema,
+    UpdateSpotStatusSchema,
 )
+from app.features.spots.services.spots_service import SpotsService
 
 
 class SpotsController:
@@ -76,10 +77,7 @@ class SpotsController:
         error, success, message = SpotsService.update_spot(
             str(payload["parking_id"]),
             spot_id,
-            spot_data.floor_id,
-            spot_data.spot,
-            spot_data.spot_status,
-            spot_data.vehicle_type_id,
+            spot_data,
         )
 
         if error:

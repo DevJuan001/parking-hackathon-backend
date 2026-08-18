@@ -1,10 +1,14 @@
 from fastapi import APIRouter, Depends
 from fastapi_limiter.depends import RateLimiter
+
+from app.features.parking.controllers.parking_controller import ParkingController
+from app.features.parking.models.parking_schemas import (
+    CreatePlateSchema,
+    UpdateParkingSchema,
+)
+from app.features.spots.models.spots_schemas import SpotsFiltersSchema
 from app.middlewares.jwt_middleware import verify_jwt
 from app.middlewares.roles_middleware import require_roles
-from app.features.spots.models.spots_schemas import SpotsFiltersSchema
-from app.features.parking.controllers.parking_controller import ParkingController
-from app.features.parking.models.parking_schemas import CreatePlateSchema, UpdateParkingSchema
 
 router = APIRouter(
     prefix="/api/parking",

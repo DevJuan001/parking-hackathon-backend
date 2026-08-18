@@ -1,6 +1,9 @@
-from app.utils.logger import get_logger
 from app.features.exits.models.exits_responses import ExitResponse
-from app.features.exits.models.exits_schemas import ExitsFiltersSchema, StatsExitsFiltersSchema
+from app.features.exits.models.exits_schemas import (
+    ExitsFiltersSchema,
+    StatsExitsFiltersSchema,
+)
+from app.utils.logger import get_logger
 
 logger = get_logger("exits.repository")
 

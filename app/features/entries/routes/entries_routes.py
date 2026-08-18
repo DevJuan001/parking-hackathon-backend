@@ -1,10 +1,14 @@
 from fastapi import APIRouter, Depends
 from fastapi_limiter.depends import RateLimiter
-from app.middlewares.jwt_middleware import verify_jwt
-from app.middlewares.roles_middleware import require_roles
-from app.middlewares.onboarding_middleware import require_onboarded
+
 from app.features.entries.controllers.entries_controller import EntriesController
-from app.features.entries.models.entries_schemas import CreateEntrySchema, EntriesFiltersSchema
+from app.features.entries.models.entries_schemas import (
+    CreateEntrySchema,
+    EntriesFiltersSchema,
+)
+from app.middlewares.jwt_middleware import verify_jwt
+from app.middlewares.onboarding_middleware import require_onboarded
+from app.middlewares.roles_middleware import require_roles
 
 router = APIRouter(
     prefix="/api/entries",

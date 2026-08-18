@@ -1,6 +1,6 @@
-from app.utils.logger import get_logger
-from app.features.spots.services.spots_service import SpotsService
 from app.features.spots.models.spots_schemas import SpotsFiltersSchema
+from app.features.spots.services.spots_service import SpotsService
+from app.utils.logger import get_logger
 
 logger = get_logger("chatbot.tools.spots")
 
@@ -33,7 +33,7 @@ def tool_list_spots(parking_id: int, floor_id: int | None = None) -> dict:
 def tool_create_spot(
     parking_id: int, floor_id: int, spot_number: str, vehicle_type_id: int
 ) -> dict:
-    error, success, message = SpotsService.create_spot(
+    error, success, _message = SpotsService.create_spot(
         parking_id, floor_id, spot_number, vehicle_type_id
     )
 
@@ -43,7 +43,7 @@ def tool_create_spot(
         }
 
     return {
-        "success": True,
+        "success": success,
         "data": {
             "message": f"Plaza `{spot_number}` registrada correctamente"
         }
@@ -83,7 +83,7 @@ def tool_update_spot(
     updated = tool_list_spots(parking_id)
 
     return {
-        "success": True,
+        "success": success,
         "data": {
             "message": message,
             "updated_list": updated.get("data") if updated.get("success") else None,
@@ -141,7 +141,7 @@ def tool_delete_spot(
     updated = tool_list_spots(parking_id)
 
     return {
-        "success": True,
+        "success": success,
         "data": {
             "message": message,
             "updated_list": updated.get("data") if updated.get("success") else None,

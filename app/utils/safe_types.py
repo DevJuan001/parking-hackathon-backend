@@ -1,8 +1,7 @@
 import re
-from typing import Optional
-from pydantic.fields import FieldInfo
-from pydantic import AfterValidator, Field
 
+from pydantic import AfterValidator, Field
+from pydantic.fields import FieldInfo
 
 _HTML_TAG = re.compile(r"<\s*/?\s*[a-zA-Z][^>]*>")
 _SCRIPT_PROTOCOL = re.compile(r"javascript\s*:", re.IGNORECASE)
@@ -20,16 +19,16 @@ _DANGEROUS_PATTERNS = (
 
 
 def _validate(
-    value: Optional[str],
+    value: str | None,
     *,
-    min_length: Optional[int] = None,
-    max_length: Optional[int] = None,
-) -> Optional[str]:
+    min_length: int | None = None,
+    max_length: int | None = None,
+) -> str | None:
     if value is None:
         return None
 
     if not isinstance(value, str):
-        raise ValueError("Por favor ingresa un texto válido.")
+        raise TypeError("Por favor ingresa un texto válido.")
 
     stripped = value.strip()
 
@@ -52,8 +51,8 @@ def _validate(
     return stripped
 
 
-def safe_str(*, min_length: Optional[int] = None, max_length: int = 100) -> FieldInfo:
-    def _validator(value: Optional[str]) -> Optional[str]:
+def safe_str(*, min_length: int | None = None, max_length: int = 100) -> FieldInfo:
+    def _validator(value: str | None) -> str | None:
         return _validate(value, min_length=min_length, max_length=max_length)
 
     field = Field(...)
@@ -61,8 +60,8 @@ def safe_str(*, min_length: Optional[int] = None, max_length: int = 100) -> Fiel
     return field
 
 
-def safe_optional_str(*, min_length: Optional[int] = None, max_length: int = 100) -> FieldInfo:
-    def _validator(value: Optional[str]) -> Optional[str]:
+def safe_optional_str(*, min_length: int | None = None, max_length: int = 100) -> FieldInfo:
+    def _validator(value: str | None) -> str | None:
         return _validate(value, min_length=min_length, max_length=max_length)
 
     field = Field(default=None)
@@ -72,7 +71,7 @@ def safe_optional_str(*, min_length: Optional[int] = None, max_length: int = 100
 
 def safe_list_str(
     *,
-    min_length: Optional[int] = None,
+    min_length: int | None = None,
     max_length: int = 100,
     min_items: int = 0,
     max_items: int = 50,
@@ -90,12 +89,12 @@ def safe_list_str(
 
 def safe_optional_list_str(
     *,
-    min_length: Optional[int] = None,
+    min_length: int | None = None,
     max_length: int = 100,
     min_items: int = 0,
     max_items: int = 50,
 ) -> FieldInfo:
-    def _list_validator(value: Optional[list]) -> Optional[list]:
+    def _list_validator(value: list | None) -> list | None:
         if value is None:
             return None
         return [

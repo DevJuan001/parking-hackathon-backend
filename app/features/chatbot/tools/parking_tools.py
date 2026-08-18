@@ -1,9 +1,12 @@
+from app.features.chatbot.services.chatbot_service import ChatbotService
+from app.features.chatbot.services.context_builder import ContextBuilder
+from app.features.parking.models.parking_schemas import (
+    CreatePlateSchema,
+    UpdateParkingSchema,
+)
+from app.features.parking.services.parking_service import ParkingService
 from app.tasks.knowledge_tasks import rebuild_parking_knowledge
 from app.utils.logger import get_logger
-from app.features.parking.services.parking_service import ParkingService
-from app.features.chatbot.services.context_builder import ContextBuilder
-from app.features.chatbot.services.chatbot_service import ChatbotService
-from app.features.parking.models.parking_schemas import CreatePlateSchema, UpdateParkingSchema
 
 logger = get_logger("chatbot.tools.parking")
 
@@ -37,7 +40,7 @@ def tool_update_parking(parking_id: int, name: str | None = None) -> dict:
         rebuild_parking_knowledge.delay(parking_id)
 
     return {
-        "success": True,
+        "success": success,
         "data": {
             "message": message
         }
@@ -75,7 +78,7 @@ async def tool_register_plate(parking_id: int, plate: str, vehicle_type_id: int 
         }
 
     return {
-        "success": True,
+        "success": success,
         "data": {
             "message": message
         }

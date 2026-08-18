@@ -1,5 +1,5 @@
 from datetime import time
-from typing import Optional
+
 from pydantic import BaseModel, EmailStr, Field
 
 from app.utils.safe_types import safe_optional_str, safe_str
@@ -27,7 +27,7 @@ class RegisterSchema(BaseModel):
 class OnboardingSchema(BaseModel):
     name: str = safe_str(min_length=3, max_length=100)
     first_surname: str = safe_str(min_length=3, max_length=100)
-    second_surname: Optional[str] = safe_optional_str(max_length=100)
+    second_surname: str | None = safe_optional_str(max_length=100)
     parking_name: str = safe_str(min_length=3, max_length=100)
     address: str = safe_str(min_length=3, max_length=100)
     start_day: int

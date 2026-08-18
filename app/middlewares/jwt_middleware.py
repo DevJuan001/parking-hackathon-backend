@@ -1,11 +1,13 @@
 import jwt
-from app.core.config import settings
-from jwt.exceptions import PyJWTError
 from fastapi import Cookie, HTTPException
+from jwt.exceptions import PyJWTError
+
+from app.core.config import settings
+from app.middlewares.jwt_payload import JWTPayload
 
 
 # Función para verificar el token en todas las solicitudes protegidas
-async def verify_jwt(access_token: str = Cookie(None)):
+async def verify_jwt(access_token: str = Cookie(None)) -> JWTPayload:
     credentials_exception = HTTPException(
         status_code=401,
         detail="Token inválido o expirado",
@@ -29,15 +31,15 @@ async def verify_jwt(access_token: str = Cookie(None)):
         if not user_id or not role:
             raise credentials_exception
 
-        return {
-            "user_id": user_id,
-            "role": role,
-            "parking_id": parking_id,
-            "onboarding_completed": onboarding_completed
-        }
+        return JWTPayload(
+            user_id=int(user_id),
+            role=role,
+            parking_id=parking_id,
+            onboarding_completed=bool(onboarding_completed),
+        )
 
     except PyJWTError:
         raise credentials_exception
 
-    except Exception as e:
+    except ValueError:
         raise credentials_exception

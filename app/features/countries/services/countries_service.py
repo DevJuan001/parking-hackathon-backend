@@ -1,7 +1,7 @@
-from app.utils.logger import get_logger
-from app.core.exception import ServiceError
 from app.core.database import get_connection
+from app.core.exception import ServiceError
 from app.features.countries.repositories.countries_repository import CountriesRepository
+from app.utils.logger import get_logger
 
 logger = get_logger("countries.service")
 

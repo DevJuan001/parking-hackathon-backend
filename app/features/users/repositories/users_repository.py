@@ -1,12 +1,24 @@
-import bcrypt
-from typing import Optional
 
+import bcrypt
 from pydantic import EmailStr
-from app.utils.logger import get_logger
-from app.utils.date_formatter import date_formatter
+
+from app.features.users.models.users_responses import (
+    SurnameResponse,
+    UserByEmailResponse,
+    UserByIdGlobalResponse,
+    UserByIdResponse,
+    UserResponse,
+    UserStatsResponse,
+)
+from app.features.users.models.users_schemas import (
+    CompleteUserOnboardingSchema,
+    CreateUserSchema,
+    UpdateUserSchema,
+    UsersFiltersSchema,
+)
 from app.features.users.types.users_types import VALID_PROVIDERS, ProviderType
-from app.features.users.models.users_schemas import CompleteUserOnboardingSchema, CreateUserSchema, UpdateUserSchema, UsersFiltersSchema
-from app.features.users.models.users_responses import SurnameResponse, UserByEmailResponse, UserByIdGlobalResponse, UserByIdResponse, UserResponse, UserStatsResponse
+from app.utils.date_formatter import date_formatter
+from app.utils.logger import get_logger
 
 logger = get_logger("users.repository")
 
@@ -367,12 +379,12 @@ class UsersRepository:
     @staticmethod
     def create_user(
         user_data: CreateUserSchema,
-        hash_password: Optional[str],
-        parking_id: Optional[str],
+        hash_password: str | None,
+        parking_id: str | None,
         onboarding_completed: bool,
         connection,
         provider: ProviderType,
-        google_id: Optional[str] = None,
+        google_id: str | None = None,
     ):
         if provider not in VALID_PROVIDERS:
             logger.error(
@@ -492,15 +504,16 @@ class UsersRepository:
         try:
             user_fields = {
                 key: data[key]
-                for key in USER_FIELDS.keys()
+                for key in USER_FIELDS
                 if key in data
             }
 
             if user_fields:
                 mapped = {
-                    USER_FIELDS[key]: value for key, value in user_fields.items()}
+                    USER_FIELDS[key]: value for key, value in user_fields.items()
+                }
 
-                columns = ", ".join(f"{col} = %s" for col in mapped.keys())
+                columns = ", ".join(f"{col} = %s" for col in mapped)
                 values = list(mapped.values()) + [parking_id, user_id]
 
                 cursor.execute(

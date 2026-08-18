@@ -1,11 +1,12 @@
-from datetime import datetime, timedelta, timezone
-from typing import Union
 import secrets
 import string
+from datetime import UTC, datetime, timedelta
+
 import bcrypt
 import jwt
-from fastapi import HTTPException, Response
+from fastapi import Response
 from fastapi.security import OAuth2PasswordBearer
+
 from app.core.config import settings
 
 # Ruta en la cúal los usuarios obtienen el login
@@ -13,7 +14,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 
 def create_refresh_token(data: dict) -> str:
-    expire = datetime.now(timezone.utc) + \
+    expire = datetime.now(UTC) + \
         timedelta(settings.REFRESH_TOKEN_EXPIRE)
 
     return jwt.encode(
@@ -26,7 +27,7 @@ def create_refresh_token(data: dict) -> str:
 # Función para crear el jwt con fecha de expiración
 def create_access_token(
     data: dict,
-    expires_delta: Union[timedelta, None] = None
+    expires_delta: timedelta | None = None
 ) -> str:
 
     # Aqui guardamos una copia de el diccionario "data" dentro de "to_encode"
@@ -34,9 +35,9 @@ def create_access_token(
 
     # Validación
     if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
+        expire = datetime.now(UTC) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+        expire = datetime.now(UTC) + timedelta(minutes=15)
     to_encode.update({"exp": expire})
 
     # Convierte la llave sub en una cadena de texto
@@ -86,10 +87,7 @@ def verify_password(user_password: str, password: str):
     password_bytes = password.encode("utf-8")
     hashed_bytes = user_password.encode("utf-8")
 
-    if not bcrypt.checkpw(password_bytes, hashed_bytes):
-        return False
-
-    return True
+    return bcrypt.checkpw(password_bytes, hashed_bytes)
 
 
 # Funcion para crear un contraseña temporal

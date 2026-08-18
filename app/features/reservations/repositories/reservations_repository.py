@@ -1,12 +1,16 @@
 from pydantic import EmailStr
-from app.utils.logger import get_logger
+
 from app.features.reservations.models.reservations_responses import ReservationsResponse
-from app.features.reservations.models.reservations_schemas import FilterReservationsSchema, UpdateReservationSchema
+from app.features.reservations.models.reservations_schemas import (
+    FilterReservationsSchema,
+    UpdateReservationSchema,
+)
+from app.utils.logger import get_logger
 
 logger = get_logger("reservations.repository")
 
 
-class ReservationsRepository():
+class ReservationsRepository:
     @staticmethod
     def find_all_reservations(filters_data: FilterReservationsSchema, parking_id: str, connection):
         cursor = connection.cursor()
@@ -201,7 +205,7 @@ class ReservationsRepository():
         try:
             reservations_fields = {
                 key: data[key]
-                for key in RESERVATION_FIELDS.keys()
+                for key in RESERVATION_FIELDS
                 if key in data
             }
 
@@ -209,7 +213,7 @@ class ReservationsRepository():
                 mapped = {
                     RESERVATION_FIELDS[key]: value for key, value in reservations_fields.items()}
 
-                columns = ", ".join(f"{col} = %s" for col in mapped.keys())
+                columns = ", ".join(f"{col} = %s" for col in mapped)
                 values = list(mapped.values()) + [parking_id, reservation_id]
 
                 cursor.execute(
