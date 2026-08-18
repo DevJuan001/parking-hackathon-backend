@@ -1,8 +1,10 @@
+
 from fastapi import Depends, HTTPException
-from typing import List
+
 from app.middlewares.jwt_middleware import verify_jwt
 
-def require_roles(roles: List[str]):
+
+def require_roles(roles: list[str]):
     """
     Función para establecer que se requiere un rol para entrar a cierta ruta que este protegida
 
