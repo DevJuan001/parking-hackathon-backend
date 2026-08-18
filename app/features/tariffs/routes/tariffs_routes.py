@@ -1,9 +1,13 @@
 from fastapi import APIRouter, Depends
 from fastapi_limiter.depends import RateLimiter
+
+from app.features.tariffs.controllers.tariffs_controller import TariffsController
+from app.features.tariffs.models.tariffs_schemas import (
+    CreateTariffSchema,
+    UpdateTariffSchema,
+)
 from app.middlewares.jwt_middleware import verify_jwt
 from app.middlewares.roles_middleware import require_roles
-from app.features.tariffs.controllers.tariffs_controller import TariffsController
-from app.features.tariffs.models.tariffs_schemas import CreateTariffSchema, UpdateTariffSchema
 
 router = APIRouter(
     prefix="/api/tariffs",

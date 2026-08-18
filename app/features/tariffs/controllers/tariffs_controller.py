@@ -1,6 +1,10 @@
 from fastapi import HTTPException
+
+from app.features.tariffs.models.tariffs_schemas import (
+    CreateTariffSchema,
+    UpdateTariffSchema,
+)
 from app.features.tariffs.services.tariffs_service import TariffsService
-from app.features.tariffs.models.tariffs_schemas import CreateTariffSchema, UpdateTariffSchema
 
 
 class TariffsController:
