@@ -1,15 +1,18 @@
-from app.utils.logger import get_logger
-from app.core.exception import ServiceError
 from app.core.database import get_connection
-from app.utils.plate_formatter import plate_formatter
-from app.features.exits.repositories.exits_repository import ExitsRepository
-from app.features.spots.repositories.spots_repository import SpotsRepository
-from app.features.parking.repositories.plates_repository import PlatesRepository
+from app.core.exception import ServiceError
 from app.features.entries.repositories.entries_repository import EntriesRepository
-from app.features.payments.repositories.payments_repository import PaymentsRepository
-from app.features.exits.models.exits_schemas import CreateExitSchema, ExitsFiltersSchema, StatsExitsFiltersSchema
 from app.features.exits.models.exits_responses import ExitStatsResponse
-
+from app.features.exits.models.exits_schemas import (
+    CreateExitSchema,
+    ExitsFiltersSchema,
+    StatsExitsFiltersSchema,
+)
+from app.features.exits.repositories.exits_repository import ExitsRepository
+from app.features.parking.repositories.plates_repository import PlatesRepository
+from app.features.payments.repositories.payments_repository import PaymentsRepository
+from app.features.spots.repositories.spots_repository import SpotsRepository
+from app.utils.logger import get_logger
+from app.utils.plate_formatter import plate_formatter
 
 logger = get_logger("exits.service")
 
@@ -140,7 +143,7 @@ class ExitsService:
                     error or "No se encontró un ingreso para esta placa"
                 )
 
-            error, success, message = ExitsRepository.create_exit(
+            error, success, _message = ExitsRepository.create_exit(
                 parking_id=parking_id,
                 plate_id=plate.id,
                 connection=connection
@@ -149,7 +152,7 @@ class ExitsService:
             if error or not success:
                 raise ServiceError(error)
 
-            error, success, message = SpotsRepository.update_spot_status(
+            error, success, _message = SpotsRepository.update_spot_status(
                 parking_id, spot_id, 2, connection
             )
 

@@ -1,6 +1,11 @@
 from fastapi import HTTPException
+
+from app.features.exits.models.exits_schemas import (
+    CreateExitSchema,
+    ExitsFiltersSchema,
+    StatsExitsFiltersSchema,
+)
 from app.features.exits.services.exits_service import ExitsService
-from app.features.exits.models.exits_schemas import CreateExitSchema, ExitsFiltersSchema, StatsExitsFiltersSchema
 
 
 class ExitsController:
