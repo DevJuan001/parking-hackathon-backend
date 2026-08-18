@@ -540,6 +540,7 @@ class UsersRepository:
             return None, True, "Contraseña actualizada correctamente"
 
         except Exception:
+            logger.exception("Error en update_user_password")
             return "Error al intentar actualizar la contraseña del usuario", False, None
 
         finally:
