@@ -1,11 +1,6 @@
 
 
-from typing import Annotated
-
-from fastapi import Depends
 from pydantic import BaseModel
-
-from app.middlewares.jwt_middleware import verify_jwt
 
 
 class JWTPayload(BaseModel):
@@ -13,6 +8,3 @@ class JWTPayload(BaseModel):
     role: str
     parking_id: str | None = None
     onboarding_completed: bool = False
-
-
-AuthPayload = Annotated[JWTPayload, Depends(verify_jwt)]
