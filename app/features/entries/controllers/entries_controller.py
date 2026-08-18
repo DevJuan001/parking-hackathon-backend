@@ -1,6 +1,10 @@
 from fastapi import HTTPException
+
+from app.features.entries.models.entries_schemas import (
+    CreateEntrySchema,
+    EntriesFiltersSchema,
+)
 from app.features.entries.services.entries_service import EntriesService
-from app.features.entries.models.entries_schemas import CreateEntrySchema, EntriesFiltersSchema
 
 
 class EntriesController:
