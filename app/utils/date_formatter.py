@@ -1,4 +1,4 @@
-from datetime import datetime, date, time
+from datetime import date, datetime, time
 
 MONTHS_ES = {
     1: "Enero",
@@ -29,10 +29,7 @@ def date_formatter(date_str):
 
 
 def time_to_12h(time_value):
-    if isinstance(time_value, datetime):
-        hour, minutes = time_value.hour, time_value.minute
-
-    elif isinstance(time_value, time):
+    if isinstance(time_value, (datetime, time)):
         hour, minutes = time_value.hour, time_value.minute
 
     elif isinstance(time_value, str):
