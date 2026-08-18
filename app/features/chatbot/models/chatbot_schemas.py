@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+
 from app.utils.safe_types import safe_str
 
 
