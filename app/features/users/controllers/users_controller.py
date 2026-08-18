@@ -8,14 +8,15 @@ from app.features.users.models.users_schemas import (
     UsersFiltersSchema,
 )
 from app.features.users.services.users_service import UsersService
+from app.middlewares.jwt_middleware import AuthPayload
 
 
 class UsersController:
 
     @staticmethod
-    def get_all_users(filters: UsersFiltersSchema, payload: dict):
+    def get_all_users(filters: UsersFiltersSchema, payload: AuthPayload):
         error, users = UsersService.get_all_users(
-            str(payload["parking_id"]),
+            payload.parking_id,
             filters
         )
 
@@ -27,9 +28,9 @@ class UsersController:
         }
 
     @staticmethod
-    def get_user_stats(payload: dict):
+    def get_user_stats(payload: AuthPayload):
         error, stats = UsersService.get_user_stats(
-            str(payload["parking_id"])
+            payload.parking_id
         )
 
         if error:
@@ -40,9 +41,9 @@ class UsersController:
         }
 
     @staticmethod
-    def get_user_by_id(user_id: int, payload: dict):
+    def get_user_by_id(user_id: int, payload: AuthPayload):
         error, user = UsersService.get_user_by_id(
-            str(payload["parking_id"]),
+            payload.parking_id,
             user_id
         )
 
@@ -54,9 +55,9 @@ class UsersController:
         }
 
     @staticmethod
-    def get_current_user(payload: dict):
+    def get_current_user(payload: AuthPayload):
         error, user = UsersService.get_user_by_id_global(
-            int(payload["user_id"])
+            payload.user_id
         )
 
         if error:
@@ -64,7 +65,7 @@ class UsersController:
 
         return {
             "data": user,
-            "onboarding_completed": bool(payload.get("onboarding_completed"))
+            "onboarding_completed": payload.onboarding_completed
         }
 
     @staticmethod
@@ -90,9 +91,9 @@ class UsersController:
         }
 
     @staticmethod
-    def get_all_surnames(payload: dict):
+    def get_all_surnames(payload: AuthPayload):
         error, data = UsersService.get_all_surnames(
-            str(payload["parking_id"])
+            payload.parking_id
         )
 
         if error:
@@ -114,10 +115,10 @@ class UsersController:
         }
 
     @staticmethod
-    async def create_user(user_data: CreateUserSchema, payload: dict):
+    async def create_user(user_data: CreateUserSchema, payload: AuthPayload):
         error, success, message = await UsersService.create_user(
             user_data,
-            str(payload["parking_id"])
+            payload.parking_id
         )
 
         if error:
@@ -129,9 +130,9 @@ class UsersController:
         }
 
     @staticmethod
-    def update_user(user_id: int, user_data: UpdateUserSchema, payload: dict):
+    def update_user(user_id: int, user_data: UpdateUserSchema, payload: AuthPayload):
         error, success, message = UsersService.update_user(
-            str(payload["parking_id"]),
+            payload.parking_id,
             user_id,
             user_data
         )
@@ -145,10 +146,10 @@ class UsersController:
         }
 
     @staticmethod
-    def update_current_user(user_data: UpdateCurrentUserSchema, payload: dict):
+    def update_current_user(user_data: UpdateCurrentUserSchema, payload: AuthPayload):
         error, success, message = UsersService.update_user(
-            str(payload["parking_id"]),
-            int(payload["user_id"]),
+            payload.parking_id,
+            payload.user_id,
             user_data
         )
 
@@ -161,11 +162,11 @@ class UsersController:
         }
 
     @staticmethod
-    def update_user_password(password_data: UpdatePasswordSchema, payload: dict):
+    def update_user_password(password_data: UpdatePasswordSchema, payload: AuthPayload):
         error, success, message = UsersService.update_user_password(
-            str(payload["parking_id"]),
+            payload.parking_id,
             password_data,
-            int(payload["user_id"])
+            payload.user_id
         )
 
         if error:
@@ -179,9 +180,9 @@ class UsersController:
         }
 
     @staticmethod
-    def disable_user(user_id: int, payload: dict):
+    def disable_user(user_id: int, payload: AuthPayload):
         error, success, message = UsersService.disable_user(
-            str(payload["parking_id"]),
+            payload.parking_id,
             user_id
         )
 
@@ -194,9 +195,9 @@ class UsersController:
         }
 
     @staticmethod
-    def enable_user(user_id: int, payload: dict):
+    def enable_user(user_id: int, payload: AuthPayload):
         error, success, message = UsersService.enable_user(
-            str(payload["parking_id"]),
+            payload.parking_id,
             user_id
         )
 
