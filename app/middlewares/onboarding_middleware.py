@@ -1,4 +1,5 @@
 from typing import Annotated
+
 from fastapi import Depends, HTTPException
 
 from app.middlewares.jwt_middleware import verify_jwt
