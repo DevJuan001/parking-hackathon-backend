@@ -510,7 +510,8 @@ class UsersRepository:
 
             if user_fields:
                 mapped = {
-                    USER_FIELDS[key]: value for key, value in user_fields.items()}
+                    USER_FIELDS[key]: value for key, value in user_fields.items()
+                }
 
                 columns = ", ".join(f"{col} = %s" for col in mapped)
                 values = list(mapped.values()) + [parking_id, user_id]
