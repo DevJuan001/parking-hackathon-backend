@@ -1,7 +1,8 @@
 import jwt
-from app.core.config import settings
-from jwt.exceptions import PyJWTError
 from fastapi import Cookie, HTTPException
+from jwt.exceptions import PyJWTError
+
+from app.core.config import settings
 
 
 # Función para verificar el token en todas las solicitudes protegidas
@@ -39,5 +40,5 @@ async def verify_jwt(access_token: str = Cookie(None)):
     except PyJWTError:
         raise credentials_exception
 
-    except Exception as e:
+    except Exception:
         raise credentials_exception
