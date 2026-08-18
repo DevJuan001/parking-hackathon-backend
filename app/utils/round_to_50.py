@@ -1,4 +1,4 @@
-from decimal import Decimal, ROUND_UP
+from decimal import ROUND_UP, Decimal
 
 
 def round_up_to_next_50(value: float) -> float:
@@ -21,7 +21,7 @@ def round_up_to_next_50(value: float) -> float:
     if value <= 0:
         return 50
 
-    step = Decimal("50")
+    step = Decimal(50)
     value_decimal = Decimal(str(value))
 
     return float((value_decimal / step).to_integral_value(rounding=ROUND_UP) * step)
