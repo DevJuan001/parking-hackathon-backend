@@ -3,25 +3,25 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from fastapi_limiter import FastAPILimiter
 from fastapi.middleware.cors import CORSMiddleware
-from app.features.auth.routes import auth_routes
-from app.features.spots.routes import spots_routes
-from app.features.users.routes import users_routes
-from app.features.exits.routes import exits_routes
-from app.features.floors.routes import floors_routes
-from app.features.chatbot.routes import chatbot_routes
-from app.features.tariffs.routes import tariffs_routes
-from app.features.entries.routes import entries_routes
-from app.features.parking.routes import parking_routes
-from app.features.payments.routes import payments_routes
-from app.features.countries.routes import countries_routes
-from app.features.reservations.routes import reservations_routes
+from fastapi_limiter import FastAPILimiter
 
 from app.core.config import settings
 from app.core.database import get_connection
+from app.core.qdrant import close_qdrant, init_qdrant
 from app.core.redis import close_redis, init_redis
-from app.core.qdrant import init_qdrant, close_qdrant
+from app.features.auth.routes import auth_routes
+from app.features.chatbot.routes import chatbot_routes
+from app.features.countries.routes import countries_routes
+from app.features.entries.routes import entries_routes
+from app.features.exits.routes import exits_routes
+from app.features.floors.routes import floors_routes
+from app.features.parking.routes import parking_routes
+from app.features.payments.routes import payments_routes
+from app.features.reservations.routes import reservations_routes
+from app.features.spots.routes import spots_routes
+from app.features.tariffs.routes import tariffs_routes
+from app.features.users.routes import users_routes
 
 
 @asynccontextmanager
