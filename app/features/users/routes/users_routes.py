@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Query
 from fastapi_limiter.depends import RateLimiter
 
 from app.features.users.controllers.users_controller import UsersController
@@ -9,7 +11,7 @@ from app.features.users.models.users_schemas import (
     UpdateUserSchema,
     UsersFiltersSchema,
 )
-from app.middlewares.jwt_middleware import verify_jwt
+from app.middlewares.jwt_middleware import AuthPayload
 from app.middlewares.roles_middleware import require_roles
 
 router = APIRouter(
@@ -27,8 +29,8 @@ router = APIRouter(
     ]
 )
 def get_all_users(
-    filters: UsersFiltersSchema = Depends(),
-    payload: dict = Depends(verify_jwt)
+    filters: Annotated[UsersFiltersSchema, Query()],
+    payload: AuthPayload
 ):
     return UsersController.get_all_users(filters, payload)
 
@@ -41,7 +43,7 @@ def get_all_users(
         Depends(require_roles(["Admin", "Maquina", "Cliente"])),
     ]
 )
-def get_me(payload: dict = Depends(verify_jwt)):
+def get_me(payload: AuthPayload):
     return UsersController.get_current_user(payload)
 
 
@@ -65,7 +67,7 @@ def get_all_roles():
         Depends(require_roles(["Admin"]))
     ]
 )
-def get_all_surnames(payload: dict = Depends(verify_jwt)):
+def get_all_surnames(payload: AuthPayload):
     return UsersController.get_all_surnames(payload)
 
 
@@ -76,7 +78,7 @@ def get_all_surnames(payload: dict = Depends(verify_jwt)):
         Depends(require_roles(["Admin"]))
     ]
 )
-def get_user_stats(payload: dict = Depends(verify_jwt)):
+def get_user_stats(payload: AuthPayload):
     return UsersController.get_user_stats(payload)
 
 
@@ -90,7 +92,7 @@ def get_user_stats(payload: dict = Depends(verify_jwt)):
 )
 def get_user_by_id(
     user_id: int,
-    payload: dict = Depends(verify_jwt)
+    payload: AuthPayload
 ):
     return UsersController.get_user_by_id(user_id, payload)
 
@@ -105,7 +107,7 @@ def get_user_by_id(
 )
 async def create_user(
     user_data: CreateUserSchema,
-    payload: dict = Depends(verify_jwt)
+    payload: AuthPayload
 ):
     return await UsersController.create_user(user_data, payload)
 
@@ -118,7 +120,7 @@ async def create_user(
         Depends(require_roles(["Admin", "Maquina", "Cliente"]))
     ]
 )
-def update_me(user_data: UpdateCurrentUserSchema, payload: dict = Depends(verify_jwt)):
+def update_me(user_data: UpdateCurrentUserSchema, payload: AuthPayload):
     return UsersController.update_current_user(user_data, payload)
 
 
@@ -130,7 +132,7 @@ def update_me(user_data: UpdateCurrentUserSchema, payload: dict = Depends(verify
         Depends(require_roles(["Admin", "Maquina", "Cliente"]))
     ]
 )
-def update_user_password(password_data: UpdatePasswordSchema, payload: dict = Depends(verify_jwt)):
+def update_user_password(password_data: UpdatePasswordSchema, payload: AuthPayload):
     return UsersController.update_user_password(password_data, payload)
 
 
@@ -145,7 +147,7 @@ def update_user_password(password_data: UpdatePasswordSchema, payload: dict = De
 def update_user(
     user_id: int,
     user_data: UpdateUserSchema,
-    payload: dict = Depends(verify_jwt)
+    payload: AuthPayload
 ):
     return UsersController.update_user(user_id, user_data, payload)
 
@@ -160,7 +162,7 @@ def update_user(
 )
 def disable_user(
     user_id: int,
-    payload: dict = Depends(verify_jwt)
+    payload: AuthPayload
 ):
     return UsersController.disable_user(user_id, payload)
 
@@ -175,6 +177,6 @@ def disable_user(
 )
 def enable_user(
     user_id: int,
-    payload: dict = Depends(verify_jwt)
+    payload: AuthPayload
 ):
     return UsersController.enable_user(user_id, payload)
