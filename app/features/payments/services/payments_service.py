@@ -1,18 +1,22 @@
 from datetime import datetime
-from app.utils.logger import get_logger
-from app.utils.uuid import generate_uuid
-from app.core.exception import ServiceError
+
 from app.core.database import get_connection
-from app.utils.plate_formatter import plate_formatter
-from app.utils.round_to_50 import round_up_to_next_50
+from app.core.exception import ServiceError
+from app.features.entries.repositories.entries_repository import EntriesRepository
 from app.features.exits.repositories.exits_repository import ExitsRepository
 from app.features.parking.repositories.plates_repository import PlatesRepository
-from app.features.tariffs.repositories.tariffs_repository import TariffsRepository
-from app.features.entries.repositories.entries_repository import EntriesRepository
-from app.features.spots.repositories.spots_repository import SpotsRepository
 from app.features.payments.models.payments_responses import CalculatePaymentResponse
+from app.features.payments.models.payments_schemas import (
+    CreatePaymentSchema,
+    PaymentsFiltersSchema,
+)
 from app.features.payments.repositories.payments_repository import PaymentsRepository
-from app.features.payments.models.payments_schemas import CreatePaymentSchema, PaymentsFiltersSchema
+from app.features.spots.repositories.spots_repository import SpotsRepository
+from app.features.tariffs.repositories.tariffs_repository import TariffsRepository
+from app.utils.logger import get_logger
+from app.utils.plate_formatter import plate_formatter
+from app.utils.round_to_50 import round_up_to_next_50
+from app.utils.uuid import generate_uuid
 
 logger = get_logger("payments.service")
 
@@ -314,7 +318,7 @@ class PaymentsService:
 
             value = round_up_to_next_50(value_raw)
 
-            error, success, message = ExitsRepository.create_exit(
+            error, success, _message = ExitsRepository.create_exit(
                 parking_id=parking_id,
                 plate_id=plate_id,
                 connection=connection
@@ -327,7 +331,7 @@ class PaymentsService:
                 
             uuid = generate_uuid()
 
-            error, success, message = PaymentsRepository.create_payment(
+            error, success, _message = PaymentsRepository.create_payment(
                 uuid=uuid,
                 parking_id=parking_id,
                 plate_id=plate_id,
@@ -341,7 +345,7 @@ class PaymentsService:
                 raise ServiceError(error)
 
             if entry.spot_id is not None:
-                error, success, message = SpotsRepository.update_spot_status(
+                error, success, _message = SpotsRepository.update_spot_status(
                     parking_id, entry.spot_id, 2, connection
                 )
 
