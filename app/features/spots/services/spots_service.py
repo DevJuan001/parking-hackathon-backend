@@ -1,12 +1,12 @@
-from app.utils.logger import get_logger
-from app.core.exception import ServiceError
 from app.core.database import get_connection
+from app.core.exception import ServiceError
 from app.features.floors.repositories.floors_repository import FloorsRepository
 from app.features.parking.repositories.vehicle_types_repository import (
     VehicleTypesRepository,
 )
+from app.features.spots.models.spots_schemas import SpotsFiltersSchema, UpdateSpotSchema
 from app.features.spots.repositories.spots_repository import SpotsRepository
-from app.features.spots.models.spots_schemas import SpotsFiltersSchema
+from app.utils.logger import get_logger
 
 logger = get_logger("spots.service")
 
@@ -118,7 +118,7 @@ class SpotsService:
                     error or "Tipo de vehículo no encontrado, verifica el id e intentalo nuevamente"
                 )
 
-            error, success, message = SpotsRepository.create_spot(
+            error, success, _message = SpotsRepository.create_spot(
                 floor_id, spot_label, vehicle_type_id, connection
             )
 
@@ -180,11 +180,8 @@ class SpotsService:
     @staticmethod
     def update_spot(
         parking_id: str,
-        spot_id: int,
-        floor_id: int | None,
-        spot_label: str | None,
-        spot_status: int | None,
-        vehicle_type_id: int | None,
+        spot_id: str,
+        spot_data: UpdateSpotSchema,
     ):
         connection = get_connection()
 
@@ -198,19 +195,19 @@ class SpotsService:
                 raise ServiceError(error or "Plaza no encontrada")
 
             # Si llega un floor_id, validamos que el piso exista
-            if floor_id is not None:
+            if spot_data.floor_id is not None:
                 error, floor = FloorsRepository.find_floor_by_id(
-                    parking_id, floor_id, connection
+                    parking_id, spot_data.floor_id, connection
                 )
 
                 if error or not floor:
                     raise ServiceError(error or "Piso no encontrado")
 
             # Si llega un vehicle_type_id, validamos que exista
-            if vehicle_type_id is not None:
+            if spot_data.vehicle_type_id is not None:
                 error, existing_type = (
                     VehicleTypesRepository.find_vehicle_type_by_id(
-                        vehicle_type_id, connection
+                        spot_data.vehicle_type_id, connection
                     )
                 )
 
@@ -222,10 +219,7 @@ class SpotsService:
             error, success, message = SpotsRepository.update_spot(
                 parking_id,
                 spot_id,
-                floor_id,
-                spot_label,
-                spot_status,
-                vehicle_type_id,
+                spot_data,
                 connection,
             )
 

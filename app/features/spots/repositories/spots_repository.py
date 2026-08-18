@@ -1,7 +1,7 @@
-from app.utils.logger import get_logger
-from app.utils.date_formatter import date_formatter
-from app.features.spots.models.spots_schemas import SpotsFiltersSchema
 from app.features.spots.models.spots_responses import SpotResponse
+from app.features.spots.models.spots_schemas import SpotsFiltersSchema, UpdateSpotSchema
+from app.utils.date_formatter import date_formatter
+from app.utils.logger import get_logger
 
 logger = get_logger("spots.repository")
 
@@ -76,6 +76,7 @@ class SpotsRepository:
                 )
                 for item in results
             ]
+
             return None, spots
 
         except Exception as e:
@@ -117,6 +118,7 @@ class SpotsRepository:
 
         try:
             cursor.execute(query, (parking_id, spot_id))
+
             result = cursor.fetchone()
 
             if not result:
@@ -145,15 +147,18 @@ class SpotsRepository:
         cursor = connection.cursor()
 
         query = """
-        SELECT s.spot_id
+        SELECT
+            s.spot_id
         FROM SPOTS s
-        JOIN FLOORS f ON f.id = s.floor_id
+        JOIN FLOORS f
+            ON f.id = s.floor_id
         WHERE f.parking_id = %s AND s.spot = %s
         LIMIT 1
         """
 
         try:
             cursor.execute(query, (parking_id, label))
+
             result = cursor.fetchone()
 
             if not result:
@@ -162,7 +167,11 @@ class SpotsRepository:
             return None, result[0]
 
         except Exception as e:
-            logger.error("Error en find_spot_id_by_label: %s", e, exc_info=True)
+            logger.error(
+                "Error en find_spot_id_by_label: %s",
+                e,
+                exc_info=True
+            )
             return "Error al buscar la plaza por etiqueta", None
 
         finally:
@@ -173,9 +182,13 @@ class SpotsRepository:
         cursor = connection.cursor()
 
         query = """
-        SELECT s.spot_id, s.spot, f.name
+        SELECT
+            s.spot_id,
+            s.spot,
+            f.name
         FROM SPOTS AS s
-        INNER JOIN FLOORS AS f ON f.id = s.floor_id
+        INNER JOIN FLOORS AS f
+            ON f.id = s.floor_id
         WHERE f.parking_id = %s
           AND s.spot_status = 2
           AND s.vehicle_type_id = %s
@@ -184,6 +197,7 @@ class SpotsRepository:
 
         try:
             cursor.execute(query, (parking_id, vehicle_type_id))
+
             result = cursor.fetchone()
 
             if not result:
@@ -214,6 +228,7 @@ class SpotsRepository:
 
         try:
             cursor.execute(query, (floor_id, spot_label, vehicle_type_id))
+
             return None, True, "Plaza registrada correctamente"
 
         except Exception as e:
@@ -229,13 +244,15 @@ class SpotsRepository:
 
         query = """
         UPDATE SPOTS AS s
-        INNER JOIN FLOORS AS f ON f.id = s.floor_id
+        INNER JOIN FLOORS AS f
+            ON f.id = s.floor_id
         SET s.spot_status = %s
         WHERE f.parking_id = %s AND s.spot_id = %s
         """
 
         try:
             cursor.execute(query, (status, parking_id, spot_id))
+
             return None, True, "Estado de la plaza actualizado correctamente"
 
         except Exception as e:
@@ -251,7 +268,8 @@ class SpotsRepository:
 
         query = """
         DELETE s FROM SPOTS AS s
-        INNER JOIN FLOORS AS f ON f.id = s.floor_id
+        INNER JOIN FLOORS AS f
+            ON f.id = s.floor_id
         WHERE f.parking_id = %s AND s.spot_id = %s
         """
 
@@ -277,21 +295,28 @@ class SpotsRepository:
         cursor = connection.cursor()
 
         query = """
-        SELECT COUNT(*)
+        SELECT
+            COUNT(*)
         FROM SPOTS AS s
-        INNER JOIN FLOORS AS f ON f.id = s.floor_id
+        INNER JOIN FLOORS AS f
+            ON f.id = s.floor_id
         WHERE f.parking_id = %s AND s.floor_id = %s AND s.spot_status = 3
         """
 
         try:
             cursor.execute(query, (parking_id, floor_id))
+
             result = cursor.fetchone()
+
             count = int(result[0]) if result and result[0] is not None else 0
+
             return None, count
 
         except Exception as e:
             logger.error(
-                "Error en count_occupied_spots_by_floor: %s", e, exc_info=True
+                "Error en count_occupied_spots_by_floor: %s",
+                e,
+                exc_info=True
             )
             return "Error al verificar plazas ocupadas del piso", 0
 
@@ -304,17 +329,21 @@ class SpotsRepository:
 
         query = """
         DELETE s FROM SPOTS AS s
-        INNER JOIN FLOORS AS f ON f.id = s.floor_id
+        INNER JOIN FLOORS AS f
+            ON f.id = s.floor_id
         WHERE f.parking_id = %s AND s.floor_id = %s
         """
 
         try:
             cursor.execute(query, (parking_id, floor_id))
+
             return None, True, "Plazas del piso eliminadas correctamente"
 
         except Exception as e:
             logger.error(
-                "Error en delete_spots_by_floor: %s", e, exc_info=True
+                "Error en delete_spots_by_floor: %s",
+                e,
+                exc_info=True
             )
             return "Error al intentar eliminar las plazas del piso", False, None
 
@@ -325,13 +354,10 @@ class SpotsRepository:
     def update_spot(
         parking_id: str,
         spot_id: int,
-        floor_id: int | None,
-        spot_label: str | None,
-        spot_status: int | None,
-        vehicle_type_id: int | None,
+        spot_data: UpdateSpotSchema,
         connection,
     ):
-        cursor = connection.cursor()
+        data = spot_data.model_dump(exclude_none=True)
 
         SPOT_FIELDS = {
             "floor_id": "floor_id",
@@ -340,35 +366,32 @@ class SpotsRepository:
             "vehicle_type_id": "vehicle_type_id",
         }
 
+        cursor = connection.cursor()
+
         try:
-            values: dict = {}
+            spot_fields = {
+                key: data[key]
+                for key in SPOT_FIELDS
+                if key in data
+            }
 
-            if floor_id is not None:
-                values["floor_id"] = floor_id
+            if spot_fields:
+                mapped = {
+                    SPOT_FIELDS[key]: value for key, value in spot_fields.items()
+                }
 
-            if spot_label is not None:
-                values["spot"] = spot_label
-
-            if spot_status is not None:
-                values["spot_status"] = spot_status
-
-            if vehicle_type_id is not None:
-                values["vehicle_type_id"] = vehicle_type_id
-
-            if not values:
-                return None, True, "Sin cambios para aplicar"
-
-            set_clause = ", ".join(f"{col} = %s" for col in values.keys())
-            params = list(values.values()) + [parking_id, spot_id]
+            columns = ", ".join(f"{col} = %s" for col in mapped)
+            values = list(mapped.values()) + [parking_id, spot_id]
 
             cursor.execute(
                 f"""
                 UPDATE SPOTS AS s
-                INNER JOIN FLOORS AS f ON f.id = s.floor_id
-                SET {set_clause}
+                INNER JOIN FLOORS AS f
+                    ON f.id = s.floor_id
+                SET {columns}
                 WHERE f.parking_id = %s AND s.spot_id = %s
                 """,
-                params,
+                values,
             )
 
             return None, True, "Plaza actualizada correctamente"
