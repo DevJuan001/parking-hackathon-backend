@@ -24,8 +24,8 @@ class RolesRepository:
             ]
             return None, data
 
-        except Exception as e:
-            logger.error("Error en find_all_roles: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_all_roles")
             return "Error al intentar obtener los roles", None
 
         finally:
