@@ -76,8 +76,8 @@ class ConversationService:
         user_id: int,
         role: str,
         content: str,
-        tool_calls: list = None,
-        tool_call_id: str = None,
+        tool_calls: list | None = None,
+        tool_call_id: str | None = None,
     ) -> None:
         redis = await get_redis()
 

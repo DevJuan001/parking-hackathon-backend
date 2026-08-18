@@ -1,6 +1,6 @@
-from app.utils.logger import get_logger
-from app.features.exits.services.exits_service import ExitsService
 from app.features.exits.models.exits_schemas import CreateExitSchema, ExitsFiltersSchema
+from app.features.exits.services.exits_service import ExitsService
+from app.utils.logger import get_logger
 
 logger = get_logger("chatbot.tools.exits")
 
@@ -38,7 +38,7 @@ async def tool_register_exit(parking_id: int, plate: str, spot_id: int | None = 
         }
 
     return {
-        "success": True,
+        "success": success,
         "data": {
             "message": message
         }

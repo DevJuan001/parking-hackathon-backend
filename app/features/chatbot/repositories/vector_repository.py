@@ -1,10 +1,10 @@
 import uuid
 
-from qdrant_client.http.models import Filter, FieldCondition, MatchValue, PointStruct
+from qdrant_client.http.models import FieldCondition, Filter, MatchValue, PointStruct
 
 from app.core.qdrant import get_qdrant
-from app.utils.logger import get_logger
 from app.features.chatbot.services.embedding_service import embed_text
+from app.utils.logger import get_logger
 
 logger = get_logger("chatbot.vector_repository")
 

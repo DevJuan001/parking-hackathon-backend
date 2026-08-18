@@ -1,15 +1,19 @@
 import asyncio
 import json
+
 import openai
 from openai import AsyncOpenAI
 
 from app.core.config import settings
-from app.utils.logger import get_logger
 from app.features.chatbot.models.chatbot_responses import ChatbotResponse
 from app.features.chatbot.repositories.vector_repository import VectorRepository
 from app.features.chatbot.services.conversation_service import ConversationService
-from app.features.chatbot.services.intent_classifier import IntentClassifier, Intent
-from app.features.chatbot.services.tool_registry import get_tool_definitions, execute_tool
+from app.features.chatbot.services.intent_classifier import Intent, IntentClassifier
+from app.features.chatbot.services.tool_registry import (
+    execute_tool,
+    get_tool_definitions,
+)
+from app.utils.logger import get_logger
 
 logger = get_logger("chatbot.rag_service")
 

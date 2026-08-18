@@ -1,11 +1,11 @@
 from datetime import datetime
 
-from app.utils.logger import get_logger
-from app.features.payments.services.payments_service import PaymentsService
 from app.features.payments.models.payments_schemas import (
     CreatePaymentSchema,
     PaymentsFiltersSchema,
 )
+from app.features.payments.services.payments_service import PaymentsService
+from app.utils.logger import get_logger
 
 logger = get_logger("chatbot.tools.payments")
 
@@ -61,7 +61,7 @@ async def tool_create_payment(
         }
 
     return {
-        "success": True,
+        "success": success,
         "data": {
             "message": message
         }

@@ -1,8 +1,8 @@
 import json
 
 from app.core.database import get_connection
-from app.utils.logger import get_logger
 from app.features.chatbot.repositories.chatbot_repository import ChatbotRepository
+from app.utils.logger import get_logger
 
 logger = get_logger("chatbot.context_builder")
 

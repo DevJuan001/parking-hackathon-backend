@@ -1,7 +1,7 @@
-from app.utils.logger import get_logger
 from app.core.database import get_connection
 from app.features.chatbot.repositories.chatbot_repository import ChatbotRepository
 from app.features.chatbot.repositories.vector_repository import VectorRepository
+from app.utils.logger import get_logger
 
 logger = get_logger("chatbot.knowledge_generator")
 
@@ -105,7 +105,7 @@ class KnowledgeGenerator:
                 e,
                 exc_info=True,
             )
-            return f"Error al generar el conocimiento: {str(e)}", False
+            return f"Error al generar el conocimiento: {e!s}", False
 
         finally:
             connection.close()

@@ -1,6 +1,9 @@
-from app.utils.logger import get_logger
+from app.features.tariffs.models.tariffs_schemas import (
+    CreateTariffSchema,
+    UpdateTariffSchema,
+)
 from app.features.tariffs.services.tariffs_service import TariffsService
-from app.features.tariffs.models.tariffs_schemas import CreateTariffSchema, UpdateTariffSchema
+from app.utils.logger import get_logger
 
 logger = get_logger("chatbot.tools.tariffs")
 
@@ -27,7 +30,8 @@ def tool_list_tariffs(parking_id: int) -> dict:
 
 async def tool_create_tariff(parking_id: int, vehicle_type_id: int, rate_per_hour: float) -> dict:
     tariff_data = CreateTariffSchema(
-        vehicle_type=vehicle_type_id, value=rate_per_hour)
+        vehicle_type=vehicle_type_id, value=rate_per_hour
+    )
 
     error, success, message = await TariffsService.create_tariff(parking_id, tariff_data)
 
@@ -37,7 +41,7 @@ async def tool_create_tariff(parking_id: int, vehicle_type_id: int, rate_per_hou
         }
 
     return {
-        "success": True,
+        "success": success,
         "data": {
             "message": message
         }
@@ -85,7 +89,7 @@ def tool_update_tariff(parking_id: int, tariff_id: int | None = None, vehicle_ty
     updated = tool_list_tariffs(parking_id)
 
     return {
-        "success": True,
+        "success": success,
         "data": {
             "message": message,
             "updated_list": updated.get("data") if updated.get("success") else None,
@@ -120,7 +124,7 @@ def tool_delete_tariff(parking_id: int, tariff_id: int | None = None, vehicle_ty
     updated = tool_list_tariffs(parking_id)
 
     return {
-        "success": True,
+        "success": success,
         "data": {
             "message": message,
             "updated_list": updated.get("data") if updated.get("success") else None,

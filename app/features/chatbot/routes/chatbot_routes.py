@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends
 from fastapi_limiter.depends import RateLimiter
 
-from app.middlewares.jwt_middleware import verify_jwt
-from app.middlewares.roles_middleware import require_roles
-from app.middlewares.onboarding_middleware import require_onboarded
-from app.features.chatbot.models.chatbot_schemas import ChatbotAskSchema
 from app.features.chatbot.controllers.chatbot_controller import ChatbotController
+from app.features.chatbot.models.chatbot_schemas import ChatbotAskSchema
+from app.middlewares.jwt_middleware import verify_jwt
+from app.middlewares.onboarding_middleware import require_onboarded
+from app.middlewares.roles_middleware import require_roles
 
 router = APIRouter(
     prefix="/api/chatbot",
