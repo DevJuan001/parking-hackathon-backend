@@ -103,8 +103,8 @@ class UsersRepository:
             ]
             return None, users
 
-        except Exception as e:
-            logger.error("Error en find_all_users: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_all_users")
             return "Error al intentar obtener todos los usuarios", None
 
         finally:
@@ -133,8 +133,8 @@ class UsersRepository:
             ]
             return None, surnames
 
-        except Exception as e:
-            logger.error("Error en find_all_surnames: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_all_surnames")
             return "Error al intentar obtener los apellidos de los usuarios", None
 
         finally:
@@ -170,8 +170,8 @@ class UsersRepository:
             )
             return None, stats
 
-        except Exception as e:
-            logger.error("Error en count_user_stats: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en count_user_stats")
             return "Error al intentar obtener las estadisticas de usuarios", None
 
         finally:
@@ -222,8 +222,8 @@ class UsersRepository:
             ]
             return None, data[0]
 
-        except Exception as e:
-            logger.error("Error en find_user_by_id: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_user_by_id")
             return "Error al intentar obtener el usuario mediante el id", None
 
         finally:
@@ -277,10 +277,8 @@ class UsersRepository:
             ]
             return None, data
 
-        except Exception as e:
-            logger.error(
-                "Error en find_user_by_id_global: %s", e, exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en find_user_by_id_global")
             return "Error al intentar obtener el usuario mediante el id", None
 
         finally:
@@ -307,12 +305,8 @@ class UsersRepository:
 
             return None, result
 
-        except Exception as e:
-            logger.error(
-                "Error en find_user_password_by_id: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en find_user_password_by_id")
             return "Error al intentar obtener la contraseña del usuario", None
 
         finally:
@@ -368,8 +362,8 @@ class UsersRepository:
 
                 return None, data
 
-        except Exception as e:
-            logger.error("Error en find_user_by_email: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_user_by_email")
             return "Error al intentar obtener el usuario mediante el correo", None
 
         finally:
@@ -387,9 +381,8 @@ class UsersRepository:
         google_id: str | None = None,
     ):
         if provider not in VALID_PROVIDERS:
-            logger.error(
-                "Provider inválido '%s'. Valores válidos: %s. "
-                "Esto es un bug en el código que llama a create_user.",
+            logger.exception(
+                "Provider inválido '%s'. Valores válidos: %s. ",
                 provider,
                 sorted(VALID_PROVIDERS),
             )
@@ -435,8 +428,8 @@ class UsersRepository:
 
             return None, True, "Usuario creado correctamente"
 
-        except Exception as e:
-            logger.error("Error en create_user: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en create_user")
             return "Error al intentar crear el usuario", False, None
 
         finally:
@@ -476,10 +469,8 @@ class UsersRepository:
 
             return None, True, "Onboarding completado correctamente"
 
-        except Exception as e:
-            logger.error(
-                "Error en complete_user_onboarding: %s", e, exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en complete_user_onboarding")
             return "Error al intentar completar el onboarding", False, None
 
         finally:
@@ -523,8 +514,8 @@ class UsersRepository:
 
             return None, True, "Usuario actualizado correctamente"
 
-        except Exception as e:
-            logger.error("Error en update_user: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en update_user")
             return "Error al intentar actualizar el usuario", False, None
 
         finally:
@@ -565,8 +556,8 @@ class UsersRepository:
             cursor.execute(query, (parking_id, user_id))
             return None, True, "Usuario deshabilitado correctamente"
 
-        except Exception as e:
-            logger.error("Error en disable_user: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en disable_user")
             return "Error la intentar deshabilitar el usuario", False, None
 
         finally:
@@ -584,8 +575,8 @@ class UsersRepository:
 
             return None, True, "Usuario habilitado correctamente"
 
-        except Exception as e:
-            logger.error("Error en enable_user: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en enable_user")
             return "Error la intentar habilitar el usuario", False, None
 
         finally:
