@@ -1,17 +1,18 @@
 from fastapi import APIRouter, Depends
 from fastapi_limiter.depends import RateLimiter
 
-from app.middlewares.jwt_middleware import verify_jwt
-from app.middlewares.roles_middleware import require_roles
-from app.middlewares.onboarding_middleware import require_onboarded
+from app.features.reservations.controllers.reservations_controller import (
+    ReservationsController,
+)
 from app.features.reservations.models.reservations_schemas import (
     CreateReservationSchema,
     CreateSelfReservationSchema,
     FilterReservationsSchema,
     UpdateReservationSchema,
 )
-from app.features.reservations.controllers.reservations_controller import ReservationsController
-
+from app.middlewares.jwt_middleware import verify_jwt
+from app.middlewares.onboarding_middleware import require_onboarded
+from app.middlewares.roles_middleware import require_roles
 
 router = APIRouter(
     prefix="/api/reservations",

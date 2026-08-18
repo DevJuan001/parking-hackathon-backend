@@ -2,23 +2,30 @@ from datetime import date, datetime, time
 
 from pydantic import EmailStr
 
-from app.utils.logger import get_logger
-from app.core.exception import ServiceError
 from app.core.database import get_connection
-from app.utils.round_to_50 import round_up_to_next_50
-from app.utils.plate_formatter import plate_formatter
-from app.features.tariffs.repositories.tariffs_repository import TariffsRepository
+from app.core.exception import ServiceError
 from app.features.parking.repositories.parkings_repository import ParkingsRepository
-from app.features.reservations.repositories.reservations_repository import ReservationsRepository
-from app.tasks.email_tasks import send_reservation_created_email, send_reservation_cancelled_email
-from app.features.reservations.models.reservations_schemas import FilterReservationsSchema, UpdateReservationSchema
+from app.features.reservations.models.reservations_schemas import (
+    FilterReservationsSchema,
+    UpdateReservationSchema,
+)
+from app.features.reservations.repositories.reservations_repository import (
+    ReservationsRepository,
+)
+from app.features.tariffs.repositories.tariffs_repository import TariffsRepository
+from app.tasks.email_tasks import (
+    send_reservation_cancelled_email,
+    send_reservation_created_email,
+)
+from app.utils.logger import get_logger
+from app.utils.plate_formatter import plate_formatter
+from app.utils.round_to_50 import round_up_to_next_50
 from app.utils.uuid import generate_uuid
-
 
 logger = get_logger("reservations.service")
 
 
-class ReservationsService():
+class ReservationsService:
     @staticmethod
     def get_all_reservations(filters: FilterReservationsSchema, parking_id: str):
         connection = get_connection()
@@ -204,7 +211,7 @@ class ReservationsService():
             reservation_data.start_date = start_date
             reservation_data.end_date = end_date
 
-            error, success, message = ReservationsRepository.update_reservation(
+            error, success, _message = ReservationsRepository.update_reservation(
                 reservation_id, parking_id, reservation_data, connection
             )
 
@@ -263,7 +270,7 @@ class ReservationsService():
                     "No se puede eliminar una reserva que está en proceso"
                 )
 
-            error, success, message = ReservationsRepository.delete_reservation(
+            error, success, _message = ReservationsRepository.delete_reservation(
                 reservation_id, parking_id, connection
             )
 
