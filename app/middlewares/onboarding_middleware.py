@@ -1,10 +1,10 @@
-from fastapi import Depends, HTTPException
+from fastapi import HTTPException
 
-from app.middlewares.jwt_middleware import verify_jwt
+from app.middlewares.jwt_payload import JWTPayload
 
 
-def require_onboarded(payload: dict = Depends(verify_jwt)):
-    if not payload.get("onboarding_completed"):
+def require_onboarded(payload: JWTPayload) -> JWTPayload:
+    if not payload.onboarding_completed:
         raise HTTPException(
             status_code=403,
             detail="Debes completar el onboarding para acceder a este recurso"
