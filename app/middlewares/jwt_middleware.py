@@ -1,4 +1,5 @@
 from typing import Annotated
+
 import jwt
 from fastapi import Cookie, Depends, HTTPException
 from jwt.exceptions import PyJWTError
