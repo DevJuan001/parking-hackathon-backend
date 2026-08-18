@@ -1,5 +1,5 @@
-from fastapi_limiter.depends import RateLimiter
 from fastapi import APIRouter, Depends, Request, Response
+from fastapi_limiter.depends import RateLimiter
 
 from app.features.auth.controllers.auth_controller import AuthController
 from app.features.auth.models.auth_schemas import (
@@ -11,7 +11,6 @@ from app.features.auth.models.auth_schemas import (
 )
 from app.middlewares.jwt_middleware import verify_jwt
 from app.middlewares.roles_middleware import require_roles
-
 
 router = APIRouter(
     prefix="/api/auth",
