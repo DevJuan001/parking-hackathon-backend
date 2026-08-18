@@ -1,6 +1,6 @@
 from datetime import datetime, date, time
 
-MESES_ES = {
+MONTHS_ES = {
     1: "Enero",
     2: "Febrero",
     3: "Marzo",
@@ -24,25 +24,25 @@ def date_formatter(date_str):
     else:
         raise TypeError(f"date_formatter: tipo no soportado: {type(date_str)}")
 
-    mes = MESES_ES[dt.month]
+    mes = MONTHS_ES[dt.month]
     return f"{mes} {dt.day:02d} {dt.year}"
 
 
-def time_to_12h(time_val):
-    if isinstance(time_val, datetime):
-        hour, minutes = time_val.hour, time_val.minute
+def time_to_12h(time_value):
+    if isinstance(time_value, datetime):
+        hour, minutes = time_value.hour, time_value.minute
 
-    elif isinstance(time_val, time):
-        hour, minutes = time_val.hour, time_val.minute
+    elif isinstance(time_value, time):
+        hour, minutes = time_value.hour, time_value.minute
 
-    elif isinstance(time_val, str):
-        parts = time_val.strip().split(":")
+    elif isinstance(time_value, str):
+        parts = time_value.strip().split(":")
         hour, minutes = int(parts[0]), int(parts[1]) if len(parts) > 1 else 0
 
     else:
-        raise TypeError(f"time_to_12h: tipo no soportado: {type(time_val)}")
+        raise TypeError(f"time_to_12h: tipo no soportado: {type(time_value)}")
 
     periodo = "A.M." if hour < 12 else "P.M."
     hora_12 = hour % 12 or 12
-    
+
     return f"{hora_12}:{minutes:02d} {periodo}"
