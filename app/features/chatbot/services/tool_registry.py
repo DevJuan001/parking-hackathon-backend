@@ -43,9 +43,12 @@ from app.features.chatbot.tools.tariffs_tools import (
     tool_list_tariffs,
     tool_update_tariff,
 )
+from app.middlewares.jwt_middleware import AuthPayload
 from app.utils.logger import get_logger
 
 TOOLS: dict[str, dict] = {}
+
+logger = get_logger("chatbot.tool_registry")
 
 
 def register_tool(
@@ -78,7 +81,7 @@ def get_tool_definitions() -> list[dict]:
     ]
 
 
-async def execute_tool(name: str, params: dict, user_payload: dict) -> dict:
+async def execute_tool(name: str, params: dict, payload: AuthPayload) -> dict:
     tool = TOOLS.get(name)
 
     if not tool:
@@ -86,14 +89,14 @@ async def execute_tool(name: str, params: dict, user_payload: dict) -> dict:
             "error": f"La herramienta '{name}' no existe"
         }
 
-    user_role = user_payload.get("role")
+    user_role = payload.role
 
     if user_role not in tool["required_roles"]:
         return {
             "error": "No tenés permisos para realizar esta acción"
         }
 
-    parking_id = user_payload.get("parking_id")
+    parking_id = payload.parking_id
 
     if not parking_id:
         return {
@@ -111,9 +114,8 @@ async def execute_tool(name: str, params: dict, user_payload: dict) -> dict:
 
         return result
 
-    except Exception as e:
-        logger = get_logger("chatbot.tool_registry")
-        logger.error("Error ejecutando tool '%s': %s", name, e, exc_info=True)
+    except Exception:
+        logger.exception("Error ejecutando tool '%s'", name)
         return {
             "error": "Ocurrió un error inesperado al ejecutar la acción"
         }
