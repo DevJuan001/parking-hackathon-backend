@@ -8,7 +8,7 @@ from app.utils.logger import get_logger
 logger = get_logger("chatbot.tools.entries")
 
 
-def tool_list_entries(parking_id: int) -> dict:
+def tool_list_entries(parking_id: str) -> dict:
     filters = EntriesFiltersSchema()
 
     error, data = EntriesService.get_all_entries(parking_id, filters)
@@ -30,7 +30,7 @@ def tool_list_entries(parking_id: int) -> dict:
     }
 
 
-async def tool_register_entry(parking_id: int, plate: str, spot_id: int | None = None, vehicle_type_id: int | None = None) -> dict:
+async def tool_register_entry(parking_id: str, plate: str) -> dict:
     entry_data = CreateEntrySchema(plate=plate)
 
     error, success, message = await EntriesService.create_entry(parking_id, entry_data)
