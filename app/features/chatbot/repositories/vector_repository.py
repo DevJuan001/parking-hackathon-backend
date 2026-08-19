@@ -52,8 +52,8 @@ class VectorRepository:
 
             return None, True
 
-        except Exception as e:
-            logger.error("Error al insertar fragmentos: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error al insertar fragmentos")
             return "Error al guardar los fragmentos de conocimiento", False
 
     @staticmethod
@@ -93,8 +93,8 @@ class VectorRepository:
 
             return None, chunks
 
-        except Exception as e:
-            logger.error("Error al buscar fragmentos: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error al buscar fragmentos")
             return "Error al buscar en la base de conocimiento", []
 
     @staticmethod
@@ -111,13 +111,8 @@ class VectorRepository:
 
             return None, True
 
-        except Exception as e:
-            logger.error(
-                "Error al eliminar fragmento %s: %s",
-                chunk_id,
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error al eliminar fragmento %s", chunk_id)
             return "Error al eliminar el fragmento", False
 
     @staticmethod
@@ -146,13 +141,8 @@ class VectorRepository:
 
             return None, True
 
-        except Exception as e:
-            logger.error(
-                "Error al eliminar chunks del parking %d: %s",
-                parking_id,
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error al eliminar chunks del parking %d", parking_id)
             return "Error al eliminar los fragmentos del parking", False
 
 
