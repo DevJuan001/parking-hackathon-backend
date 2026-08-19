@@ -3,7 +3,7 @@ from fastapi_limiter.depends import RateLimiter
 
 from app.features.chatbot.controllers.chatbot_controller import ChatbotController
 from app.features.chatbot.models.chatbot_schemas import ChatbotAskSchema
-from app.middlewares.jwt_middleware import verify_jwt
+from app.middlewares.jwt_middleware import AuthPayload
 from app.middlewares.onboarding_middleware import require_onboarded
 from app.middlewares.roles_middleware import require_roles
 
@@ -17,13 +17,12 @@ router = APIRouter(
     "/ask",
     dependencies=[
         Depends(RateLimiter(times=20, seconds=60)),
-        Depends(verify_jwt),
         Depends(require_roles(["Admin"])),
         Depends(require_onboarded),
     ],
 )
 async def ask_chatbot(
     query: ChatbotAskSchema,
-    payload: dict = Depends(verify_jwt),
+    payload: AuthPayload,
 ):
     return await ChatbotController.ask(query, payload)
