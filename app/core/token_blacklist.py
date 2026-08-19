@@ -2,6 +2,8 @@ import hashlib
 from datetime import UTC, datetime
 
 import jwt
+from jwt.exceptions import PyJWTError
+from redis.exceptions import RedisError
 
 from app.core.redis import get_redis
 
@@ -24,8 +26,8 @@ def get_token_remaining_ttl(token: str) -> int:
         remaining = int(exp - datetime.now(UTC).timestamp())
 
         return max(0, remaining)
-    except Exception:
-        
+
+    except PyJWTError:
         return 0
 
 
@@ -42,7 +44,7 @@ async def add_to_blacklist(token: str, ttl_seconds: int) -> bool:
 
         return True
 
-    except Exception:
+    except RedisError:
         return False
 
 

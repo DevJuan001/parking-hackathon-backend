@@ -1,5 +1,7 @@
+from typing import Annotated
+
 import jwt
-from fastapi import Cookie, HTTPException
+from fastapi import Cookie, Depends, HTTPException
 from jwt.exceptions import PyJWTError
 
 from app.core.config import settings
@@ -43,3 +45,6 @@ async def verify_jwt(access_token: str = Cookie(None)) -> JWTPayload:
 
     except ValueError:
         raise credentials_exception
+
+
+AuthPayload = Annotated[JWTPayload, Depends(verify_jwt)]

@@ -1,6 +1,9 @@
 
-from fastapi import HTTPException
+from typing import Annotated
 
+from fastapi import Depends, HTTPException
+
+from app.middlewares.jwt_middleware import verify_jwt
 from app.middlewares.jwt_payload import JWTPayload
 
 
@@ -14,7 +17,7 @@ def require_roles(roles: list[str]):
     Returns:
         role_verifier: Otra función que dentro valida el rol desestructurando el objeto payload
     """
-    def role_verifier(payload: JWTPayload) -> JWTPayload:
+    def role_verifier(payload: Annotated[JWTPayload, Depends(verify_jwt)]) -> JWTPayload:
         """
         Función para verificar el rol del usuario
 

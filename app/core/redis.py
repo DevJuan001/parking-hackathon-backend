@@ -12,6 +12,7 @@ async def get_redis() -> redis.Redis:
 
 async def init_redis(app: FastAPI):
     global redis_client
+
     redis_client = await redis.from_url(
         settings.REDIS_URL,
         encoding="utf-8",
@@ -24,7 +25,5 @@ async def init_redis(app: FastAPI):
 
 
 async def close_redis():
-    global redis_client
-    
     if redis_client:
         await redis_client.close()

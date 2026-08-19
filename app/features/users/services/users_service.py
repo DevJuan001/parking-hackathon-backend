@@ -38,12 +38,8 @@ class UsersService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_all_users: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_all_users")
             return "Error al intentar obtener los usuarios", None
 
         finally:
@@ -66,12 +62,8 @@ class UsersService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_user_stats: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_user_stats")
             return "Error al intentar obtener las estadisticas de usuarios", None
 
         finally:
@@ -96,12 +88,8 @@ class UsersService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_user_by_id: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_user_by_id")
             return "Error al intentar obtener el usuario mediante el id", None
 
         finally:
@@ -125,12 +113,8 @@ class UsersService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_user_by_id_global: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_user_by_id_global")
             return "Error al intentar obtener el usuario mediante el id", None
 
         finally:
@@ -154,12 +138,8 @@ class UsersService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_user_by_email: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_user_by_email")
             return "Error al intentar obtener el usuario mediante el correo", None
 
         finally:
@@ -182,12 +162,8 @@ class UsersService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_all_roles: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_all_roles")
             return "Error al intentar obtener los roles", None
 
         finally:
@@ -211,12 +187,8 @@ class UsersService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_all_surnames: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_all_surnames")
             return "Error al intentar obtener los apellidos de los usuarios", None
 
         finally:
@@ -278,13 +250,9 @@ class UsersService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error(
-                "Error en create_user: %s",
-                e,
-                exc_info=True
-            )
+            logger.exception("Error en create_user")
             return "Error al intentar crear el usuario", False, None
 
         finally:
@@ -330,13 +298,9 @@ class UsersService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error(
-                "Error en update_user: %s",
-                e,
-                exc_info=True
-            )
+            logger.exception("Error en update_user")
             return "Error al intentar actualizar el usuario", False, None
 
         finally:
@@ -385,13 +349,9 @@ class UsersService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error(
-                "Error en update_user_password: %s",
-                e,
-                exc_info=True
-            )
+            logger.exception("Error en update_user_password")
             return "Error al intentar actualizar la contraseña", False, None
 
         finally:
@@ -425,13 +385,9 @@ class UsersService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error(
-                "Error en disable_user: %s",
-                e,
-                exc_info=True
-            )
+            logger.exception("Error en disable_user")
             return "Error al intentar deshabilitar el usuario", False, None
 
         finally:
@@ -465,13 +421,9 @@ class UsersService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error(
-                "Error en enable_user: %s",
-                e,
-                exc_info=True
-            )
+            logger.exception("Error en enable_user")
             return "Error al intentar habilitar el usuario", False, None
 
         finally:

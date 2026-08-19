@@ -1,4 +1,5 @@
 import asyncio
+import smtplib
 from datetime import date, datetime, time, timedelta
 
 from fastapi_mail import MessageSchema
@@ -30,7 +31,7 @@ def send_welcome_email(self, user_name: str, user_first_surname: str, user_email
             )
         )
 
-    except Exception as e:
+    except (ConnectionError, TimeoutError, OSError, smtplib.SMTPException) as e:
         raise self.retry(exc=e, countdown=60)
 
 
@@ -50,7 +51,7 @@ def recovery_password_email(self, user_email: EmailStr, user_name: str):
             )
         )
 
-    except Exception as e:
+    except (ConnectionError, TimeoutError, OSError, smtplib.SMTPException) as e:
         raise self.retry(exc=e, countdown=60)
 
 
@@ -78,7 +79,7 @@ def send_welcome_registration_email(
             )
         )
 
-    except Exception as e:
+    except (ConnectionError, TimeoutError, OSError, smtplib.SMTPException) as e:
         raise self.retry(exc=e, countdown=60)
 
 
@@ -128,7 +129,7 @@ def send_reservation_created_email(
             )
         )
 
-    except Exception as e:
+    except (ConnectionError, TimeoutError, OSError, smtplib.SMTPException) as e:
         raise self.retry(exc=e, countdown=60)
 
 
@@ -165,5 +166,5 @@ def send_reservation_cancelled_email(
             )
         )
 
-    except Exception as e:
+    except (ConnectionError, TimeoutError, OSError, smtplib.SMTPException) as e:
         raise self.retry(exc=e, countdown=60)
