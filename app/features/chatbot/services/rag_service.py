@@ -3,6 +3,7 @@ import json
 
 import openai
 from openai import AsyncOpenAI
+from redis.exceptions import RedisError
 
 from app.core.config import settings
 from app.features.chatbot.models.chatbot_responses import ChatbotResponse
@@ -13,6 +14,7 @@ from app.features.chatbot.services.tool_registry import (
     execute_tool,
     get_tool_definitions,
 )
+from app.middlewares.jwt_middleware import AuthPayload
 from app.utils.logger import get_logger
 
 logger = get_logger("chatbot.rag_service")
@@ -58,7 +60,7 @@ class RAGService:
         return f"{base}\n\n## INFORMACIÓN DE REFERENCIA:\n{context_text}"
 
     @staticmethod
-    async def ask(message: str, user_payload: dict) -> dict:
+    async def ask(message: str, payload: AuthPayload) -> dict:
         # Clasificamos la intención del mensaje
         intent = IntentClassifier.classify(message)
 
@@ -69,8 +71,8 @@ class RAGService:
                 "sources": [],
             }
 
-        parking_id = user_payload.get("parking_id")
-        user_id = user_payload.get("user_id")
+        parking_id = payload.parking_id
+        user_id = payload.user_id
 
         # Buscamos la información almacenada en la base de datos vectorial
         # (también a un thread: qdrant-client y el encode de embeddings son síncronos)
@@ -86,7 +88,7 @@ class RAGService:
         try:
             history = await ConversationService.get_history(parking_id, user_id, limit=10)
 
-        except Exception as e:
+        except (RedisError, ConnectionError, TimeoutError) as e:
             logger.warning(
                 "No se pudo cargar el historial de conversación: %s", e
             )
@@ -210,7 +212,7 @@ class RAGService:
                 )
 
                 # Ejecutamos cada herramienta elegida
-                result = await execute_tool(func_name, func_args, user_payload)
+                result = await execute_tool(func_name, func_args, payload)
 
                 # Almacenamos cada herramienta ejecutada y su respuesta
                 action = {
@@ -265,7 +267,7 @@ class RAGService:
                     tool_call_id=msg.get("tool_call_id"),
                 )
 
-        except Exception as e:
+        except (RedisError, ConnectionError, TimeoutError) as e:
             logger.warning(
                 "No se pudo guardar el historial de conversación: %s", e
             )
