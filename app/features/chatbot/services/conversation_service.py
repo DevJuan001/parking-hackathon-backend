@@ -13,11 +13,11 @@ class ConversationService:
     MAX_MESSAGES = 40
 
     @staticmethod
-    def key(parking_id: str, user_id: int) -> str:
+    def key(parking_id: str, user_id: str) -> str:
         return f"{ConversationService.HISTORY_PREFIX}{parking_id}:{user_id}"
 
     @staticmethod
-    async def get_history(parking_id: str, user_id: int, limit: int = 15) -> list:
+    async def get_history(parking_id: str, user_id: str, limit: int = 15) -> list:
         redis = await get_redis()
 
         key = ConversationService.key(parking_id, user_id)
@@ -26,12 +26,8 @@ class ConversationService:
             raw = await redis.lrange(key, -limit, -1)
             messages = [json.loads(m) for m in raw]
 
-        except Exception as e:
-            logger.error(
-                "Error al obtener el historial de chat: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error al obtener el historial de chat")
             return []
 
         # Sacamos secuencias incompletas del final (tool o tool_calls sin respuesta colgando)
@@ -73,7 +69,7 @@ class ConversationService:
     @staticmethod
     async def add_message(
         parking_id: str,
-        user_id: int,
+        user_id: str,
         role: str,
         content: str,
         tool_calls: list | None = None,
@@ -101,12 +97,8 @@ class ConversationService:
 
             await redis.expire(key, ConversationService.TTL)
 
-        except Exception as e:
-            logger.error(
-                "Error al agregar mensaje al historial: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error al agregar mensaje al historial")
 
     @staticmethod
     async def clear_history(parking_id: str, user_id: int) -> None:
@@ -117,9 +109,5 @@ class ConversationService:
         try:
             await redis.delete(key)
 
-        except Exception as e:
-            logger.error(
-                "Error al limpiar el historial de chat: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error al limpiar el historial de chat")
