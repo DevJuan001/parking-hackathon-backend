@@ -9,7 +9,7 @@ from app.features.auth.models.auth_schemas import (
     RecoverPasswordSchema,
     RegisterSchema,
 )
-from app.middlewares.jwt_middleware import verify_jwt
+from app.middlewares.jwt_middleware import AuthPayload
 from app.middlewares.roles_middleware import require_roles
 
 router = APIRouter(
@@ -61,7 +61,7 @@ async def register(data: RegisterSchema, response: Response):
 )
 async def complete_onboarding(
     data: OnboardingSchema,
-    payload: dict = Depends(verify_jwt),
+    payload: AuthPayload,
     response: Response = None
 ):
     return await AuthController.complete_onboarding(data, payload, response)
