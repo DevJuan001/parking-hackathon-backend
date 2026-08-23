@@ -31,7 +31,8 @@ class UsersController:
     @staticmethod
     def get_user_stats(payload: AuthPayload):
         error, stats = UsersService.get_user_stats(
-            payload.parking_id
+            payload.parking_id,
+            payload.user_id,
         )
 
         if error:
