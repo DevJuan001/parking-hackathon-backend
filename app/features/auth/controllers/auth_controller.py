@@ -7,6 +7,7 @@ from app.features.auth.models.auth_schemas import (
     RegisterSchema,
 )
 from app.features.auth.services.auth_service import AuthService
+from app.middlewares.jwt_middleware import AuthPayload
 
 
 class AuthController:
@@ -55,7 +56,7 @@ class AuthController:
     @staticmethod
     async def complete_onboarding(
         data: OnboardingSchema,
-        payload: dict,
+        payload: AuthPayload,
         response: Response
     ):
         error, success, message = await AuthService.complete_onboarding(

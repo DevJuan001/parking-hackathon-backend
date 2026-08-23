@@ -28,6 +28,7 @@ from app.features.users.models.users_schemas import (
 )
 from app.features.users.repositories.users_repository import UsersRepository
 from app.features.users.services.users_service import UsersService
+from app.middlewares.jwt_middleware import AuthPayload
 from app.tasks.email_tasks import (
     recovery_password_email,
     send_welcome_registration_email,
@@ -93,8 +94,8 @@ class AuthService:
         except ServiceError as e:
             return e.message, False, "No autorizado"
 
-        except Exception as e:
-            logger.error("Error en login: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en login")
             return "No autorizado", False, None
 
         finally:
@@ -202,8 +203,8 @@ class AuthService:
         except ServiceError as e:
             return e.message, False, False, "No autorizado"
 
-        except Exception as e:
-            logger.error("Error en google_login: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en google_login")
             return "No autorizado", False, False, None
 
         finally:
@@ -298,9 +299,9 @@ class AuthService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error("Error en register: %s", e, exc_info=True)
+            logger.exception("Error en register")
             return "Error al intentar registrar el usuario", False, None
 
         finally:
@@ -309,15 +310,15 @@ class AuthService:
     @staticmethod
     async def complete_onboarding(
         data: OnboardingSchema,
-        payload: dict,
+        payload: AuthPayload,
         response: Response
     ):
         connection = get_connection()
 
         try:
-            user_id = int(payload["user_id"])
+            user_id = payload.user_id
 
-            if payload.get("onboarding_completed"):
+            if payload.onboarding_completed:
                 raise ServiceError("El usuario ya completó el onboarding")
 
             uuid = generate_uuid()
@@ -420,9 +421,9 @@ class AuthService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error("Error en complete_onboarding: %s", e, exc_info=True)
+            logger.exception("Error en complete_onboarding")
             return "Error al intentar completar el onboarding", False, None
 
         finally:
@@ -487,8 +488,8 @@ class AuthService:
         except ServiceError as e:
             return e.message, False, None
 
-        except Exception as e:
-            logger.error("Error en refresh_tokens: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en refresh_tokens")
             return "Error al intentar refrezcar los tokens", False, None
 
     @staticmethod
@@ -533,8 +534,8 @@ class AuthService:
 
             return None, True, "Sesión cerrada exitosamente"
 
-        except Exception as e:
-            logger.error("Error en logout: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en logout")
             return "Error al intentar cerrar la sesión", False, None
 
     @staticmethod
@@ -548,7 +549,7 @@ class AuthService:
                     user_name=user.name
                 )
 
-        except Exception as e:
-            logger.error("Error en recover_password: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en recover_password")
 
         return True, "Te hemos enviado un correo para restablecer la contraseña"
