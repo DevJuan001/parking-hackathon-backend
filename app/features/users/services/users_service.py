@@ -20,12 +20,13 @@ logger = get_logger("users.service")
 
 class UsersService:
     @staticmethod
-    def get_all_users(parking_id: str, filters: UsersFiltersSchema):
+    def get_all_users(parking_id: str, user_id: int, filters: UsersFiltersSchema):
         connection = get_connection()
 
         try:
             error, users = UsersRepository.find_all_users(
                 parking_id,
+                user_id,
                 filters,
                 connection
             )
