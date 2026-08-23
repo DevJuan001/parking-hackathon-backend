@@ -145,7 +145,7 @@ class UsersRepository:
 
     # Obtener estadisticas de usuarios del parking
     @staticmethod
-    def count_user_stats(parking_id: str, connection):
+    def count_user_stats(parking_id: str, user_id: int, connection):
         cursor = connection.cursor()
 
         query = """
@@ -158,11 +158,11 @@ class UsersRepository:
                 ELSE 0 END
             ) AS created_this_week
         FROM USERS AS u
-        WHERE u.parking_id = %s
+        WHERE u.parking_id = %s AND u.id NOT LIKE %s
         """
 
         try:
-            cursor.execute(query, (parking_id,))
+            cursor.execute(query, (parking_id, user_id))
             result = cursor.fetchone()
 
             stats = UserStatsResponse(
