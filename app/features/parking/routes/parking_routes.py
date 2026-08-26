@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Query
 from fastapi_limiter.depends import RateLimiter
 
 from app.features.parking.controllers.parking_controller import ParkingController
@@ -7,7 +9,7 @@ from app.features.parking.models.parking_schemas import (
     UpdateParkingSchema,
 )
 from app.features.spots.models.spots_schemas import SpotsFiltersSchema
-from app.middlewares.jwt_middleware import verify_jwt
+from app.middlewares.jwt_middleware import AuthPayload
 from app.middlewares.roles_middleware import require_roles
 
 router = APIRouter(
@@ -23,7 +25,7 @@ router = APIRouter(
         Depends(require_roles(["Admin"])),
     ]
 )
-def get_parking_by_private_info(payload: dict = Depends(verify_jwt)):
+def get_parking_by_private_info(payload: AuthPayload):
     return ParkingController.get_parking_by_private_info(payload)
 
 
@@ -34,7 +36,7 @@ def get_parking_by_private_info(payload: dict = Depends(verify_jwt)):
         Depends(require_roles(["Admin"])),
     ]
 )
-def get_all_plates(payload: dict = Depends(verify_jwt)):
+def get_all_plates(payload: AuthPayload):
     return ParkingController.get_all_plates(payload)
 
 
@@ -57,8 +59,8 @@ def get_all_vehicle_types():
     ]
 )
 def get_all_spots(
-    filters: SpotsFiltersSchema = Depends(),
-    payload: dict = Depends(verify_jwt)
+    filters: Annotated[SpotsFiltersSchema, Query()],
+    payload: AuthPayload
 ):
     return ParkingController.get_all_spots(payload, filters)
 
@@ -70,7 +72,7 @@ def get_all_spots(
         Depends(require_roles(["Admin"])),
     ]
 )
-def get_plate_by_name(plate: str, payload: dict = Depends(verify_jwt)):
+def get_plate_by_name(plate: str, payload: AuthPayload):
     return ParkingController.get_plate_by_name(plate, payload)
 
 
@@ -93,7 +95,7 @@ def get_parking_by_id(parking_id: str):
 )
 async def create_plate(
     plate_data: CreatePlateSchema,
-    payload: dict = Depends(verify_jwt)
+    payload: AuthPayload
 ):
     return await ParkingController.create_plate(plate_data, payload)
 
@@ -107,6 +109,6 @@ async def create_plate(
 )
 def update_parking(
     data: UpdateParkingSchema,
-    payload: dict = Depends(verify_jwt)
+    payload: AuthPayload
 ):
     return ParkingController.update_parking(data, payload)
