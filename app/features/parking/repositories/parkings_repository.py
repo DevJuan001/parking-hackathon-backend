@@ -68,12 +68,8 @@ class ParkingsRepository:
                 time_remaining=time_remaining,
             )
 
-        except Exception as e:
-            logger.error(
-                "Error en find_parking_by_private_info: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en find_parking_by_private_info")
             return "Error al intentar obtener la información del parking", None
 
         finally:
@@ -87,10 +83,8 @@ class ParkingsRepository:
         SELECT
             p.uuid,
             p.name,
-            c.name
+            p.address
         FROM PARKINGS AS p
-        INNER JOIN COUNTRIES AS c
-            ON p.country_id = c.id
         WHERE p.uuid = %s
         """
 
@@ -99,14 +93,17 @@ class ParkingsRepository:
 
             result = cursor.fetchone()
 
+            if not result:
+                return "Parking no encontrado", None
+
             return None, ParkingResponse(
                 uuid=result[0],
                 name=result[1],
-                country=result[2]
+                address=result[2]
             )
 
-        except Exception as e:
-            logger.error("Error en find_parking_by_id: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_parking_by_id")
             return "Error al intentar obtener la información del parking", None
 
         finally:
@@ -157,8 +154,8 @@ class ParkingsRepository:
 
             return None, True, uuid
 
-        except Exception as e:
-            logger.error("Error en create_parking: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en create_parking")
 
             return "Error al intentar crear el parking", False, None
 
@@ -206,8 +203,8 @@ class ParkingsRepository:
 
             return None, True, "Parking actualizado correctamente"
 
-        except Exception as e:
-            logger.error("Error en update_parking: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en update_parking")
             return "Error al intentar actualizar el parking", False, None
 
         finally:
