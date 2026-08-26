@@ -27,7 +27,7 @@ class UsersRepository:
 
     # Obtener todos los usuarios
     @staticmethod
-    def find_all_users(parking_id: str, filters_data: UsersFiltersSchema, connection):
+    def find_all_users(parking_id: str, user_id: int, filters_data: UsersFiltersSchema, connection):
         data = filters_data.model_dump(exclude_none=True)
 
         cursor = connection.cursor()
@@ -51,6 +51,9 @@ class UsersRepository:
 
         filters = ["u.parking_id = %s"]
         values = [parking_id]
+
+        filters.append("u.id NOT LIKE %s")
+        values.append(f"{user_id}%")
 
         if "role_order" in data:
             filters.append("r.id = %s")
@@ -142,7 +145,7 @@ class UsersRepository:
 
     # Obtener estadisticas de usuarios del parking
     @staticmethod
-    def count_user_stats(parking_id: str, connection):
+    def count_user_stats(parking_id: str, user_id: int, connection):
         cursor = connection.cursor()
 
         query = """
@@ -155,11 +158,11 @@ class UsersRepository:
                 ELSE 0 END
             ) AS created_this_week
         FROM USERS AS u
-        WHERE u.parking_id = %s
+        WHERE u.parking_id = %s AND u.id NOT LIKE %s
         """
 
         try:
-            cursor.execute(query, (parking_id,))
+            cursor.execute(query, (parking_id, user_id))
             result = cursor.fetchone()
 
             stats = UserStatsResponse(
