@@ -39,8 +39,8 @@ class PlatesRepository:
             ]
             return None, plates
 
-        except Exception as e:
-            logger.error("Error en find_all_plates: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_all_plates")
             return "Error al intentar obtener las placas", None
 
         finally:
@@ -76,8 +76,8 @@ class PlatesRepository:
             )
             return None, plate
 
-        except Exception as e:
-            logger.error("Error en find_plate_by_id: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_plate_by_id")
             return "Error al intentar obtener la placa", None
 
         finally:
@@ -118,8 +118,8 @@ class PlatesRepository:
 
             return None, plate_response
 
-        except Exception as e:
-            logger.error("Error en get_plate_by_name: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en get_plate_by_name")
             return "Error al intentar buscar la placa", None
 
         finally:
@@ -138,8 +138,8 @@ class PlatesRepository:
             cursor.execute(query, (parking_id, plate_str, vehicle_type_id))
             return None, cursor.lastrowid, "Placa registrada correctamente"
 
-        except Exception as e:
-            logger.error("Error en create_plate: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en create_plate")
             return "Error al intentar registrar la placa", None, None
 
         finally:
@@ -159,8 +159,8 @@ class PlatesRepository:
             cursor.execute(query, (vehicle_type_id, parking_id, plate_id))
             return None, True
 
-        except Exception as e:
-            logger.error("Error en update_plate_vehicle_type: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en update_plate_vehicle_type")
             return "Error al actualizar el tipo de vehículo", False
 
         finally:
