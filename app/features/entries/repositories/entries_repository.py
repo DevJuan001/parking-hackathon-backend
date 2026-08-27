@@ -74,8 +74,8 @@ class EntriesRepository:
             ]
             return None, entries
 
-        except Exception as e:
-            logger.error("Error en find_all_entries: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_all_entries")
             return "Error al intentar obtener los ingresos", None
 
         finally:
@@ -117,8 +117,8 @@ class EntriesRepository:
             )
             return None, entry
 
-        except Exception as e:
-            logger.error("Error en find_entry_by_id: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_entry_by_id")
             return "Error al intentar obtener el ingreso", None
 
         finally:
@@ -162,8 +162,8 @@ class EntriesRepository:
             ]
             return None, entries
 
-        except Exception as e:
-            logger.error("Error en find_recent_entries: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_recent_entries")
             return "Error al intentar obtener los ingresos recientes", None
 
         finally:
@@ -200,8 +200,8 @@ class EntriesRepository:
             )
             return None, stats
 
-        except Exception as e:
-            logger.error("Error en count_entry_stats: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en count_entry_stats")
             return "Error al intentar obtener las estadisticas de ingresos", None
 
         finally:
@@ -244,13 +244,44 @@ class EntriesRepository:
             ]
             return None, entries
 
-        except Exception as e:
-            logger.error(
-                "Error en find_entries_by_plate: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en find_entries_by_plate")
             return "Error al intentar obtener los ingresos de la placa", None
+
+        finally:
+            cursor.close()
+
+    @staticmethod
+    def count_active_entries(parking_id: str, connection):
+        cursor = connection.cursor()
+
+        query = """
+        SELECT COUNT(DISTINCT e.plate_id)
+        FROM ENTRIES AS e
+        WHERE e.parking_id = %s
+          AND (
+              NOT EXISTS (
+                  SELECT 1 FROM EXITS x
+                  WHERE x.parking_id = e.parking_id
+                    AND x.plate_id   = e.plate_id
+              )
+              OR e.created_at > (
+                  SELECT MAX(x.created_at)
+                  FROM EXITS x
+                  WHERE x.parking_id = e.parking_id
+                    AND x.plate_id   = e.plate_id
+              )
+          )
+        """
+
+        try:
+            cursor.execute(query, (parking_id,))
+            row = cursor.fetchone()
+            return None, int(row[0] or 0)
+
+        except Exception:
+            logger.exception("Error en count_active_entries")
+            return "Error al contar los ingresos activos", 0
 
         finally:
             cursor.close()
@@ -280,8 +311,8 @@ class EntriesRepository:
 
             return None, is_active
 
-        except Exception as e:
-            logger.error("Error en has_active_entry: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en has_active_entry")
             return "Error al verificar si la placa tiene un ingreso activo", False
 
         finally:
@@ -327,8 +358,8 @@ class EntriesRepository:
                 created_at=result[5]
             )
 
-        except Exception as e:
-            logger.error("Error en find_latest_entry: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_latest_entry")
             return "Error al buscar el último ingreso", None
 
         finally:
@@ -354,12 +385,8 @@ class EntriesRepository:
 
             return None, result[0]
 
-        except Exception as e:
-            logger.error(
-                "Error en find_latest_entry_spot: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en find_latest_entry_spot")
             return "Error al buscar el ingreso más reciente", None
 
         finally:
@@ -378,8 +405,8 @@ class EntriesRepository:
             cursor.execute(query, (parking_id, plate_id, spot_id))
             return None, True, "Ingreso registrado correctamente"
 
-        except Exception as e:
-            logger.error("Error en create_entry: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en create_entry")
             return "Error al intentar registrar el ingreso", False, None
 
         finally:
