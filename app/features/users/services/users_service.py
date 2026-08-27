@@ -20,12 +20,13 @@ logger = get_logger("users.service")
 
 class UsersService:
     @staticmethod
-    def get_all_users(parking_id: str, filters: UsersFiltersSchema):
+    def get_all_users(parking_id: str, user_id: int, filters: UsersFiltersSchema):
         connection = get_connection()
 
         try:
             error, users = UsersRepository.find_all_users(
                 parking_id,
+                user_id,
                 filters,
                 connection
             )
@@ -46,12 +47,14 @@ class UsersService:
             connection.close()
 
     @staticmethod
-    def get_user_stats(parking_id: str):
+    def get_user_stats(parking_id: str, user_id: int):
         connection = get_connection()
 
         try:
             error, stats = UsersRepository.count_user_stats(
-                parking_id, connection
+                parking_id,
+                user_id,
+                connection
             )
 
             if error:

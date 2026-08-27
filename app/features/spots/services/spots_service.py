@@ -12,7 +12,6 @@ logger = get_logger("spots.service")
 
 
 class SpotsService:
-
     @staticmethod
     def get_all_spots(parking_id: str, filters: SpotsFiltersSchema):
         connection = get_connection()
@@ -30,12 +29,8 @@ class SpotsService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_all_spots: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_all_spots")
             return "Error al intentar obtener las plazas", None
 
         finally:
@@ -58,12 +53,8 @@ class SpotsService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_spot_by_id: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_spot_by_id")
             return "Error al intentar obtener la plaza", None
 
         finally:
@@ -83,11 +74,52 @@ class SpotsService:
 
             return None, spot_id
 
-        except Exception as e:
-            logger.error(
-                "Error en find_spot_id_by_label: %s", e, exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en find_spot_id_by_label")
             return "Error al buscar la plaza por etiqueta", None
+
+        finally:
+            connection.close()
+
+    @staticmethod
+    def get_occupancy_stats(parking_id: str):
+        connection = get_connection()
+
+        try:
+            error, floors = FloorsRepository.find_all_floors(parking_id, connection)
+
+            if error:
+                raise ServiceError(error)
+
+            occupied = 0
+
+            for floor in floors:
+                err, count = SpotsRepository.count_occupied_spots_by_floor(
+                    parking_id, floor.id, connection
+                )
+
+                if err:
+                    raise ServiceError(err)
+
+                occupied += count
+
+            error, total = SpotsRepository.count_total_spots(parking_id, connection)
+
+            if error:
+                raise ServiceError(error)
+
+            return None, {
+                "total": total,
+                "occupied": occupied,
+                "free": total - occupied,
+            }
+
+        except ServiceError as e:
+            return e.message, None
+
+        except Exception:
+            logger.exception("Error en get_occupancy_stats")
+            return "Error al obtener las estadísticas de ocupación", None
 
         finally:
             connection.close()
@@ -115,7 +147,8 @@ class SpotsService:
 
             if error or not existing_type:
                 raise ServiceError(
-                    error or "Tipo de vehículo no encontrado, verifica el id e intentalo nuevamente"
+                    error
+                    or "Tipo de vehículo no encontrado, verifica el id e intentalo nuevamente"
                 )
 
             error, success, _message = SpotsRepository.create_spot(
@@ -133,13 +166,9 @@ class SpotsService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error(
-                "Error en create_spot: %s",
-                e,
-                exc_info=True
-            )
+            logger.exception("Error en create_spot")
             return "Error al intentar registrar la plaza", False, None
 
         finally:
@@ -165,13 +194,9 @@ class SpotsService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error(
-                "Error en update_spot_status: %s",
-                e,
-                exc_info=True
-            )
+            logger.exception("Error en update_spot_status")
             return "Error al actualizar el estado de la plaza", False, None
 
         finally:
@@ -205,15 +230,14 @@ class SpotsService:
 
             # Si llega un vehicle_type_id, validamos que exista
             if spot_data.vehicle_type_id is not None:
-                error, existing_type = (
-                    VehicleTypesRepository.find_vehicle_type_by_id(
-                        spot_data.vehicle_type_id, connection
-                    )
+                error, existing_type = VehicleTypesRepository.find_vehicle_type_by_id(
+                    spot_data.vehicle_type_id, connection
                 )
 
                 if error or not existing_type:
                     raise ServiceError(
-                        error or "Tipo de vehículo no encontrado, verifica el id e intentalo nuevamente"
+                        error
+                        or "Tipo de vehículo no encontrado, verifica el id e intentalo nuevamente"
                     )
 
             error, success, message = SpotsRepository.update_spot(
@@ -234,13 +258,9 @@ class SpotsService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error(
-                "Error en update_spot: %s",
-                e,
-                exc_info=True
-            )
+            logger.exception("Error en update_spot")
             return "Error al actualizar la plaza", False, None
 
         finally:
@@ -280,13 +300,9 @@ class SpotsService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error(
-                "Error en delete_spot: %s",
-                e,
-                exc_info=True
-            )
+            logger.exception("Error en delete_spot")
             return "Error al intentar eliminar la plaza", False, None
 
         finally:

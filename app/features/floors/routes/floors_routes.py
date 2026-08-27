@@ -6,22 +6,18 @@ from app.features.floors.models.floors_schemas import (
     CreateFloorSchema,
     UpdateFloorSchema,
 )
-from app.middlewares.jwt_middleware import verify_jwt
+from app.middlewares.jwt_middleware import AuthPayload
 
-router = APIRouter(
-    prefix="/api/floors",
-    tags=["Floors"]
-)
+router = APIRouter(prefix="/api/floors", tags=["Floors"])
 
 
 @router.get(
     "/",
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
-        Depends(verify_jwt)
-    ]
+    ],
 )
-def get_all_floors(payload: dict = Depends(verify_jwt)):
+def get_all_floors(payload: AuthPayload):
     return FloorsController.get_all_floors(payload)
 
 
@@ -29,13 +25,9 @@ def get_all_floors(payload: dict = Depends(verify_jwt)):
     "/{floor_id}",
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
-        Depends(verify_jwt)
-    ]
+    ],
 )
-def get_floor_by_id(
-    floor_id: int,
-    payload: dict = Depends(verify_jwt)
-):
+def get_floor_by_id(floor_id: int, payload: AuthPayload):
     return FloorsController.get_floor_by_id(floor_id, payload)
 
 
@@ -43,13 +35,9 @@ def get_floor_by_id(
     "/create",
     dependencies=[
         Depends(RateLimiter(times=10, seconds=60)),
-        Depends(verify_jwt)
-    ]
+    ],
 )
-def create_floor(
-    floor_data: CreateFloorSchema,
-    payload: dict = Depends(verify_jwt)
-):
+def create_floor(floor_data: CreateFloorSchema, payload: AuthPayload):
     return FloorsController.create_floor(floor_data, payload)
 
 
@@ -57,14 +45,9 @@ def create_floor(
     "/update/{floor_id}",
     dependencies=[
         Depends(RateLimiter(times=10, seconds=60)),
-        Depends(verify_jwt)
-    ]
+    ],
 )
-def update_floor(
-    floor_id: int,
-    floor_data: UpdateFloorSchema,
-    payload: dict = Depends(verify_jwt)
-):
+def update_floor(floor_id: int, floor_data: UpdateFloorSchema, payload: AuthPayload):
     return FloorsController.update_floor(floor_id, floor_data, payload)
 
 
@@ -72,11 +55,7 @@ def update_floor(
     "/delete/{floor_id}",
     dependencies=[
         Depends(RateLimiter(times=10, seconds=60)),
-        Depends(verify_jwt)
-    ]
+    ],
 )
-def delete_floor(
-    floor_id: int,
-    payload: dict = Depends(verify_jwt)
-):
+def delete_floor(floor_id: int, payload: AuthPayload):
     return FloorsController.delete_floor(floor_id, payload)

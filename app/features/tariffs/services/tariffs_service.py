@@ -30,12 +30,8 @@ class TariffsService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_all_tariffs: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_all_tariffs")
             return "Error al intentar obtener las tarifas", None
 
         finally:
@@ -58,12 +54,8 @@ class TariffsService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_tariff_by_id: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_tariff_by_id")
             return "Error al intentar obtener la tarifa", None
 
         finally:
@@ -88,12 +80,8 @@ class TariffsService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_available_vehicle_types: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_available_vehicle_types")
             return "Error al intentar obtener los tipos de vehículo disponibles", None
 
         finally:
@@ -113,10 +101,8 @@ class TariffsService:
 
             return None, tariff_id
 
-        except Exception as e:
-            logger.error(
-                "Error en find_tariff_id_by_vehicle_type: %s", e, exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en find_tariff_id_by_vehicle_type")
             return "Error al buscar la tarifa por tipo de vehículo", None
 
         finally:
@@ -149,13 +135,9 @@ class TariffsService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error(
-                "Error en create_tariff: %s",
-                e,
-                exc_info=True
-            )
+            logger.exception("Error en create_tariff")
             return "Error al intentar crear la tarifa", False, None
 
         finally:
@@ -192,13 +174,9 @@ class TariffsService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error(
-                "Error en update_tariff: %s",
-                e,
-                exc_info=True
-            )
+            logger.exception("Error en update_tariff")
             return "Error al intentar actualizar la tarifa", False, None
 
         finally:
@@ -250,13 +228,9 @@ class TariffsService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error(
-                "Error en delete_tariff: %s",
-                e,
-                exc_info=True
-            )
+            logger.exception("Error en delete_tariff")
             return "Error al intentar eliminar la tarifa", False, None
 
         finally:

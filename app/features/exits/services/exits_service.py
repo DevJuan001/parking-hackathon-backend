@@ -36,12 +36,8 @@ class ExitsService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_all_exits: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_all_exits")
             return "Error al intentar obtener las salidas", None
 
         finally:
@@ -64,12 +60,8 @@ class ExitsService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_exit_by_id: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_exit_by_id")
             return "Error al intentar obtener la salida", None
 
         finally:
@@ -92,12 +84,8 @@ class ExitsService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_exits_by_plate: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_exits_by_plate")
             return "Error al intentar obtener las salidas de la placa", None
 
         finally:
@@ -169,13 +157,9 @@ class ExitsService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error(
-                "Error en create_exit: %s",
-                e,
-                exc_info=True
-            )
+            logger.exception("Error en create_exit")
             return "Error al intentar registrar la salida", False, None
 
         finally:
@@ -201,14 +185,14 @@ class ExitsService:
                 raise ServiceError(error)
 
             stats = ExitStatsResponse(
-                total_exits=exits["total"],
-                today_exits=exits["today"],
-                this_week_exits=exits["this_week"],
-                this_month_exits=exits["this_month"],
-                total_revenue=revenue["total"],
-                today_revenue=revenue["today"],
-                this_week_revenue=revenue["this_week"],
-                this_month_revenue=revenue["this_month"]
+                total_exits=exits.total,
+                today_exits=exits.today,
+                this_week_exits=exits.this_week,
+                this_month_exits=exits.this_month,
+                total_revenue=revenue.total,
+                today_revenue=revenue.today,
+                this_week_revenue=revenue.this_week,
+                this_month_revenue=revenue.this_month
             )
 
             return None, stats
@@ -216,12 +200,8 @@ class ExitsService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_exit_stats: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_exit_stats")
             return "Error al intentar obtener las estadisticas de salidas", None
 
         finally:

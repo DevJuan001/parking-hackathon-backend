@@ -7,15 +7,12 @@ logger = get_logger("countries.service")
 
 
 class CountriesService:
-
     @staticmethod
     def get_all_countries():
         connection = get_connection()
 
         try:
-            error, countries = CountriesRepository.find_all_countries(
-                connection
-            )
+            error, countries = CountriesRepository.find_all_countries(connection)
 
             if error:
                 raise ServiceError(error)
@@ -25,12 +22,8 @@ class CountriesService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_all_countries: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_all_countries")
             return "Error al intentar obtener los paises", None
 
         finally:

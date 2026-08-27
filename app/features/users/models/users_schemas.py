@@ -49,6 +49,7 @@ class UpdateUserSchema(BaseModel):
     email: EmailStr | None = safe_optional_str(
         max_length=256
     )
+    status: int | None = None
 
 
 class UpdateCurrentUserSchema(BaseModel):

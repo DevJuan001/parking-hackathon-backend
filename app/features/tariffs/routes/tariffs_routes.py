@@ -6,13 +6,10 @@ from app.features.tariffs.models.tariffs_schemas import (
     CreateTariffSchema,
     UpdateTariffSchema,
 )
-from app.middlewares.jwt_middleware import verify_jwt
+from app.middlewares.jwt_middleware import AuthPayload
 from app.middlewares.roles_middleware import require_roles
 
-router = APIRouter(
-    prefix="/api/tariffs",
-    tags=["Tariffs"]
-)
+router = APIRouter(prefix="/api/tariffs", tags=["Tariffs"])
 
 
 @router.get(
@@ -20,9 +17,9 @@ router = APIRouter(
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
         Depends(require_roles(["Admin"])),
-    ]
+    ],
 )
-def get_all_tariffs(payload: dict = Depends(verify_jwt)):
+def get_all_tariffs(payload: AuthPayload):
     return TariffsController.get_all_tariffs(payload)
 
 
@@ -31,9 +28,9 @@ def get_all_tariffs(payload: dict = Depends(verify_jwt)):
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
         Depends(require_roles(["Admin"])),
-    ]
+    ],
 )
-def get_available_vehicle_types(payload: dict = Depends(verify_jwt)):
+def get_available_vehicle_types(payload: AuthPayload):
     return TariffsController.get_available_vehicle_types(payload)
 
 
@@ -42,12 +39,9 @@ def get_available_vehicle_types(payload: dict = Depends(verify_jwt)):
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
         Depends(require_roles(["Admin"])),
-    ]
+    ],
 )
-def get_tariff_by_id(
-    tariff_id: int,
-    payload: dict = Depends(verify_jwt)
-):
+def get_tariff_by_id(tariff_id: int, payload: AuthPayload):
     return TariffsController.get_tariff_by_id(tariff_id, payload)
 
 
@@ -56,12 +50,9 @@ def get_tariff_by_id(
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
         Depends(require_roles(["Admin"])),
-    ]
+    ],
 )
-async def create_tariff(
-    tariff_data: CreateTariffSchema,
-    payload: dict = Depends(verify_jwt)
-):
+async def create_tariff(tariff_data: CreateTariffSchema, payload: AuthPayload):
     return await TariffsController.create_tariff(tariff_data, payload)
 
 
@@ -70,12 +61,10 @@ async def create_tariff(
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
         Depends(require_roles(["Admin"])),
-    ]
+    ],
 )
 def update_tariff(
-    tariff_id: int,
-    tariff_data: UpdateTariffSchema,
-    payload: dict = Depends(verify_jwt)
+    tariff_id: int, tariff_data: UpdateTariffSchema, payload: AuthPayload
 ):
     return TariffsController.update_tariff(tariff_id, tariff_data, payload)
 
@@ -85,10 +74,7 @@ def update_tariff(
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
         Depends(require_roles(["Admin"])),
-    ]
+    ],
 )
-def delete_tariff(
-    tariff_id: int,
-    payload: dict = Depends(verify_jwt)
-):
+def delete_tariff(tariff_id: int, payload: AuthPayload):
     return TariffsController.delete_tariff(tariff_id, payload)

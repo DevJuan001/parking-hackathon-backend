@@ -8,15 +8,12 @@ logger = get_logger("floors.service")
 
 
 class FloorsService:
-
     @staticmethod
     def get_all_floors(parking_id: str):
         connection = get_connection()
 
         try:
-            error, floors = FloorsRepository.find_all_floors(
-                parking_id, connection
-            )
+            error, floors = FloorsRepository.find_all_floors(parking_id, connection)
 
             if error:
                 raise ServiceError(error)
@@ -26,12 +23,8 @@ class FloorsService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_all_floors: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_all_floors")
             return "Error al intentar obtener los pisos", None
 
         finally:
@@ -54,12 +47,8 @@ class FloorsService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_floor_by_id: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_floor_by_id")
             return "Error al intentar obtener el piso", None
 
         finally:
@@ -79,10 +68,8 @@ class FloorsService:
 
             return None, floor_id
 
-        except Exception as e:
-            logger.error(
-                "Error en find_floor_id_by_name: %s", e, exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en find_floor_id_by_name")
             return "Error al buscar el piso por nombre", None
 
         finally:
@@ -110,13 +97,9 @@ class FloorsService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error(
-                "Error en create_floor: %s",
-                e,
-                exc_info=True
-            )
+            logger.exception("Error en create_floor")
             return "Error al intentar registrar el piso", False, None
 
         finally:
@@ -153,13 +136,9 @@ class FloorsService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error(
-                "Error en update_floor: %s",
-                e,
-                exc_info=True
-            )
+            logger.exception("Error en update_floor")
             return "Error al intentar actualizar el piso", False, None
 
         finally:
@@ -221,13 +200,9 @@ class FloorsService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error(
-                "Error en delete_floor: %s",
-                e,
-                exc_info=True
-            )
+            logger.exception("Error en delete_floor")
             return "Error al intentar eliminar el piso", False, None
 
         finally:
@@ -236,13 +211,13 @@ class FloorsService:
 
 def _format_floor_name(name: str) -> str:
     cleaned = name.strip()
-    
+
     if not cleaned:
         raise ServiceError(
             "El nombre del piso no puede estar vacio, ingresa un valor e intentalo nuevamente"
         )
-    
+
     if "piso" in cleaned.lower():
         return cleaned
-    
+
     return f"Piso {cleaned}"

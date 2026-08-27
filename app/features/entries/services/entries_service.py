@@ -32,12 +32,8 @@ class EntriesService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_all_entries: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_all_entries")
             return "Error al intentar obtener los ingresos", None
 
         finally:
@@ -60,12 +56,8 @@ class EntriesService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_entry_by_id: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_entry_by_id")
             return "Error al intentar obtener el ingreso", None
 
         finally:
@@ -88,12 +80,8 @@ class EntriesService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_recent_entries: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_recent_entries")
             return "Error al intentar obtener los ingresos recientes", None
 
         finally:
@@ -116,12 +104,8 @@ class EntriesService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_entry_stats: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_entry_stats")
             return "Error al intentar obtener las estadisticas de ingresos", None
 
         finally:
@@ -144,12 +128,8 @@ class EntriesService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_entries_by_plate: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_entries_by_plate")
             return "Error al intentar obtener los ingresos de la placa", None
 
         finally:
@@ -188,7 +168,7 @@ class EntriesService:
             plate = plate_list[0] if plate_list else None
 
             if not plate:
-                error, new_plate_id, message = PlatesRepository.create_plate(
+                error, new_plate_id, _message = PlatesRepository.create_plate(
                     parking_id=parking_id,
                     plate_str=plate_text,
                     vehicle_type_id=vehicle_type_id,
@@ -222,7 +202,7 @@ class EntriesService:
             if error or not spot_id:
                 raise ServiceError(error or "No hay plazas disponibles")
 
-            error, success, message = EntriesRepository.create_entry(
+            error, success, _message = EntriesRepository.create_entry(
                 parking_id=parking_id,
                 plate_id=plate_id,
                 spot_id=spot_id,
@@ -247,13 +227,9 @@ class EntriesService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error(
-                "Error en create_entry: %s",
-                e,
-                exc_info=True
-            )
+            logger.exception("Error en create_entry")
             return "Error al intentar registrar el ingreso", False, None
 
         finally:

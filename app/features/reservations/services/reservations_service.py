@@ -1,4 +1,4 @@
-from datetime import date, datetime, time
+from datetime import UTC, datetime, time
 
 from pydantic import EmailStr
 
@@ -43,12 +43,8 @@ class ReservationsService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_all_reservations: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_all_reservations")
             return "Error al intentar obtener las reservas", None
 
         finally:
@@ -73,8 +69,8 @@ class ReservationsService:
             start_datetime = datetime.combine(start_date, start_time)
 
             if end_date is not None:
-                effective_end_time = end_time if end_time is not None else time(
-                    23, 59, 59
+                effective_end_time = (
+                    end_time if end_time is not None else time(23, 59, 59)
                 )
                 end_datetime = datetime.combine(end_date, effective_end_time)
             else:
@@ -86,7 +82,7 @@ class ReservationsService:
                     "La fecha de fin debe ser igual o posterior a la fecha de inicio"
                 )
 
-            today = date.today()
+            today = datetime.now(UTC)
 
             if start_date < today:
                 raise ServiceError(
@@ -95,16 +91,18 @@ class ReservationsService:
 
             uuid = generate_uuid()
 
-            error, success, message, reservation_id = ReservationsRepository.create_reservation(
-                parking_id=parking_id,
-                uuid=uuid,
-                name=name,
-                email=email,
-                plate=plate,
-                level=level,
-                start_datetime=start_datetime,
-                end_datetime=end_datetime,
-                connection=connection,
+            error, success, message, reservation_id = (
+                ReservationsRepository.create_reservation(
+                    parking_id=parking_id,
+                    uuid=uuid,
+                    name=name,
+                    email=email,
+                    plate=plate,
+                    level=level,
+                    start_datetime=start_datetime,
+                    end_datetime=end_datetime,
+                    connection=connection,
+                )
             )
 
             if error or not success:
@@ -165,20 +163,18 @@ class ReservationsService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error(
-                "Error en create_reservation: %s",
-                e,
-                exc_info=True
-            )
+            logger.exception("Error en create_reservation")
             return "Error al intentar crear la reserva", False, None
 
         finally:
             connection.close()
 
     @staticmethod
-    def update_reservation(reservation_id: int, reservation_data: UpdateReservationSchema, parking_id: str):
+    def update_reservation(
+        reservation_id: int, reservation_data: UpdateReservationSchema, parking_id: str
+    ):
         connection = get_connection()
 
         try:
@@ -189,16 +185,19 @@ class ReservationsService:
             if error or not existing_reservation:
                 raise ServiceError(error or "Reserva no encontrada")
 
-            today = date.today()
+            today = datetime.now(UTC)
             start_date = datetime.combine(
                 reservation_data.start_date or existing_reservation.start_date,
-                reservation_data.start_time or existing_reservation.start_time
+                reservation_data.start_time or existing_reservation.start_time,
             )
 
-            if reservation_data.end_date is not None or existing_reservation.end_date is not None:
+            if (
+                reservation_data.end_date is not None
+                or existing_reservation.end_date is not None
+            ):
                 end_date = datetime.combine(
                     reservation_data.end_date or existing_reservation.end_date,
-                    reservation_data.end_time or existing_reservation.end_time
+                    reservation_data.end_time or existing_reservation.end_time,
                 )
             else:
                 end_date = None
@@ -216,13 +215,11 @@ class ReservationsService:
             )
 
             if error or not success:
-                raise ServiceError(
-                    error or "Error al intentar actualizar la reserva"
-                )
+                raise ServiceError(error or "Error al intentar actualizar la reserva")
 
             connection.commit()
 
-            if (reservation_data.status == 1):
+            if reservation_data.status == 1:
                 send_reservation_cancelled_email.delay(
                     user_email=existing_reservation.email,
                     user_name=existing_reservation.name,
@@ -231,8 +228,12 @@ class ReservationsService:
                     template_name="reservation_cancelled_by_admin.html",
                     start_date=existing_reservation.start_date,
                     start_time=existing_reservation.start_time,
-                    end_date=existing_reservation.end_date if existing_reservation.end_date else None,
-                    end_time=existing_reservation.end_time if existing_reservation.end_time else None,
+                    end_date=existing_reservation.end_date
+                    if existing_reservation.end_date
+                    else None,
+                    end_time=existing_reservation.end_time
+                    if existing_reservation.end_time
+                    else None,
                 )
 
             return None, True, "Reserva actualizada correctamente"
@@ -241,13 +242,9 @@ class ReservationsService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error(
-                "Error en update_reservation_status: %s",
-                e,
-                exc_info=True
-            )
+            logger.exception("Error en update_reservation_status")
             return "Error al intentar actualizar el estado de la reserva", False, None
 
         finally:
@@ -275,13 +272,11 @@ class ReservationsService:
             )
 
             if error or not success:
-                raise ServiceError(
-                    error or "Error al intentar eliminar la reserva"
-                )
+                raise ServiceError(error or "Error al intentar eliminar la reserva")
 
             connection.commit()
 
-            if (existing.status not in (1, 4)):
+            if existing.status not in (1, 4):
                 send_reservation_cancelled_email.delay(
                     user_email=existing.email,
                     user_name=existing.name,
@@ -300,13 +295,9 @@ class ReservationsService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error(
-                "Error en delete_reservation: %s",
-                e,
-                exc_info=True
-            )
+            logger.exception("Error en delete_reservation")
             return "Error al intentar eliminar la reserva", False, None
 
         finally:

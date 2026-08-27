@@ -7,7 +7,6 @@ logger = get_logger("tariffs.repository")
 
 
 class TariffsRepository:
-
     @staticmethod
     def find_all_tariffs(parking_id: str, connection):
         cursor = connection.cursor()
@@ -34,14 +33,14 @@ class TariffsRepository:
                     vehicle_type=item[1],
                     value=item[2],
                     created_at=date_formatter(item[3]),
-                    updated_at=date_formatter(item[4])
+                    updated_at=date_formatter(item[4]),
                 )
                 for item in results
             ]
             return None, tariffs
 
-        except Exception as e:
-            logger.error("Error en find_all_tariffs: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_all_tariffs")
             return "Error al intentar obtener las tarifas", None
 
         finally:
@@ -74,12 +73,12 @@ class TariffsRepository:
                 vehicle_type=result[1],
                 value=result[2],
                 created_at=date_formatter(result[3]),
-                updated_at=date_formatter(result[4])
+                updated_at=date_formatter(result[4]),
             )
             return None, tariff
 
-        except Exception as e:
-            logger.error("Error en find_tariff_by_id: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_tariff_by_id")
             return "Error al intentar obtener la tarifa", None
 
         finally:
@@ -106,29 +105,30 @@ class TariffsRepository:
             result = cursor.fetchone()
 
             if not result:
-                return "Lo sentimos, no hay una tarifa registrada para ese tipo de vehículo", None
+                return (
+                    "Lo sentimos, no hay una tarifa registrada para ese tipo de vehículo",
+                    None,
+                )
 
             return None, TariffResponse(
                 id=result[0],
                 vehicle_type=result[1],
                 value=result[2],
                 created_at=date_formatter(result[3]),
-                updated_at=date_formatter(result[4])
+                updated_at=date_formatter(result[4]),
             )
 
-        except Exception as e:
-            logger.error(
-                "Error en find_rate_by_vehicle_type: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en find_rate_by_vehicle_type")
             return "Error al buscar la tarifa", None
 
         finally:
             cursor.close()
 
     @staticmethod
-    def find_tariff_id_by_vehicle_type(parking_id: str, vehicle_type_id: int, connection):
+    def find_tariff_id_by_vehicle_type(
+        parking_id: str, vehicle_type_id: int, connection
+    ):
         cursor = connection.cursor()
 
         query = """
@@ -147,10 +147,8 @@ class TariffsRepository:
 
             return None, result[0]
 
-        except Exception as e:
-            logger.error(
-                "Error en find_tariff_id_by_vehicle_type: %s", e, exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en find_tariff_id_by_vehicle_type")
             return "Error al buscar la tarifa por tipo de vehículo", None
 
         finally:
@@ -177,17 +175,12 @@ class TariffsRepository:
             results = cursor.fetchall()
 
             vehicle_types = [
-                VehicleTypeResponse(id=item[0], name=item[1])
-                for item in results
+                VehicleTypeResponse(id=item[0], name=item[1]) for item in results
             ]
             return None, vehicle_types
 
-        except Exception as e:
-            logger.error(
-                "Error en find_vehicle_types_without_tariff: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en find_vehicle_types_without_tariff")
             return "Error al obtener los tipos de vehículo sin tarifa", None
 
         finally:
@@ -203,15 +196,11 @@ class TariffsRepository:
         """
 
         try:
-            cursor.execute(query, (
-                parking_id,
-                vehicle_type_id,
-                value
-            ))
+            cursor.execute(query, (parking_id, vehicle_type_id, value))
             return None, True, "Tarifa creada correctamente"
 
-        except Exception as e:
-            logger.error("Error en create_tariff: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en create_tariff")
             return "Error al intentar crear la tarifa", False, None
 
         finally:
@@ -235,8 +224,8 @@ class TariffsRepository:
 
             return None, True, "Tarifa actualizada correctamente"
 
-        except Exception as e:
-            logger.error("Error en update_tariff: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en update_tariff")
             return "Error al intentar actualizar la tarifa", False, None
 
         finally:
@@ -283,10 +272,8 @@ class TariffsRepository:
             count = int(result[0]) if result and result[0] is not None else 0
             return None, count
 
-        except Exception as e:
-            logger.error(
-                "Error en count_active_vehicles_by_type: %s", e, exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en count_active_vehicles_by_type")
             return "Error al verificar vehiculos activos para esta tarifa", 0
 
         finally:
@@ -309,8 +296,8 @@ class TariffsRepository:
 
             return None, True, "Tarifa eliminada correctamente"
 
-        except Exception as e:
-            logger.error("Error en delete_tariff: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en delete_tariff")
             return "Error al intentar eliminar la tarifa", False, None
 
         finally:

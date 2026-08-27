@@ -30,3 +30,10 @@ class CalculatePaymentResponse(BaseModel):
 class PaymentsGrowthResponse(BaseModel):
     date: date | str
     value: float
+
+
+class CountPaymentsStatsResponse(BaseModel):
+    total: float
+    today: float
+    this_week: float
+    this_month: float

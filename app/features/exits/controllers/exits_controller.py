@@ -6,14 +6,15 @@ from app.features.exits.models.exits_schemas import (
     StatsExitsFiltersSchema,
 )
 from app.features.exits.services.exits_service import ExitsService
+from app.middlewares.jwt_middleware import AuthPayload
 
 
 class ExitsController:
 
     @staticmethod
-    def get_all_exits(filters: ExitsFiltersSchema, payload: dict):
+    def get_all_exits(filters: ExitsFiltersSchema, payload: AuthPayload):
         error, exits = ExitsService.get_all_exits(
-            str(payload["parking_id"]),
+            payload.parking_id,
             filters
         )
 
@@ -25,9 +26,9 @@ class ExitsController:
         }
 
     @staticmethod
-    def get_exit_by_id(exit_id: int, payload: dict):
+    def get_exit_by_id(exit_id: int, payload: AuthPayload):
         error, exit_record = ExitsService.get_exit_by_id(
-            str(payload["parking_id"]),
+            payload.parking_id,
             exit_id
         )
 
@@ -39,9 +40,9 @@ class ExitsController:
         }
 
     @staticmethod
-    def get_exits_by_plate(plate_id: int, payload: dict):
+    def get_exits_by_plate(plate_id: int, payload: AuthPayload):
         error, exits = ExitsService.get_exits_by_plate(
-            str(payload["parking_id"]),
+            payload.parking_id,
             plate_id
         )
 
@@ -53,9 +54,9 @@ class ExitsController:
         }
 
     @staticmethod
-    async def create_exit(exit_data: CreateExitSchema, payload: dict):
+    async def create_exit(exit_data: CreateExitSchema, payload: AuthPayload):
         error, success, message = await ExitsService.create_exit(
-            str(payload["parking_id"]),
+            payload.parking_id,
             exit_data
         )
 
@@ -68,10 +69,10 @@ class ExitsController:
         }
 
     @staticmethod
-    def get_exit_stats(filters: StatsExitsFiltersSchema, payload: dict):
+    def get_exit_stats(filters: StatsExitsFiltersSchema, payload: AuthPayload):
         error, stats = ExitsService.get_exit_stats(
             filters,
-            str(payload["parking_id"])
+            payload.parking_id
         )
 
         if error:

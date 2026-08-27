@@ -37,12 +37,8 @@ class ParkingService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_parking_by_private_info: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_parking_by_private_info")
             return "Error al intentar crear el parking", None
 
         finally:
@@ -67,12 +63,8 @@ class ParkingService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_parking_by_id: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_parking_by_id")
             return "Error al intentar crear el parking", None
 
         finally:
@@ -95,12 +87,8 @@ class ParkingService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_all_plates: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_all_plates")
             return "Error al intentar obtener las placas", None
 
         finally:
@@ -123,12 +111,8 @@ class ParkingService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_all_vehicle_types: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_all_vehicle_types")
             return "Error al intentar obtener los tipos de vehículo", None
 
         finally:
@@ -151,12 +135,8 @@ class ParkingService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_all_spots: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_all_spots")
             return "Error al intentar obtener los espacios", None
 
         finally:
@@ -179,12 +159,8 @@ class ParkingService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_plate_by_name: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_plate_by_name")
             return "Error al intentar buscar la placa", None
 
         finally:
@@ -242,13 +218,9 @@ class ParkingService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error(
-                "Error en create_plate: %s",
-                e,
-                exc_info=True
-            )
+            logger.exception("Error en create_plate")
             return "Error al intentar registrar la placa", False, None
 
         finally:
@@ -276,13 +248,9 @@ class ParkingService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error(
-                "Error en update_parking: %s",
-                e,
-                exc_info=True,
-            )
+            logger.exception("Error en update_parking")
             return "Error al intentar actualizar el parking", False, None
 
         finally:

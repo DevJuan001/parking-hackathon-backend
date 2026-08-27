@@ -17,6 +17,7 @@ class UsersController:
     def get_all_users(filters: UsersFiltersSchema, payload: AuthPayload):
         error, users = UsersService.get_all_users(
             payload.parking_id,
+            payload.user_id,
             filters
         )
 
@@ -30,7 +31,8 @@ class UsersController:
     @staticmethod
     def get_user_stats(payload: AuthPayload):
         error, stats = UsersService.get_user_stats(
-            payload.parking_id
+            payload.parking_id,
+            payload.user_id,
         )
 
         if error:

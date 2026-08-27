@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Query
 from fastapi_limiter.depends import RateLimiter
 
 from app.features.payments.controllers.payments_controller import PaymentsController
@@ -7,13 +9,10 @@ from app.features.payments.models.payments_schemas import (
     CreatePaymentSchema,
     PaymentsFiltersSchema,
 )
-from app.middlewares.jwt_middleware import verify_jwt
+from app.middlewares.jwt_middleware import AuthPayload
 from app.middlewares.roles_middleware import require_roles
 
-router = APIRouter(
-    prefix="/api/payments",
-    tags=["Payments"]
-)
+router = APIRouter(prefix="/api/payments", tags=["Payments"])
 
 
 @router.get(
@@ -21,11 +20,10 @@ router = APIRouter(
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
         Depends(require_roles(["Admin"])),
-    ]
+    ],
 )
 def get_all_payments(
-    filters: PaymentsFiltersSchema = Depends(),
-    payload: dict = Depends(verify_jwt)
+    filters: Annotated[PaymentsFiltersSchema, Query()], payload: AuthPayload
 ):
     return PaymentsController.get_all_payments(filters, payload)
 
@@ -35,11 +33,10 @@ def get_all_payments(
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
         Depends(require_roles(["Maquina"])),
-    ]
+    ],
 )
 def calculate_payment(
-    params: CalculatePaymentSchema = Depends(),
-    payload: dict = Depends(verify_jwt)
+    params: Annotated[CalculatePaymentSchema, Query()], payload: AuthPayload
 ):
     return PaymentsController.calculate_payment(params, payload)
 
@@ -49,10 +46,10 @@ def calculate_payment(
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
         Depends(require_roles(["Admin", "Maquina"])),
-    ]
+    ],
 )
-def get_all_payment_methods(payload: dict = Depends(verify_jwt)):
-    return PaymentsController.get_all_payment_methods(payload)
+def get_all_payment_methods():
+    return PaymentsController.get_all_payment_methods()
 
 
 @router.get(
@@ -60,12 +57,9 @@ def get_all_payment_methods(payload: dict = Depends(verify_jwt)):
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
         Depends(require_roles(["Admin"])),
-    ]
+    ],
 )
-def get_payments_growth(
-    period: str = "30d",
-    payload: dict = Depends(verify_jwt)
-):
+def get_payments_growth(period: str, payload: AuthPayload):
     return PaymentsController.get_payments_growth(period, payload)
 
 
@@ -74,12 +68,9 @@ def get_payments_growth(
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
         Depends(require_roles(["Admin"])),
-    ]
+    ],
 )
-def get_payments_by_plate(
-    plate_id: int,
-    payload: dict = Depends(verify_jwt)
-):
+def get_payments_by_plate(plate_id: int, payload: AuthPayload):
     return PaymentsController.get_payments_by_plate(plate_id, payload)
 
 
@@ -88,12 +79,9 @@ def get_payments_by_plate(
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
         Depends(require_roles(["Admin"])),
-    ]
+    ],
 )
-def get_payment_by_id(
-    payment_id: int,
-    payload: dict = Depends(verify_jwt)
-):
+def get_payment_by_id(payment_id: int, payload: AuthPayload):
     return PaymentsController.get_payment_by_id(payment_id, payload)
 
 
@@ -102,10 +90,7 @@ def get_payment_by_id(
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
         Depends(require_roles(["Maquina"])),
-    ]
+    ],
 )
-async def create_payment(
-    payment_data: CreatePaymentSchema,
-    payload: dict = Depends(verify_jwt)
-):
+async def create_payment(payment_data: CreatePaymentSchema, payload: AuthPayload):
     return await PaymentsController.create_payment(payment_data, payload)
