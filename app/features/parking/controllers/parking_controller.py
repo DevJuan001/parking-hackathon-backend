@@ -6,13 +6,14 @@ from app.features.parking.models.parking_schemas import (
 )
 from app.features.parking.services.parking_service import ParkingService
 from app.features.spots.models.spots_schemas import SpotsFiltersSchema
+from app.middlewares.jwt_middleware import AuthPayload
 
 
 class ParkingController:
     @staticmethod
-    def get_parking_by_private_info(payload):
+    def get_parking_by_private_info(payload: AuthPayload):
         error, parking = ParkingService.get_parking_by_private_info(
-            str(payload["parking_id"])
+            payload.parking_id
         )
 
         if error:
@@ -36,9 +37,9 @@ class ParkingController:
         }
 
     @staticmethod
-    def get_all_plates(payload: dict):
+    def get_all_plates(payload: AuthPayload):
         error, plates = ParkingService.get_all_plates(
-            str(payload["parking_id"])
+            payload.parking_id
         )
 
         if error:
@@ -60,9 +61,10 @@ class ParkingController:
         }
 
     @staticmethod
-    def get_all_spots(payload: dict, filters: SpotsFiltersSchema):
+    def get_all_spots(payload: AuthPayload, filters: SpotsFiltersSchema):
         error, spots = ParkingService.get_all_spots(
-            str(payload["parking_id"]), filters
+            payload.parking_id,
+            filters
         )
 
         if error:
@@ -73,9 +75,9 @@ class ParkingController:
         }
 
     @staticmethod
-    def get_plate_by_name(plate: str, payload: dict):
+    def get_plate_by_name(plate: str, payload: AuthPayload):
         error, plate_response = ParkingService.get_plate_by_name(
-            str(payload["parking_id"]),
+            payload.parking_id,
             plate
         )
 
@@ -87,9 +89,9 @@ class ParkingController:
         }
 
     @staticmethod
-    async def create_plate(plate_data: CreatePlateSchema, payload: dict):
+    async def create_plate(plate_data: CreatePlateSchema, payload: AuthPayload):
         error, success, message = await ParkingService.create_plate(
-            str(payload["parking_id"]),
+            payload.parking_id,
             plate_data
         )
 
@@ -102,9 +104,9 @@ class ParkingController:
         }
 
     @staticmethod
-    def update_parking(parking_data: UpdateParkingSchema, payload: dict):
+    def update_parking(parking_data: UpdateParkingSchema, payload: AuthPayload):
         error, success, message = ParkingService.update_parking(
-            str(payload["parking_id"]),
+            payload.parking_id,
             parking_data,
         )
 

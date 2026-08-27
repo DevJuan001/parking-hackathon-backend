@@ -21,10 +21,8 @@ class VehicleTypesRepository:
 
             return None, result[0]
 
-        except Exception as e:
-            logger.error(
-                "Error en find_vehicle_type_id_by_name: %s", e, exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en find_vehicle_type_id_by_name")
             return "Error al buscar el tipo de vehículo", None
 
         finally:
@@ -45,10 +43,8 @@ class VehicleTypesRepository:
 
             return None, result[0]
 
-        except Exception as e:
-            logger.error(
-                "Error en find_vehicle_type_by_id: %s", e, exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en find_vehicle_type_by_id")
             return "Error al buscar el tipo de vehículo", None
 
         finally:
@@ -70,10 +66,8 @@ class VehicleTypesRepository:
             ]
             return None, vehicle_types
 
-        except Exception as e:
-            logger.error(
-                "Error en find_all_vehicle_types: %s", e, exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en find_all_vehicle_types")
             return "Error al intentar obtener los tipos de vehículo", None
 
         finally:

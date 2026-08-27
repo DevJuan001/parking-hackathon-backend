@@ -207,8 +207,8 @@ INSERT INTO COUNTRIES (name, iso_code) VALUES
 INSERT INTO PLANS (name, value, status) VALUES
  ('Gratuito', 0.0, 2),
  ('Básico', 17900.0, 2),
- ('Empresarial', 149900.0, 2),
- ('Profesional', 49900.0, 2);
+ ('Profesional', 49900.0, 2),
+ ('Empresarial', 149900.0, 2);
 
 -- PARKINGS
 INSERT INTO PARKINGS (uuid, plan_id, name, address, start_day, start_time, end_day, end_time) VALUES
