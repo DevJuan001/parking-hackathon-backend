@@ -6,14 +6,15 @@ from app.features.payments.models.payments_schemas import (
     PaymentsFiltersSchema,
 )
 from app.features.payments.services.payments_service import PaymentsService
+from app.middlewares.jwt_middleware import AuthPayload
 
 
 class PaymentsController:
 
     @staticmethod
-    def get_all_payments(filters: PaymentsFiltersSchema, payload: dict):
+    def get_all_payments(filters: PaymentsFiltersSchema, payload: AuthPayload):
         error, payments = PaymentsService.get_all_payments(
-            str(payload["parking_id"]),
+            payload.parking_id,
             filters
         )
 
@@ -25,9 +26,9 @@ class PaymentsController:
         }
 
     @staticmethod
-    def get_payment_by_id(payment_id: str, payload: dict):
+    def get_payment_by_id(payment_id: str, payload: AuthPayload):
         error, payment = PaymentsService.get_payment_by_id(
-            str(payload["parking_id"]),
+            payload.parking_id,
             payment_id
         )
 
@@ -39,9 +40,9 @@ class PaymentsController:
         }
 
     @staticmethod
-    def get_payments_growth(period: str, payload: dict):
+    def get_payments_growth(period: str, payload: AuthPayload):
         error, payments = PaymentsService.get_payments_growth(
-            str(payload["parking_id"]),
+            payload.parking_id,
             period,
         )
 
@@ -53,9 +54,9 @@ class PaymentsController:
         }
 
     @staticmethod
-    def get_payments_by_plate(plate_id: int, payload: dict):
+    def get_payments_by_plate(plate_id: int, payload: AuthPayload):
         error, payments = PaymentsService.get_payments_by_plate(
-            str(payload["parking_id"]),
+            payload.parking_id,
             plate_id
         )
 
@@ -67,7 +68,7 @@ class PaymentsController:
         }
 
     @staticmethod
-    def get_all_payment_methods(payload: dict):
+    def get_all_payment_methods():
         error, methods = PaymentsService.get_all_payment_methods()
 
         if error:
@@ -78,9 +79,9 @@ class PaymentsController:
         }
 
     @staticmethod
-    def calculate_payment(params: CalculatePaymentSchema, payload: dict):
+    def calculate_payment(params: CalculatePaymentSchema, payload: AuthPayload):
         error, result = PaymentsService.calculate_payment(
-            str(payload["parking_id"]),
+            payload.parking_id,
             params.plate
         )
 
@@ -92,9 +93,9 @@ class PaymentsController:
         }
 
     @staticmethod
-    async def create_payment(payment_data: CreatePaymentSchema, payload: dict):
+    async def create_payment(payment_data: CreatePaymentSchema, payload: AuthPayload):
         error, success, message = await PaymentsService.create_payment(
-            str(payload["parking_id"]),
+            payload.parking_id,
             payment_data
         )
 
