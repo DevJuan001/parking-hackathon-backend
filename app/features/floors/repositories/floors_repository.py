@@ -1,3 +1,5 @@
+import json
+
 from app.features.floors.models.floors_responses import FloorResponse
 from app.utils.date_formatter import date_formatter
 from app.utils.logger import get_logger
@@ -6,7 +8,6 @@ logger = get_logger("floors.repository")
 
 
 class FloorsRepository:
-
     @staticmethod
     def find_all_floors(parking_id: int, connection):
         cursor = connection.cursor()
@@ -27,16 +28,14 @@ class FloorsRepository:
 
             floors = [
                 FloorResponse(
-                    id=item[0],
-                    name=item[1],
-                    created_at=date_formatter(item[2])
+                    id=item[0], name=item[1], created_at=date_formatter(item[2])
                 )
                 for item in results
             ]
             return None, floors
 
-        except Exception as e:
-            logger.error("Error en find_all_floors: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_all_floors")
             return "Error al intentar obtener los pisos", None
 
         finally:
@@ -63,14 +62,12 @@ class FloorsRepository:
                 return "Piso no encontrado", None
 
             floor = FloorResponse(
-                id=result[0],
-                name=result[1],
-                created_at=date_formatter(result[2])
+                id=result[0], name=result[1], created_at=date_formatter(result[2])
             )
             return None, floor
 
-        except Exception as e:
-            logger.error("Error en find_floor_by_id: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_floor_by_id")
             return "Error al intentar obtener el piso", None
 
         finally:
@@ -96,8 +93,8 @@ class FloorsRepository:
 
             return None, result[0]
 
-        except Exception as e:
-            logger.error("Error en find_floor_id_by_name: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_floor_id_by_name")
             return "Error al buscar el piso por nombre", None
 
         finally:
@@ -116,8 +113,8 @@ class FloorsRepository:
             cursor.execute(query, (parking_id, name))
             return None, cursor.lastrowid, "Piso registrado correctamente"
 
-        except Exception as e:
-            logger.error("Error en create_floor: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en create_floor")
             return "Error al intentar registrar el piso", None, None
 
         finally:
@@ -137,8 +134,8 @@ class FloorsRepository:
             cursor.execute(query, (name, parking_id, floor_id))
             return None, True, "Piso actualizado correctamente"
 
-        except Exception as e:
-            logger.error("Error en update_floor: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en update_floor")
             return "Error al intentar actualizar el piso", False, None
 
         finally:
@@ -161,9 +158,40 @@ class FloorsRepository:
 
             return None, True, "Piso eliminado correctamente"
 
-        except Exception as e:
-            logger.error("Error en delete_floor: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en delete_floor")
             return "Error al intentar eliminar el piso", False, None
+
+        finally:
+            cursor.close()
+
+    @staticmethod
+    def find_all_floors_with_spots(parking_id: int, connection):
+        cursor = connection.cursor()
+
+        query = """
+        SELECT f.id, f.name, JSON_ARRAYAGG(s.spot)
+        FROM FLOORS AS f
+        LEFT JOIN SPOTS AS s ON s.floor_id = f.id
+        WHERE f.parking_id = %s
+        GROUP BY f.id, f.name
+        ORDER BY f.name ASC
+        """
+
+        try:
+            cursor.execute(query, (parking_id,))
+            rows = cursor.fetchall()
+
+            result = []
+            for floor_id, name, spots_json in rows:
+                spots = json.loads(spots_json) if spots_json else []
+                result.append((floor_id, name, spots))
+
+            return None, result
+
+        except Exception:
+            logger.exception("Error en find_all_floors_with_spots")
+            return "Error al obtener los pisos con sus plazas", []
 
         finally:
             cursor.close()
