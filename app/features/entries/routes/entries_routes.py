@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Query
 from fastapi_limiter.depends import RateLimiter
 
 from app.features.entries.controllers.entries_controller import EntriesController
@@ -6,7 +8,7 @@ from app.features.entries.models.entries_schemas import (
     CreateEntrySchema,
     EntriesFiltersSchema,
 )
-from app.middlewares.jwt_middleware import verify_jwt
+from app.middlewares.jwt_middleware import AuthPayload
 from app.middlewares.onboarding_middleware import require_onboarded
 from app.middlewares.roles_middleware import require_roles
 
@@ -25,8 +27,8 @@ router = APIRouter(
     ]
 )
 def get_all_entries(
-    filters: EntriesFiltersSchema = Depends(),
-    payload: dict = Depends(verify_jwt)
+    filters: Annotated[EntriesFiltersSchema, Query()],
+    payload: AuthPayload
 ):
     return EntriesController.get_all_entries(filters, payload)
 
@@ -39,7 +41,7 @@ def get_all_entries(
         Depends(require_onboarded)
     ]
 )
-def get_recent_entries(payload: dict = Depends(verify_jwt)):
+def get_recent_entries(payload: AuthPayload):
     return EntriesController.get_recent_entries(payload)
 
 
@@ -51,7 +53,7 @@ def get_recent_entries(payload: dict = Depends(verify_jwt)):
         Depends(require_onboarded)
     ]
 )
-def get_entry_stats(payload: dict = Depends(verify_jwt)):
+def get_entry_stats(payload: AuthPayload):
     return EntriesController.get_entry_stats(payload)
 
 
@@ -65,7 +67,7 @@ def get_entry_stats(payload: dict = Depends(verify_jwt)):
 )
 def get_entries_by_plate(
     plate_id: int,
-    payload: dict = Depends(verify_jwt)
+    payload: AuthPayload
 ):
     return EntriesController.get_entries_by_plate(plate_id, payload)
 
@@ -80,7 +82,7 @@ def get_entries_by_plate(
 )
 def get_entry_by_id(
     entry_id: int,
-    payload: dict = Depends(verify_jwt)
+    payload: AuthPayload
 ):
     return EntriesController.get_entry_by_id(entry_id, payload)
 
@@ -95,6 +97,6 @@ def get_entry_by_id(
 )
 async def create_entry(
     entry_data: CreateEntrySchema,
-    payload: dict = Depends(verify_jwt)
+    payload: AuthPayload
 ):
     return await EntriesController.create_entry(entry_data, payload)
