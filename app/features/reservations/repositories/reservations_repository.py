@@ -12,7 +12,9 @@ logger = get_logger("reservations.repository")
 
 class ReservationsRepository:
     @staticmethod
-    def find_all_reservations(filters_data: FilterReservationsSchema, parking_id: str, connection):
+    def find_all_reservations(
+        filters_data: FilterReservationsSchema, parking_id: str, connection
+    ):
         cursor = connection.cursor()
 
         data = filters_data.model_dump(exclude_none=True)
@@ -68,18 +70,13 @@ class ReservationsRepository:
                     created_at=item[6],
                     status=item[7],
                 )
-
                 for item in results
             ]
 
             return None, data
 
-        except Exception as e:
-            logger.error(
-                "Error en find_all_reservations: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en find_all_reservations")
             return "Error al intentar obtener las reservas", None
 
         finally:
@@ -121,12 +118,8 @@ class ReservationsRepository:
                 status=result[7],
             )
 
-        except Exception as e:
-            logger.error(
-                "Error en find_reservation_by_id: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en find_reservation_by_id")
             return "Error al intentar obtener la reserva", None
 
         finally:
@@ -162,7 +155,8 @@ class ReservationsRepository:
 
         try:
             cursor.execute(
-                query, (
+                query,
+                (
                     uuid,
                     parking_id,
                     name,
@@ -170,25 +164,26 @@ class ReservationsRepository:
                     plate,
                     level,
                     start_datetime,
-                    end_datetime
+                    end_datetime,
                 ),
             )
 
             return None, True, "Reserva creada correctamente", uuid
 
-        except Exception as e:
-            logger.error(
-                "Error en create_reservation: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en create_reservation")
             return "Error al intentar crear la reserva", False, None, None
 
         finally:
             cursor.close()
 
     @staticmethod
-    def update_reservation(reservation_id: str, parking_id: str, reservation_data: UpdateReservationSchema, connection):
+    def update_reservation(
+        reservation_id: str,
+        parking_id: str,
+        reservation_data: UpdateReservationSchema,
+        connection,
+    ):
         data = reservation_data.model_dump(exclude_none=True)
 
         cursor = connection.cursor()
@@ -199,36 +194,32 @@ class ReservationsRepository:
             "user_id": "user_id",
             "start_date": "start_date",
             "end_date": "end_date",
-            "status": "status"
+            "status": "status",
         }
 
         try:
             reservations_fields = {
-                key: data[key]
-                for key in RESERVATION_FIELDS
-                if key in data
+                key: data[key] for key in RESERVATION_FIELDS if key in data
             }
 
             if reservations_fields:
                 mapped = {
-                    RESERVATION_FIELDS[key]: value for key, value in reservations_fields.items()}
+                    RESERVATION_FIELDS[key]: value
+                    for key, value in reservations_fields.items()
+                }
 
                 columns = ", ".join(f"{col} = %s" for col in mapped)
                 values = list(mapped.values()) + [parking_id, reservation_id]
 
                 cursor.execute(
                     f"UPDATE RESERVATIONS SET {columns} WHERE parking_id = %s AND uuid = %s",
-                    values
+                    values,
                 )
 
             return None, True, "Reserva actualizada correctamente"
 
-        except Exception as e:
-            logger.error(
-                "Error en update_reservation_status: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en update_reservation_status")
             return "Error al intentar actualizar la reserva", False, None
 
         finally:
@@ -251,12 +242,8 @@ class ReservationsRepository:
 
             return None, True, "Reserva eliminada correctamente"
 
-        except Exception as e:
-            logger.error(
-                "Error en delete_reservation: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en delete_reservation")
             return "Error al intentar eliminar la reserva", False, None
 
         finally:
