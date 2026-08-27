@@ -12,10 +12,7 @@ from app.features.payments.models.payments_schemas import (
 from app.middlewares.jwt_middleware import AuthPayload
 from app.middlewares.roles_middleware import require_roles
 
-router = APIRouter(
-    prefix="/api/payments",
-    tags=["Payments"]
-)
+router = APIRouter(prefix="/api/payments", tags=["Payments"])
 
 
 @router.get(
@@ -23,11 +20,10 @@ router = APIRouter(
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
         Depends(require_roles(["Admin"])),
-    ]
+    ],
 )
 def get_all_payments(
-    filters: Annotated[PaymentsFiltersSchema, Query()],
-    payload: AuthPayload
+    filters: Annotated[PaymentsFiltersSchema, Query()], payload: AuthPayload
 ):
     return PaymentsController.get_all_payments(filters, payload)
 
@@ -37,11 +33,10 @@ def get_all_payments(
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
         Depends(require_roles(["Maquina"])),
-    ]
+    ],
 )
 def calculate_payment(
-    params: Annotated[CalculatePaymentSchema, Query()],
-    payload: AuthPayload
+    params: Annotated[CalculatePaymentSchema, Query()], payload: AuthPayload
 ):
     return PaymentsController.calculate_payment(params, payload)
 
@@ -51,7 +46,7 @@ def calculate_payment(
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
         Depends(require_roles(["Admin", "Maquina"])),
-    ]
+    ],
 )
 def get_all_payment_methods():
     return PaymentsController.get_all_payment_methods()
@@ -62,12 +57,9 @@ def get_all_payment_methods():
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
         Depends(require_roles(["Admin"])),
-    ]
+    ],
 )
-def get_payments_growth(
-    period: str,
-    payload: AuthPayload
-):
+def get_payments_growth(period: str, payload: AuthPayload):
     return PaymentsController.get_payments_growth(period, payload)
 
 
@@ -76,12 +68,9 @@ def get_payments_growth(
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
         Depends(require_roles(["Admin"])),
-    ]
+    ],
 )
-def get_payments_by_plate(
-    plate_id: int,
-    payload: AuthPayload
-):
+def get_payments_by_plate(plate_id: int, payload: AuthPayload):
     return PaymentsController.get_payments_by_plate(plate_id, payload)
 
 
@@ -90,12 +79,9 @@ def get_payments_by_plate(
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
         Depends(require_roles(["Admin"])),
-    ]
+    ],
 )
-def get_payment_by_id(
-    payment_id: int,
-    payload: AuthPayload
-):
+def get_payment_by_id(payment_id: int, payload: AuthPayload):
     return PaymentsController.get_payment_by_id(payment_id, payload)
 
 
@@ -104,10 +90,7 @@ def get_payment_by_id(
     dependencies=[
         Depends(RateLimiter(times=30, seconds=60)),
         Depends(require_roles(["Maquina"])),
-    ]
+    ],
 )
-async def create_payment(
-    payment_data: CreatePaymentSchema,
-    payload: AuthPayload
-):
+async def create_payment(payment_data: CreatePaymentSchema, payload: AuthPayload):
     return await PaymentsController.create_payment(payment_data, payload)
