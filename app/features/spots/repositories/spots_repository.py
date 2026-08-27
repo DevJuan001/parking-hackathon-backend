@@ -7,7 +7,6 @@ logger = get_logger("spots.repository")
 
 
 class SpotsRepository:
-
     @staticmethod
     def find_all_spots(parking_id: str, filters_data: SpotsFiltersSchema, connection):
         data = filters_data.model_dump(exclude_none=True)
@@ -72,15 +71,15 @@ class SpotsRepository:
                     spot_status=item[3],
                     created_at=date_formatter(item[4]),
                     vehicle_type_id=item[5],
-                    plate=item[6]
+                    plate=item[6],
                 )
                 for item in results
             ]
 
             return None, spots
 
-        except Exception as e:
-            logger.error("Error en find_all_spots: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_all_spots")
             return "Error al intentar obtener las plazas", None
 
         finally:
@@ -131,12 +130,12 @@ class SpotsRepository:
                 spot_status=result[3],
                 created_at=date_formatter(result[4]),
                 vehicle_type_id=result[5],
-                plate=result[6]
+                plate=result[6],
             )
             return None, spot
 
-        except Exception as e:
-            logger.error("Error en find_spot_by_id: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_spot_by_id")
             return "Error al intentar obtener la plaza", None
 
         finally:
@@ -166,12 +165,8 @@ class SpotsRepository:
 
             return None, result[0]
 
-        except Exception as e:
-            logger.error(
-                "Error en find_spot_id_by_label: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en find_spot_id_by_label")
             return "Error al buscar la plaza por etiqueta", None
 
         finally:
@@ -201,12 +196,17 @@ class SpotsRepository:
             result = cursor.fetchone()
 
             if not result:
-                return "Lo sentimos, no hay plazas disponibles para este tipo de vehículo", None, None, None,
+                return (
+                    "Lo sentimos, no hay plazas disponibles para este tipo de vehículo",
+                    None,
+                    None,
+                    None,
+                )
 
             return None, result[0], result[1], result[2]
 
-        except Exception as e:
-            logger.error("Error en find_available_spot: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_available_spot")
             return "Error al buscar plaza disponible", None, None, None
 
         finally:
@@ -231,8 +231,8 @@ class SpotsRepository:
 
             return None, True, "Plaza registrada correctamente"
 
-        except Exception as e:
-            logger.error("Error en create_spot: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en create_spot")
             return "Error al intentar registrar la plaza", False, None
 
         finally:
@@ -255,97 +255,9 @@ class SpotsRepository:
 
             return None, True, "Estado de la plaza actualizado correctamente"
 
-        except Exception as e:
-            logger.error("Error en update_spot_status: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en update_spot_status")
             return "Error al actualizar el estado de la plaza", False, None
-
-        finally:
-            cursor.close()
-
-    @staticmethod
-    def delete_spot(parking_id: str, spot_id: int, connection):
-        cursor = connection.cursor()
-
-        query = """
-        DELETE s FROM SPOTS AS s
-        INNER JOIN FLOORS AS f
-            ON f.id = s.floor_id
-        WHERE f.parking_id = %s AND s.spot_id = %s
-        """
-
-        try:
-            cursor.execute(query, (parking_id, spot_id))
-
-            if cursor.rowcount == 0:
-                return "Plaza no encontrada", False, None
-
-            return None, True, "Plaza eliminada correctamente"
-
-        except Exception as e:
-            logger.error("Error en delete_spot: %s", e, exc_info=True)
-            return "Error al intentar eliminar la plaza", False, None
-
-        finally:
-            cursor.close()
-
-    @staticmethod
-    def count_occupied_spots_by_floor(
-        parking_id: str, floor_id: int, connection
-    ):
-        cursor = connection.cursor()
-
-        query = """
-        SELECT
-            COUNT(*)
-        FROM SPOTS AS s
-        INNER JOIN FLOORS AS f
-            ON f.id = s.floor_id
-        WHERE f.parking_id = %s AND s.floor_id = %s AND s.spot_status = 3
-        """
-
-        try:
-            cursor.execute(query, (parking_id, floor_id))
-
-            result = cursor.fetchone()
-
-            count = int(result[0]) if result and result[0] is not None else 0
-
-            return None, count
-
-        except Exception as e:
-            logger.error(
-                "Error en count_occupied_spots_by_floor: %s",
-                e,
-                exc_info=True
-            )
-            return "Error al verificar plazas ocupadas del piso", 0
-
-        finally:
-            cursor.close()
-
-    @staticmethod
-    def delete_spots_by_floor(parking_id: str, floor_id: int, connection):
-        cursor = connection.cursor()
-
-        query = """
-        DELETE s FROM SPOTS AS s
-        INNER JOIN FLOORS AS f
-            ON f.id = s.floor_id
-        WHERE f.parking_id = %s AND s.floor_id = %s
-        """
-
-        try:
-            cursor.execute(query, (parking_id, floor_id))
-
-            return None, True, "Plazas del piso eliminadas correctamente"
-
-        except Exception as e:
-            logger.error(
-                "Error en delete_spots_by_floor: %s",
-                e,
-                exc_info=True
-            )
-            return "Error al intentar eliminar las plazas del piso", False, None
 
         finally:
             cursor.close()
@@ -369,16 +281,10 @@ class SpotsRepository:
         cursor = connection.cursor()
 
         try:
-            spot_fields = {
-                key: data[key]
-                for key in SPOT_FIELDS
-                if key in data
-            }
+            spot_fields = {key: data[key] for key in SPOT_FIELDS if key in data}
 
             if spot_fields:
-                mapped = {
-                    SPOT_FIELDS[key]: value for key, value in spot_fields.items()
-                }
+                mapped = {SPOT_FIELDS[key]: value for key, value in spot_fields.items()}
 
             columns = ", ".join(f"{col} = %s" for col in mapped)
             values = list(mapped.values()) + [parking_id, spot_id]
@@ -396,9 +302,114 @@ class SpotsRepository:
 
             return None, True, "Plaza actualizada correctamente"
 
-        except Exception as e:
-            logger.error("Error en update_spot: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en update_spot")
             return "Error al actualizar la plaza", False, None
+
+        finally:
+            cursor.close()
+
+    @staticmethod
+    def delete_spot(parking_id: str, spot_id: int, connection):
+        cursor = connection.cursor()
+
+        query = """
+        DELETE s FROM SPOTS AS s
+        INNER JOIN FLOORS AS f
+            ON f.id = s.floor_id
+        WHERE f.parking_id = %s AND s.spot_id = %s
+        """
+
+        try:
+            cursor.execute(query, (parking_id, spot_id))
+
+            if cursor.rowcount == 0:
+                return "Plaza no encontrada", False, None
+
+            return None, True, "Plaza eliminada correctamente"
+
+        except Exception:
+            logger.exception("Error en delete_spot")
+            return "Error al intentar eliminar la plaza", False, None
+
+        finally:
+            cursor.close()
+
+    @staticmethod
+    def count_occupied_spots_by_floor(parking_id: str, floor_id: int, connection):
+        cursor = connection.cursor()
+
+        query = """
+        SELECT
+            COUNT(*)
+        FROM SPOTS AS s
+        INNER JOIN FLOORS AS f
+            ON f.id = s.floor_id
+        WHERE f.parking_id = %s AND s.floor_id = %s AND s.spot_status = 3
+        """
+
+        try:
+            cursor.execute(query, (parking_id, floor_id))
+
+            result = cursor.fetchone()
+
+            count = int(result[0]) if result and result[0] is not None else 0
+
+            return None, count
+
+        except Exception:
+            logger.exception("Error en count_occupied_spots_by_floor")
+            return "Error al verificar plazas ocupadas del piso", 0
+
+        finally:
+            cursor.close()
+
+    @staticmethod
+    def count_total_spots(parking_id: str, connection):
+        cursor = connection.cursor()
+
+        query = """
+        SELECT COUNT(*)
+        FROM SPOTS AS s
+        INNER JOIN FLOORS AS f
+            ON f.id = s.floor_id
+        WHERE f.parking_id = %s
+        """
+
+        try:
+            cursor.execute(query, (parking_id,))
+            result = cursor.fetchone()
+
+            count = int(result[0]) if result and result[0] is not None else 0
+
+            return None, count
+
+        except Exception:
+            logger.exception("Error en count_total_spots")
+            return "Error al contar las plazas del parking", 0
+
+        finally:
+            cursor.close()
+
+    @staticmethod
+    def delete_spots_by_floor(parking_id: str, floor_id: int, connection):
+        cursor = connection.cursor()
+
+        query = """
+        DELETE s FROM SPOTS AS s
+        INNER JOIN FLOORS AS f
+            ON f.id = s.floor_id
+        WHERE f.parking_id = %s AND s.floor_id = %s
+        """
+
+        try:
+            cursor.execute(query, (parking_id, floor_id))
+
+            return None, True, "Plazas del piso eliminadas correctamente"
+
+        except Exception:
+            logger.exception("Error en delete_spots_by_floor")
+            return "Error al intentar eliminar las plazas del piso", False, None
 
         finally:
             cursor.close()
