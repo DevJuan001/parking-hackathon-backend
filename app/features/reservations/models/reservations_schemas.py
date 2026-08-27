@@ -1,5 +1,3 @@
-
-import datetime
 from datetime import date, datetime, time
 
 from pydantic import BaseModel, EmailStr, Field
