@@ -1,4 +1,4 @@
-from datetime import date, datetime, time, timedelta
+from datetime import UTC, date, datetime, time, timedelta
 from typing import Literal
 
 from pydantic import BaseModel, field_validator
@@ -12,7 +12,7 @@ class TimeRemaining(BaseModel):
 class ParkingResponse(BaseModel):
     uuid: str
     name: str
-    country: str
+    address: str
 
 
 class ParkingPrivateResponse(BaseModel):
@@ -33,7 +33,7 @@ class ParkingPrivateResponse(BaseModel):
     def _coerce_time(cls, value):
         # mysql-connector-python devuelve TIME como timedelta; Pydantic time lo rechaza.
         if isinstance(value, timedelta):
-            return (datetime.min + value).time()
+            return (datetime(1970, 1, 1, tzinfo=UTC) + value).time()
         return value
 
 
