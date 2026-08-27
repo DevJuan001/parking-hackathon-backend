@@ -1,4 +1,7 @@
-from app.features.exits.models.exits_responses import ExitResponse
+from app.features.exits.models.exits_responses import (
+    CountExitsStatsResponse,
+    ExitResponse,
+)
 from app.features.exits.models.exits_schemas import (
     ExitsFiltersSchema,
     StatsExitsFiltersSchema,
@@ -9,7 +12,6 @@ logger = get_logger("exits.repository")
 
 
 class ExitsRepository:
-
     @staticmethod
     def find_all_exits(parking_id: str, filters_data: ExitsFiltersSchema, connection):
         cursor = connection.cursor()
@@ -73,14 +75,14 @@ class ExitsRepository:
                     plate=item[1],
                     value=item[2],
                     payment_method=item[3],
-                    created_at=item[4]
+                    created_at=item[4],
                 )
                 for item in results
             ]
             return None, exits
 
-        except Exception as e:
-            logger.error("Error en find_all_exits: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_all_exits")
             return "Error al intentar obtener las salidas", None
 
         finally:
@@ -123,11 +125,11 @@ class ExitsRepository:
                 plate=result[1],
                 value=result[2],
                 payment_method=result[3],
-                created_at=result[4]
+                created_at=result[4],
             )
 
-        except Exception as e:
-            logger.error("Error en find_exit_by_id: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_exit_by_id")
             return "Error al intentar obtener la salida", None
 
         finally:
@@ -170,14 +172,14 @@ class ExitsRepository:
                     plate=item[1],
                     value=item[2],
                     payment_method=item[3],
-                    created_at=item[4]
+                    created_at=item[4],
                 )
                 for item in results
             ]
             return None, exits
 
-        except Exception as e:
-            logger.error("Error en find_exits_by_plate: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_exits_by_plate")
             return "Error al intentar obtener las salidas de la placa", None
 
         finally:
@@ -223,11 +225,11 @@ class ExitsRepository:
                 plate=result[1],
                 value=result[2],
                 payment_method=result[3],
-                created_at=result[4]
+                created_at=result[4],
             )
 
-        except Exception as e:
-            logger.error("Error en find_latest_exit: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_latest_exit")
             return "Error al buscar la última salida", None
 
         finally:
@@ -246,8 +248,8 @@ class ExitsRepository:
             cursor.execute(query, (parking_id, plate_id))
             return None, True, "Salida registrada correctamente"
 
-        except Exception as e:
-            logger.error("Error en create_exit: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en create_exit")
             return "Error al intentar registrar la salida", False, None
 
         finally:
@@ -289,15 +291,15 @@ class ExitsRepository:
             cursor.execute(query, values)
             result = cursor.fetchone()
 
-            return None, {
-                "total": int(result[0] or 0),
-                "today": int(result[1] or 0),
-                "this_week": int(result[2] or 0),
-                "this_month": int(result[3] or 0)
-            }
+            return None, CountExitsStatsResponse(
+                total=int(result[0] or 0),
+                today=int(result[1] or 0),
+                this_week=int(result[2] or 0),
+                this_month=int(result[3] or 0),
+            )
 
-        except Exception as e:
-            logger.error("Error en count_exit_stats: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en count_exit_stats")
             return "Error al intentar obtener las estadisticas de salidas", None
 
         finally:
