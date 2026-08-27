@@ -26,6 +26,3 @@ def get_connection():
         logger.exception("Error al intentar conectar con la base de datos")
 
         return None
-
-
-get_connection()
