@@ -5,14 +5,15 @@ from app.features.entries.models.entries_schemas import (
     EntriesFiltersSchema,
 )
 from app.features.entries.services.entries_service import EntriesService
+from app.middlewares.jwt_middleware import AuthPayload
 
 
 class EntriesController:
 
     @staticmethod
-    def get_all_entries(filters: EntriesFiltersSchema, payload: dict):
+    def get_all_entries(filters: EntriesFiltersSchema, payload: AuthPayload):
         error, entries = EntriesService.get_all_entries(
-            str(payload["parking_id"]),
+            payload.parking_id,
             filters
         )
 
@@ -24,9 +25,9 @@ class EntriesController:
         }
 
     @staticmethod
-    def get_entry_by_id(entry_id: int, payload: dict):
+    def get_entry_by_id(entry_id: int, payload: AuthPayload):
         error, entry = EntriesService.get_entry_by_id(
-            str(payload["parking_id"]),
+            payload.parking_id,
             entry_id
         )
 
@@ -38,9 +39,9 @@ class EntriesController:
         }
 
     @staticmethod
-    def get_entries_by_plate(plate_id: int, payload: dict):
+    def get_entries_by_plate(plate_id: int, payload: AuthPayload):
         error, entries = EntriesService.get_entries_by_plate(
-            str(payload["parking_id"]),
+            payload.parking_id,
             plate_id
         )
 
@@ -52,9 +53,9 @@ class EntriesController:
         }
 
     @staticmethod
-    def get_recent_entries(payload: dict):
+    def get_recent_entries(payload: AuthPayload):
         error, entries = EntriesService.get_recent_entries(
-            str(payload["parking_id"])
+            payload.parking_id
         )
 
         if error:
@@ -65,9 +66,9 @@ class EntriesController:
         }
 
     @staticmethod
-    def get_entry_stats(payload: dict):
+    def get_entry_stats(payload: AuthPayload):
         error, stats = EntriesService.get_entry_stats(
-            str(payload["parking_id"])
+            payload.parking_id
         )
 
         if error:
@@ -78,9 +79,9 @@ class EntriesController:
         }
 
     @staticmethod
-    async def create_entry(entry_data: CreateEntrySchema, payload: dict):
+    async def create_entry(entry_data: CreateEntrySchema, payload: AuthPayload):
         error, success, message = await EntriesService.create_entry(
-            str(payload["parking_id"]),
+            payload.parking_id,
             entry_data
         )
 
