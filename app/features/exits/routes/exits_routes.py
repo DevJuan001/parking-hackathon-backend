@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Query
 from fastapi_limiter.depends import RateLimiter
 
 from app.features.exits.controllers.exits_controller import ExitsController
@@ -7,7 +9,7 @@ from app.features.exits.models.exits_schemas import (
     ExitsFiltersSchema,
     StatsExitsFiltersSchema,
 )
-from app.middlewares.jwt_middleware import verify_jwt
+from app.middlewares.jwt_middleware import AuthPayload
 from app.middlewares.roles_middleware import require_roles
 
 router = APIRouter(
@@ -24,8 +26,8 @@ router = APIRouter(
     ]
 )
 def get_all_exits(
-    filters: ExitsFiltersSchema = Depends(),
-    payload: dict = Depends(verify_jwt)
+    filters: Annotated[ExitsFiltersSchema, Query()],
+    payload: AuthPayload
 ):
     return ExitsController.get_all_exits(filters, payload)
 
@@ -39,7 +41,7 @@ def get_all_exits(
 )
 def get_exits_by_plate(
     plate_id: int,
-    payload: dict = Depends(verify_jwt)
+    payload: AuthPayload
 ):
     return ExitsController.get_exits_by_plate(plate_id, payload)
 
@@ -52,8 +54,8 @@ def get_exits_by_plate(
     ]
 )
 def get_exit_stats(
-    filters: StatsExitsFiltersSchema = Depends(),
-    payload: dict = Depends(verify_jwt)
+    filters: Annotated[StatsExitsFiltersSchema, Query()],
+    payload: AuthPayload
 ):
     return ExitsController.get_exit_stats(filters, payload)
 
@@ -67,7 +69,7 @@ def get_exit_stats(
 )
 def get_exit_by_id(
     exit_id: int,
-    payload: dict = Depends(verify_jwt)
+    payload: AuthPayload
 ):
     return ExitsController.get_exit_by_id(exit_id, payload)
 
@@ -80,6 +82,6 @@ def get_exit_by_id(
 )
 async def create_exit(
     exit_data: CreateExitSchema,
-    payload: dict = Depends(verify_jwt)
+    payload: AuthPayload
 ):
     return await ExitsController.create_exit(exit_data, payload)
