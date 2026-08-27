@@ -53,8 +53,8 @@ def calculate_payment(
         Depends(require_roles(["Admin", "Maquina"])),
     ]
 )
-def get_all_payment_methods(payload: AuthPayload):
-    return PaymentsController.get_all_payment_methods(payload)
+def get_all_payment_methods():
+    return PaymentsController.get_all_payment_methods()
 
 
 @router.get(
