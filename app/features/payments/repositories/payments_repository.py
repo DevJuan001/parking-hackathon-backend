@@ -1,4 +1,5 @@
 from app.features.payments.models.payments_responses import (
+    CountPaymentsStatsResponse,
     PaymentMethodResponse,
     PaymentResponse,
     PaymentsGrowthResponse,
@@ -11,7 +12,6 @@ logger = get_logger("payments.repository")
 
 
 class PaymentsRepository:
-
     @staticmethod
     def find_all_payments(parking_id: str, connection):
         cursor = connection.cursor()
@@ -42,14 +42,14 @@ class PaymentsRepository:
                     spot=item[2],
                     value=item[3],
                     created_at=date_formatter(item[4]),
-                    payment_method=item[5]
+                    payment_method=item[5],
                 )
                 for item in results
             ]
             return None, payments
 
-        except Exception as e:
-            logger.error("Error en find_all_payments: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_all_payments")
             return "Error al intentar obtener los pagos", None
 
         finally:
@@ -86,12 +86,12 @@ class PaymentsRepository:
                 spot=result[2],
                 value=result[3],
                 created_at=date_formatter(result[4]),
-                payment_method=result[5]
+                payment_method=result[5],
             )
             return None, payment
 
-        except Exception as e:
-            logger.error("Error en find_payment_by_id: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_payment_by_id")
             return "Error al intentar obtener el pago", None
 
         finally:
@@ -127,18 +127,14 @@ class PaymentsRepository:
                     spot=item[2],
                     value=item[3],
                     created_at=date_formatter(item[4]),
-                    payment_method=item[5]
+                    payment_method=item[5],
                 )
                 for item in results
             ]
             return None, payments
 
-        except Exception as e:
-            logger.error(
-                "Error en find_payments_by_plate: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en find_payments_by_plate")
             return "Error al intentar obtener los pagos de la placa", None
 
         finally:
@@ -152,7 +148,7 @@ class PaymentsRepository:
         spot_id: int,
         value: float,
         payment_method_id: str,
-        connection
+        connection,
     ):
         cursor = connection.cursor()
 
@@ -170,19 +166,12 @@ class PaymentsRepository:
 
         try:
             cursor.execute(
-                query, (
-                    uuid,
-                    parking_id,
-                    plate_id,
-                    spot_id,
-                    value,
-                    payment_method_id
-                )
+                query, (uuid, parking_id, plate_id, spot_id, value, payment_method_id)
             )
             return None, True, "Pago registrado correctamente"
 
-        except Exception as e:
-            logger.error("Error en create_payment: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en create_payment")
             return "Error al intentar registrar el pago", False, None
 
         finally:
@@ -206,19 +195,13 @@ class PaymentsRepository:
             results = cursor.fetchall()
 
             methods = [
-                PaymentMethodResponse(
-                    id=item[0],
-                    name=item[1],
-                    icon=item[2]
-                )
+                PaymentMethodResponse(id=item[0], name=item[1], icon=item[2])
                 for item in results
             ]
             return None, methods
 
-        except Exception as e:
-            logger.error(
-                "Error en find_all_payment_methods: %s", e, exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en find_all_payment_methods")
             return "Error al intentar obtener los metodos de pago", None
 
         finally:
@@ -257,17 +240,13 @@ class PaymentsRepository:
             results = cursor.fetchall()
 
             data = [
-                PaymentsGrowthResponse(
-                    date=item[0],
-                    value=item[1]
-                )
-                for item in results
+                PaymentsGrowthResponse(date=item[0], value=item[1]) for item in results
             ]
 
             return None, data
 
-        except Exception as e:
-            logger.error("Error en find_products_growth: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en find_products_growth")
             return "Error al intentar obtener el crecimento de los productos", None
 
         finally:
@@ -297,15 +276,15 @@ class PaymentsRepository:
             cursor.execute(query, (parking_id,))
             result = cursor.fetchone()
 
-            return None, {
-                "total": float(result[0] or 0),
-                "today": float(result[1] or 0),
-                "this_week": float(result[2] or 0),
-                "this_month": float(result[3] or 0)
-            }
+            return None, CountPaymentsStatsResponse(
+                total=float(result[0] or 0),
+                today=float(result[1] or 0),
+                this_week=float(result[2] or 0),
+                this_month=float(result[3] or 0),
+            )
 
-        except Exception as e:
-            logger.error("Error en sum_payment_stats: %s", e, exc_info=True)
+        except Exception:
+            logger.exception("Error en sum_payment_stats")
             return "Error al intentar obtener las estadisticas de pagos", None
 
         finally:

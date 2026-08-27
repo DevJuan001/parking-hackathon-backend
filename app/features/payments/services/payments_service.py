@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from app.core.database import get_connection
 from app.core.exception import ServiceError
@@ -22,7 +22,6 @@ logger = get_logger("payments.service")
 
 
 class PaymentsService:
-
     @staticmethod
     def get_all_payments(parking_id: str, filters: PaymentsFiltersSchema):
         connection = get_connection()
@@ -40,12 +39,8 @@ class PaymentsService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_all_payments: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_all_payments")
             return "Error al intentar obtener los pagos", None
 
         finally:
@@ -68,12 +63,8 @@ class PaymentsService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_payment_by_id: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_payment_by_id")
             return "Error al intentar obtener el pago", None
 
         finally:
@@ -96,12 +87,8 @@ class PaymentsService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_payments_by_plate: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_payments_by_plate")
             return "Error al intentar obtener los pagos de la placa", None
 
         finally:
@@ -124,12 +111,8 @@ class PaymentsService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_payments_growth: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_payments_growth")
             return "Error al intentar obtener el crecimiento de los pagos", None
 
         finally:
@@ -140,9 +123,7 @@ class PaymentsService:
         connection = get_connection()
 
         try:
-            error, methods = PaymentsRepository.find_all_payment_methods(
-                connection
-            )
+            error, methods = PaymentsRepository.find_all_payment_methods(connection)
 
             if error:
                 raise ServiceError(error)
@@ -152,12 +133,8 @@ class PaymentsService:
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en get_all_payment_methods: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en get_all_payment_methods")
             return "Error al intentar obtener los metodos de pago", None
 
         finally:
@@ -176,7 +153,8 @@ class PaymentsService:
 
             if error or not plate_data:
                 raise ServiceError(
-                    error or "No se encontro esta placa, revisa que este escrita correctamente e intentalo de nuevo"
+                    error
+                    or "No se encontro esta placa, revisa que este escrita correctamente e intentalo de nuevo"
                 )
 
             plate_id = plate_data[0].id
@@ -187,9 +165,7 @@ class PaymentsService:
             )
 
             if error or not entry:
-                raise ServiceError(
-                    error or "No se encontró un ingreso para esta placa"
-                )
+                raise ServiceError(error or "No se encontró un ingreso para esta placa")
 
             entry_time = entry.created_at
 
@@ -201,16 +177,12 @@ class PaymentsService:
                 raise ServiceError(error)
 
             if latest_exit and latest_exit.created_at >= entry_time:
-                raise ServiceError(
-                    "El vehiculo ya tiene una salida registrada"
-                )
+                raise ServiceError("El vehiculo ya tiene una salida registrada")
 
-            exit_time = datetime.now()
+            exit_time = datetime.now(UTC)
 
             if exit_time <= entry_time:
-                raise ServiceError(
-                    "La hora actual es anterior a la hora de ingreso"
-                )
+                raise ServiceError("La hora actual es anterior a la hora de ingreso")
 
             diff = exit_time - entry_time
 
@@ -234,18 +206,14 @@ class PaymentsService:
                 exit_time=exit_time,
                 hours_parked=hours_parked,
                 rate_value=rate_value,
-                total=total
+                total=total,
             )
 
         except ServiceError as e:
             return e.message, None
 
-        except Exception as e:
-            logger.error(
-                "Error en calculate_payment: %s",
-                e,
-                exc_info=True
-            )
+        except Exception:
+            logger.exception("Error en calculate_payment")
             return "Error al calcular el pago", None
 
         finally:
@@ -273,9 +241,7 @@ class PaymentsService:
             )
 
             if error or not entry:
-                raise ServiceError(
-                    error or "No se encontró un ingreso para esta placa"
-                )
+                raise ServiceError(error or "No se encontró un ingreso para esta placa")
 
             entry_time = entry.created_at
 
@@ -287,9 +253,7 @@ class PaymentsService:
                 raise ServiceError(error)
 
             if latest_exit and latest_exit.created_at >= entry_time:
-                raise ServiceError(
-                    "El vehiculo ya tiene una salida registrada"
-                )
+                raise ServiceError("El vehiculo ya tiene una salida registrada")
 
             exit_time = payment_data.exit_time
 
@@ -312,23 +276,17 @@ class PaymentsService:
             value_raw = round(hours_parked * rate.value, 2)
 
             if value_raw < 0:
-                raise ServiceError(
-                    "El valor calculado del pago es invalido"
-                )
+                raise ServiceError("El valor calculado del pago es invalido")
 
             value = round_up_to_next_50(value_raw)
 
             error, success, _message = ExitsRepository.create_exit(
-                parking_id=parking_id,
-                plate_id=plate_id,
-                connection=connection
+                parking_id=parking_id, plate_id=plate_id, connection=connection
             )
 
             if error or not success:
-                raise ServiceError(
-                    error or "Error al intentar crear la salida"
-                )
-                
+                raise ServiceError(error or "Error al intentar crear la salida")
+
             uuid = generate_uuid()
 
             error, success, _message = PaymentsRepository.create_payment(
@@ -338,7 +296,7 @@ class PaymentsService:
                 spot_id=entry.spot_id,
                 value=value,
                 payment_method_id=payment_data.payment_method,
-                connection=connection
+                connection=connection,
             )
 
             if error or not success:
@@ -350,9 +308,7 @@ class PaymentsService:
                 )
 
                 if error or not success:
-                    raise ServiceError(
-                        error or "Error al liberar la plaza"
-                    )
+                    raise ServiceError(error or "Error al liberar la plaza")
 
             connection.commit()
 
@@ -362,13 +318,9 @@ class PaymentsService:
             connection.rollback()
             return e.message, False, None
 
-        except Exception as e:
+        except Exception:
             connection.rollback()
-            logger.error(
-                "Error en create_payment: %s",
-                e,
-                exc_info=True
-            )
+            logger.exception("Error en create_payment")
             return "Error al intentar registrar el pago", False, None
 
         finally:
